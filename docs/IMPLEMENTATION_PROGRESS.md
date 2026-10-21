@@ -117,3 +117,112 @@ An attempted additional push to the new origin fork was rejected by automatic ap
 **Blockers:** none for D01.1. Product implementation, clean-install validation, release evidence, independent review, adoption and a fresh scoring baseline remain future work rather than blockers to this planning task.
 
 **Next task: D01.2**, not started. D01.3 and all later tasks remain unfinished.
+
+## 2026-10-21 — D01.2: repository structure, README, license and task labels
+
+**Status: completed.** Selected explicitly by the user after D01.1 verification. D01.3 and all later tasks remain unstarted.
+
+### Inspection and scope
+
+- Read the authoritative Next.js/Express plan, project brief, entire growth checklist and existing progress history. No applicable AGENTS.md or TASK_BOARD.md was present.
+- Starting commit: `d2adcba`; branch: `main`; initial worktree/index: clean. Company `upstream/main` matched local HEAD. Existing `origin` points to the `empwebdev` fork and is not a publication target for this task; both remotes and Git identity settings were preserved.
+- D01.1 remains complete. Its four open milestone issues were reused rather than duplicated. Their titles, bodies, states and 28 unchecked release criteria were preserved; only their matching release labels were added.
+- This is a repository foundation change. No dependency installation, package manifest, runtime pin, lockfile, application source, fixture, container, CI workflow or later feature was introduced.
+- The aggregate Day 01 bootstrap acceptance remains pending D01.3 and the later application setup. README clone/inspection commands are real; application install/run commands are explicitly unavailable.
+
+### Changes and decisions
+
+| Path(s) | Result |
+|---|---|
+| `apps/web/src/{app,features,components,lib}/` | Empty tracked boundaries for Next.js App Router, interactive features, shared components and API/query helpers |
+| `apps/api/src/`, `apps/worker/src/` | Empty tracked boundaries for separate Express services and background worker |
+| `packages/contracts/`, `packages/test-data/`, `tests/e2e/`, `infra/` | Empty tracked boundaries for later shared schemas, synthetic fixtures, browser checks and deployment config |
+| [README.md](../README.md) | Clear problem/users, truthful current status, real clone commands, architecture/layout, first-release scope, four existing milestone links and documentation entry points |
+| [LICENSE](../LICENSE) | Standard MIT text, copyright 2026 Empiric Infotech LLP |
+| [.gitignore](../.gitignore) | Excludes local secrets/environment files, dependencies and generated Next.js/build/test output; permits placeholder environment examples |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | Initial task-selection, issue, verification, authorship, review and label guidance; application setup/checks explicitly deferred |
+| [.github/labels.json](../.github/labels.json), [.github/README.md](../.github/README.md) | Local manifest and usage notes for the verified live task labels |
+| [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) | Marked only D01.2 newly complete and linked its repository/label evidence |
+| [PROJECT_BRIEF.md](PROJECT_BRIEF.md) | Updated foundation status, license/setup reference and next-task handoff without changing the product contract |
+| [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) | Appended this record; all D01.1 history retained |
+
+There are ten empty `.gitkeep` placeholders; existing `docs/` and the populated `.github/` do not need placeholders. Empty directories reserve architecture boundaries rather than pretend that applications exist.
+
+**License decision:** MIT supports the intended public, self-hostable tool and straightforward reuse/contributions while retaining copyright/license notices. The standard text and conditions were checked against [GitHub's MIT reference](https://choosealicense.com/licenses/mit/). No dependency licenses were assessed because dependency selection belongs to D01.3.
+
+### Live task-label configuration
+
+Verified at [company repository labels](https://github.com/empiricinfotech/webhook-inbox/labels):
+
+- Added area labels: `api`, `web`, `worker`, `docs`, `tests`.
+- Reused existing `bug` without changing its color or description.
+- Added `milestone:v0.1`, `milestone:v0.2`, `milestone:v0.3`, `milestone:v1.0`.
+- Retained all ten existing default labels. Nine new labels bring the repository total to nineteen.
+- Added the corresponding release label to [#1](https://github.com/empiricinfotech/webhook-inbox/issues/1), [#2](https://github.com/empiricinfotech/webhook-inbox/issues/2), [#3](https://github.com/empiricinfotech/webhook-inbox/issues/3) and [#4](https://github.com/empiricinfotech/webhook-inbox/issues/4) using additive updates only.
+- Live names, colors and descriptions match the ten-entry manifest. No label-sync automation or new planning issues were created.
+
+### Verification results
+
+- **Pass:** all twelve directory paths in the source plan's repository-structure block exist and have tracked content; the ten placeholder files are empty.
+- **Pass:** README describes actual repository capabilities and the planned Next.js frontend/Express API boundary, points to the canonical company clone URL, and explicitly defers runnable install/build/test commands.
+- **Pass:** standard MIT grant, notice condition and warranty/liability terms are intact with the selected holder/year.
+- **Pass:** all ten task-label names, descriptions and colors were checked against the live GitHub page. Four labeled issue snapshots retain their original titles/bodies and remain open with release criteria pending.
+- **Pass:** local Markdown link targets and anchors, code fences, JSON label schema/uniqueness and milestone links were checked. Backlog retains 120 unique task entries; only D01.1 and D01.2 are checked.
+- **Pass:** `git check-ignore --no-index` cases confirm nested environment/private-key files and generated artifacts are ignored, while placeholder environment examples, source paths, lockfiles and repository documentation can be tracked.
+- **Pass:** `git diff --check`, `git diff --cached --check` and staged-file review found no whitespace errors, real secret values, application implementation or unrelated changes. Existing Git name/email and both remote URLs were retained.
+- **Not applicable:** application builds, runtime compatibility, application tests, capture journeys or deployment checks. No runnable application exists; no such checks are claimed.
+
+Documentation/structure checks used a temporary Python standard-library script (`python3 /tmp/webhook-d012-check.py`). No new test suite or verification dependency was added. GitHub label creation used the signed-in WebDev Empiric Chrome profile because the connector exposes label assignment but not label creation; issue labels and publication used the company GitHub connector.
+
+### Growth-checklist evaluation for this run
+
+Read and evaluated every checkpoint. The numbering below follows checkbox order within the original checklist. Completed items apply only to this foundation increment; no full release/adoption phase is permanently complete.
+
+| Phase | Status | Completed work and remaining limits |
+|---|---|---|
+| 0: scope/baseline | Pending | Existing public scope, account and attribution preserved; runnable usefulness and fresh scoring data still pending |
+| 1: usable repository | Pending | README, structure, MIT license, initial contribution guide and roadmap now exist; installation, examples and clean-user setup remain pending |
+| 2: plan an improvement | Completed for this run | Explicit D01.2 need/scope, duplicate search, existing issues and acceptance checks; bug reproduction not applicable |
+| 3: build/check/review/merge | Pending | Documentation/structure/label checks completed and self-reviewed; application implementation and independent PR review not claimed |
+| 4: release | Pending | Issue reporting route exists; no installable release, version/tag, demo or release evidence |
+| 5: discovery/adoption | Pending | Public repository/roadmap links exist; promotion, user trials and adoption await usable software |
+| 6: maintenance | Not applicable beyond issue inspection | Existing milestone issues inspected and preserved; no application dependencies, defects or upstream fix involved |
+| 7: longitudinal review | Pending | Next task identified; no fresh scan, score gain or multi-year history established |
+
+| Checkpoint(s) | Status | Evidence or reason |
+|---|---|---|
+| 0.1, 0.2, 0.4, 0.5 | Completed for this run | Existing public product scope/account retained; no private data published or Git identity altered |
+| 0.3, 0.6, 0.7 | Pending | Runnable usefulness and a fresh six-category scan/status remain unverified |
+| 1.1 description/topics | Pending | Existing description retained; topics not changed in this task |
+| 1.2 README | Completed for this run | Problem, users, actual foundation status, architecture and scope are explicit |
+| 1.3 install/run; 1.4 runtime/dependencies | Pending | Real clone commands exist; runtime pinning and runnable setup are later tasks |
+| 1.5 example/demo; 1.6 sample config | Pending | No runnable sample, demonstration or environment schema exists yet |
+| 1.7 license | Completed for this run | MIT text and copyright holder/year added |
+| 1.8 contribution instructions | Pending | Initial documentation/review guidance exists; runnable developer setup and application checks still pending |
+| 1.9 roadmap | Completed for this run | Four existing release issues and acceptance criteria linked without claiming completion |
+| 1.10 fresh-user install | Pending | Needs implemented software and an independent setup attempt |
+| 2.1 need, 2.2 duplicate search, 2.3 useful tracking, 2.4 result, 2.6 criteria, 2.7 scope | Completed for this run | Repository entry points and organization were missing; existing four issues reused, task scope/verification recorded |
+| 2.5 bug reproduction | Not applicable | Repository setup rather than a defect fix |
+| 3.1 complete PR; 3.3 review feedback | Not applicable | Authorized current-branch documentation workflow; no PR or external review fabricated |
+| 3.2 relevant behavior, 3.4 attribution/links | Completed for this run | Structure, ignore rules, docs and live labels checked; authorship/settings preserved |
+| 3.5 merged result | Pending | No application/merged-PR behavior exists to validate |
+| Phase 3 numbered workflow | Not applicable beyond this foundation | Scoped implementation, documentation, self-verification and publication performed; no app tests, independent review or milestone closure claimed |
+| 4.1–4.7 installation, examples, release/tag/notes, distributable, demo, release link | Pending | No runnable release exists |
+| 4.8 problem reporting route | Completed for this run | README and contribution guide link existing issues and explain safe reporting |
+| 5.1, 5.2, 5.4–5.8 pin/tutorial/sharing/trials/support/contributor work/review | Pending | No outreach, user results or outside contributions in this task |
+| 5.3 code/install links | Pending | Canonical clone/code links exist; executable installation instructions remain future work |
+| 6.1 triage | Completed for this run | Inspected four existing milestone issues and applied only matching release labels |
+| 6.2 bug prioritization; 6.3–6.8 maintenance/examples/releases/dependency diagnosis/upstream work | Not applicable | No reported defect, application dependency or upstream problem exists in this increment |
+| 7.1–7.5 outcomes/scans/categories/comparisons/investigation | Pending | No fresh user outcomes or scoring evidence collected |
+| 7.6 next useful improvement | Completed for this run | D01.3 identified, not started |
+| 7.7 multi-year maintenance | Pending | Requires continued real work over time |
+
+The reusable PR checklist's problem/change/verification/issue references are covered here. Application tests are not applicable, self-review is documented and independent review is not claimed. No adoption, development, runtime compatibility or GHFind score improvement was invented.
+
+### Publication and handoff
+
+D01.2 changes are staged selectively and published to the authorized company repository `empiricinfotech/webhook-inbox` on `main` using the GitHub connector, then synchronized locally from `upstream/main`. The `origin` fork is outside this publication; its configuration is preserved and no push to it is attempted. Final commit hash and remote verification are supplied in the run report; `git rev-parse HEAD upstream/main` and `git ls-remote upstream refs/heads/main` verify the resulting commit.
+
+**Blockers:** none for D01.2. Bootstrap/application checks, sample configuration, independent review and future release/growth evidence remain pending rather than being claimed complete.
+
+**Next task: D01.3**, not started. Stop after D01.2.

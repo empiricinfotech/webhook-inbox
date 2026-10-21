@@ -1,0 +1,52 @@
+[
+  {
+    "name": "api",
+    "color": "0366d6",
+    "description": "Express management API, capture routes, and backend services"
+  },
+  {
+    "name": "web",
+    "color": "1d76db",
+    "description": "Next.js App Router frontend, layouts, and client interactions"
+  },
+  {
+    "name": "worker",
+    "color": "5319e7",
+    "description": "Background replay jobs, retention cleanup, and recovery"
+  },
+  {
+    "name": "docs",
+    "color": "0075ca",
+    "description": "Project documentation, examples, and contribution guidance"
+  },
+  {
+    "name": "tests",
+    "color": "0e8a16",
+    "description": "Unit, API, browser, worker, and operational verification"
+  },
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Something isn't working"
+  },
+  {
+    "name": "milestone:v0.1",
+    "color": "bfd4f2",
+    "description": "Local preview: capture, inspect, and delete synthetic events"
+  },
+  {
+    "name": "milestone:v0.2",
+    "color": "c5def5",
+    "description": "Authenticated beta: private workspaces, expiry, and GitHub signatures"
+  },
+  {
+    "name": "milestone:v0.3",
+    "color": "d4c5f9",
+    "description": "Team and replay beta: roles, collaboration, and controlled dispatch"
+  },
+  {
+    "name": "milestone:v1.0",
+    "color": "c2e0c6",
+    "description": "Public release: comparison, exports, self-hosting, and recovery"
+  }
+]

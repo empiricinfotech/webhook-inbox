@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Next.js and compiled application output
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+
+# Verification output
+coverage/
+playwright-report/
+test-results/
+
+# Local environment and credentials; allow placeholder examples
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db
