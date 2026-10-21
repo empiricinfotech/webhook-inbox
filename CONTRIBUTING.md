@@ -6,7 +6,7 @@ The repository is in its foundation stage. Read the [README](README.md), [projec
 
 Search existing issues and PRs before opening anything new. The four existing milestone issues track release outcomes, not completed implementation. Keep their acceptance checks pending until evidence supports them.
 
-Use the next eligible task in the plan and finish its prerequisites first. Keep one implementation task in progress per developer, reference its task ID and stop at the agreed scope. D01.3 is next; runtime selection and package compatibility have not been performed.
+Use the next eligible task in the plan and finish its prerequisites first. Keep one implementation task in progress per developer, reference its task ID and stop at the agreed scope. D01.3 pins Node.js 24.22.0, npm 11.19.1 and the foundation dependencies. D02.1 is next; product application startup has not been implemented.
 
 Create an issue when useful using these fields:
 
@@ -19,19 +19,26 @@ A bug report should include reproducible steps, expected behavior and observed b
 
 ## Development setup today
 
-Clone the repository using the README commands. No package manager, dependency manifest, bootstrap script or runnable application is available yet. Runtime/package selection belongs to D01.3; application startup and test tooling arrive in later foundation tasks. Do not invent commands to fill this gap.
-
-The directory placeholders follow the Next.js frontend, separate Express API, MongoDB and worker boundaries. Put authorization and persistence in the backend services rather than frontend-only route checks.
-
-For a documentation-only change, review relative links and scope statements and run:
+Use the [README](README.md) to clone the repository and activate Node.js 24.22.0 with npm 11.19.1. The complete exact-version matrix and supported verification scope are in [docs/TOOLCHAIN.md](docs/TOOLCHAIN.md).
 
 ```bash
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
 git diff --check
 git diff --cached --check
 git status --short
 ```
 
-Stage only the intended files. As meaningful application checks are introduced, document and run the relevant lint, typecheck, build and test commands; none are claimed to exist now.
+Bootstrap installs the locked dependencies of all five private workspaces. Dependency checks validate the resolved package tree and exercise library imports with synthetic in-memory values; they do not start an application or connect to MongoDB.
+
+Preserve `package-lock.json` and use `npm ci` for repeatable installs. Add or update an exact dependency only when it belongs to the selected task, and regenerate the lockfile with the pinned npm version. Recheck engines, peers, dependency smoke behavior, affected application checks and package licenses when changing the baseline.
+
+An exact `esbuild@0.28.2` install-script allowance is recorded for the tsx toolchain. Review script-policy changes when a dependency update introduces or changes a lifecycle script; do not replace the policy with a blanket allowance.
+
+The source directories still reserve the Next.js frontend, separate Express API, MongoDB and worker boundaries. No dev server, application build/typecheck/lint scripts, database configuration or application test harness exists yet. Those belong to their planned tasks; do not invent successful application checks at this stage.
+
+Stage only the intended files and preserve unrelated work and Git identity settings. For documentation-only edits, use relevant link/content/whitespace checks; run the dependency checks when manifests or the lockfile change.
 
 ## Issue labels
 

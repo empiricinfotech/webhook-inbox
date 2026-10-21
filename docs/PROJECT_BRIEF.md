@@ -2,7 +2,7 @@
 
 Task: **D01.1**. Planning baseline: [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md), version 1.1, 21 October 2026, especially sections 1, 2, 3, 7 and 8.
 
-This brief defines the product contract and four future release outcomes. D01.2 has added the repository layout, README, MIT license and task labels; the application, sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
+This brief defines the product contract and four future release outcomes. D01.2 added the repository layout, README, MIT license and task labels; D01.3 added the pinned toolchain, dependency manifests and lockfile. The application, sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
 
 ## Problem and intended outcome
 
@@ -64,9 +64,9 @@ Replay sends stored sanitized content only to an explicitly configured, operator
 - The Next.js dashboard calls the same-origin **/api/v1** management API. Providers send capture requests directly to Express so original bytes remain available for later signature verification.
 - Use revocable database-backed browser sessions and a separate Node worker with durable Mongo job records. v1.0 has no Redis requirement or raw-payload vault.
 - Initial hosted beta uses one Next.js instance, one API and one worker; shared live fan-out and distributed limits are later work. Private dashboard data must not enter shared caches.
-- Node.js 24 LTS is the source plan's proposed baseline. Runtime/package-manager selection, compatible versions and a lockfile remain **D01.3** work; no compatibility or installation check has been performed for D01.1.
+- D01.3 pins Node.js 24.22.0 and npm 11.19.1, with exact workspace dependencies and a frozen lockfile. [Toolchain evidence](TOOLCHAIN.md) records clean dependency bootstrap, strict resolution, runtime/type smoke checks and an isolated Next.js build; this is not verification of a product application.
 - One developer with working MERN knowledge is assumed to spend approximately 5–6 focused hours per development day, totaling 200–240 hours across 40 development days. Day ranges are estimates, not calendar deadlines.
-- D01.2 established the repository layout, README, MIT license and task labels. See [README.md](../README.md) and [CONTRIBUTING.md](../CONTRIBUTING.md) for the current foundation. Runtime/package selection remains D01.3 work.
+- D01.2 established the repository layout, README, MIT license and task labels. See [README.md](../README.md) and [CONTRIBUTING.md](../CONTRIBUTING.md) for the current foundation. The current toolchain/dependency baseline is recorded in [TOOLCHAIN.md](TOOLCHAIN.md).
 - Empiric Infotech owns the public repository and `empiricinfotech` is the account whose public evidence is to be tracked. No fresh GHFind scan, adoption, independent review or score improvement is claimed.
 
 ## Four release milestones and acceptance criteria
@@ -157,4 +157,4 @@ Tasks: D31.1–D40.3. v0.3 acceptance and D30 complete; D40 also requires D38 co
 
 D01.1 is complete when this user/problem/journey/scope contract and all four published planning issues are verified against the source plan. See [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) for the checks and checkpoint evaluation.
 
-The Day 01 acceptance also mentions a runnable repository bootstrap command. That is an aggregate acceptance for all three Day 01 tasks and remains pending; this planning task does not supply or claim a bootstrap command. **D01.2** is complete. **D01.3** is next and has not been started.
+The aggregate Day 01 acceptance is now supported by the documented first-release scope and the dependency-only `npm run bootstrap` command verified in D01.3. D01.1, D01.2 and D01.3 are complete. Product application startup remains D02.1 work; D02.1 is next and has not been started.

@@ -616,7 +616,7 @@ Prerequisite: None. Modules: M01 M18. Planned effort: 5 to 6 hours.
 
 - [x] **D01.2** Create the public repository structure, README skeleton, license choice and task labels. [Repository guide](../README.md) and [task labels](../.github/README.md).
 
-- [ ] **D01.3** Pin the runtime and package manager; confirm library compatibility and commit the lockfile.
+- [x] **D01.3** Pin the runtime and package manager; confirm library compatibility and commit the lockfile. [Toolchain and dependency evidence](TOOLCHAIN.md).
 
 **Acceptance:** A developer can identify the first release scope and run the repository bootstrap command.
 

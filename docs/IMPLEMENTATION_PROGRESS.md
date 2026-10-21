@@ -226,3 +226,114 @@ D01.2 changes are staged selectively and published to the authorized company rep
 **Blockers:** none for D01.2. Bootstrap/application checks, sample configuration, independent review and future release/growth evidence remain pending rather than being claimed complete.
 
 **Next task: D01.3**, not started. Stop after D01.2.
+
+## 2026-10-21 — D01.3: pinned runtime, package manager and dependency lockfile
+
+**Status: completed locally. Publication: deferred at the user's explicit request to keep the verified commit local.**
+
+### Selection and inspection
+
+- Selected the earliest unfinished eligible task: D01.3, after checking the implemented D01.1 brief/issues and D01.2 structure/README/license/labels. No earlier incomplete task was found.
+- Read the project plan, entire growth checklist, current contribution guidance and progress history. No applicable AGENTS.md or TASK_BOARD.md was present; no new board was introduced.
+- Starting commit: `089a63c` (`common prompt update`), on `main`, aligned with `origin/main` in `empwebdev/webhook-inbox`. The company `upstream/main` remained at `0eb3fef`. The existing prompt update, both remotes, branch tracking and Git identity settings were preserved.
+- Starting worktree/index was clean; app directories contained placeholders rather than application implementation.
+- A D01.3 issue/PR search across the company repository and fork found no equivalent tracking item. Reused the existing backlog/milestone context without creating another issue, PR, release, tag or public post.
+
+### Work and files affected
+
+| Files | Change |
+|---|---|
+| `.nvmrc`, `.node-version`, `package.json`, `.npmrc` | Pin Node 24.22.0/npm 11.19.1; enforce developer engines and strict peer resolution; exact dependency saves; root workspace/bootstrap commands |
+| `apps/{web,api,worker}/package.json`, `packages/{contracts,test-data}/package.json` | Register five private dependency-only workspaces matching the existing Next.js/Express/Mongo/worker architecture |
+| `package-lock.json` | Generated npm v3 lockfile with 268 entries, exact resolutions and registry integrity metadata |
+| `scripts/check-dependencies.mjs` | Repeatable synthetic dependency import/behavior smoke check without an application server or Mongo connection |
+| [TOOLCHAIN.md](TOOLCHAIN.md) | Exact versions, compatibility constraints/evidence, installation/bootstrap instructions and limits |
+| [README.md](../README.md), [CONTRIBUTING.md](../CONTRIBUTING.md) | Real dependency bootstrap/check commands; current capabilities and future application setup distinguished |
+| [PROJECT_BRIEF.md](PROJECT_BRIEF.md), [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) | Current toolchain and evidence links; only D01.3 newly marked complete; D02.1 handoff |
+| [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) | Appended this record without deleting earlier history |
+
+The runtime archive, npm cache, installed dependencies, temporary type/build fixtures and verification logs remain outside commits. No application routes/layouts/startup code, project TypeScript configuration, environment schema, Mongo connection or test harness was added. Existing placeholders, documents, license, label manifest and milestone issues are retained.
+
+### Acceptance and verification results
+
+- **Pass — exact toolchain:** used the checksum-verified official Node 24.22.0 distribution and its bundled npm 11.19.1. `npm run check:toolchain` prints those exact versions; version files, `engines`, `devEngines` and `packageManager` agree. No global Node/npm setting was changed.
+- **Pass — compatible foundation graph:** strict `npm install` generated the lockfile; `npm run check:dependencies` passed `npm ls --all` and React/Next/QueryClient/Tailwind/PostCSS/Express/Mongoose/Zod/Pino/worker/contracts smoke behavior. Direct package versions are exact; no legacy peer override or engine bypass was used.
+- **Pass — clean frozen bootstrap:** `npm run bootstrap` in a fresh temporary copy installed all five workspaces. `npm run check:toolchain`, `npm run check:dependencies` and tsx TypeScript execution then passed. Lockfile SHA-256 remained `fa44a2b15688e531819e880753d4352a00011bdae6e5e15716100687f9a74246`.
+- **Pass — negative checks:** Node 22.22.2 and npm 11.19.0 each fail with `EBADDEVENGINES`. A deliberately inconsistent temporary React lock entry fails frozen installation with `EUSAGE`; real project files were unchanged.
+- **Pass — type compatibility:** a temporary strict TypeScript integration fixture compiled with Bundler resolution, ES2024/DOM libraries and `skipLibCheck: false`. An initial ES2022-library failure exposed the modern `PromiseWithResolvers` declaration requirement; the final verified configuration is documented for D02.1.
+- **Pass — framework/compiler compatibility:** `next build --webpack` on a separate temporary App Router fixture completed compilation, TypeScript and static generation. No fixture source or config was added to the project, and no product build is claimed.
+- **Pass — execution policy/audit:** recorded npm's version-specific `esbuild@0.28.2` install-script allowance. Initial and fresh installs each reported zero vulnerabilities while auditing 170 packages. Platform-inapplicable optional packages shown by `npm ls` are not missing required dependencies.
+- **Pass — documentation/scope:** 120 unique task IDs remain; only D01.1–D01.3 are complete. Modern Next.js and separate Express architecture, real bootstrap instructions, local Markdown links, JSON/lockfile consistency, private/exact manifests, lockfile integrity and clean diff/staged scope were checked. Git name/email and both remote URLs remain unchanged.
+- **Day 01 aggregate:** the first-release scope is documented and `npm run bootstrap` now works as a dependency bootstrap. A runnable product, health endpoint and capture journey are not required to complete D01.3.
+- **Not applicable:** application UI/browser tests, project build/lint/typecheck/test scripts, database-backed journeys and deployment checks; these do not exist yet.
+
+Verification commands:
+
+```text
+npm install
+npm run check:toolchain
+npm run check:dependencies
+python3 /tmp/webhook-d013-compatibility.py
+python3 /tmp/webhook-d013-verify-bootstrap.py
+python3 /tmp/webhook-d013-check-docs.py
+git diff --check
+git diff --cached --check
+```
+
+Temporary scripts/fixtures were used for this run's clean-install, negative-version, type and isolated build checks; they are not a new application test framework. The committed dependency smoke script is available through the documented npm command.
+
+### Growth-checklist evaluation
+
+Every checkpoint was read and evaluated for this task. Completed statuses apply to this increment only; runtime/dependency compatibility is not product adoption or release evidence.
+
+| Phase | Status for this run | Evidence and remaining work |
+|---|---|---|
+| 0: public scope/baseline | Pending | Public scope and attribution retained; runnable product usefulness and fresh scan still pending |
+| 1: usable repository | Pending | Exact toolchain/dependencies and repeatable bootstrap now verified; app run commands, sample configuration/demo and fresh-user product trial remain future work |
+| 2: plan an improvement | Completed for this run | Reproducibility need, D01.3 scope, duplicate search and observable positive/negative criteria documented |
+| 3: build/check/review/merge | Completed for this run's applicable local work | Dependency/bootstrap/type/framework-fixture checks and self-review complete; commit kept local by request; no product/PR/independent-review result claimed |
+| 4: release | Pending | No product release/tag or complete install/capture workflow |
+| 5: discovery/adoption | Pending | Public project references retained; no outreach, trials or adoption claimed |
+| 6: maintenance/dependencies | Completed for this run's applicable baseline work | Exact versions, strict peers, native tooling, frozen install and dated audit checked; no user bug, fix release or upstream contribution |
+| 7: longitudinal review | Pending | D02.1 identified; fresh/comparable scoring and long-term results remain pending |
+
+Checkpoint numbers follow checkbox order within [EMPIRIC_PROJECT_GROWTH_CHECKLIST.md](EMPIRIC_PROJECT_GROWTH_CHECKLIST.md).
+
+| Checkpoint(s) | Status | Reason |
+|---|---|---|
+| 0.1, 0.2, 0.4, 0.5 | Completed for this run | Existing public scope/account retained, synthetic data only, accurate existing Git identity |
+| 0.3, 0.6, 0.7 | Pending | No runnable public product or fresh score/scan status |
+| 1.1 description/topics | Pending | Existing metadata preserved; no topics work in this task |
+| 1.2 README; 1.4 runtime/dependencies | Completed for this run | Truthful current status, exact pins, compatibility matrix and evidence |
+| 1.3 install/run commands | Pending for the product | Dependency installation/bootstrap is verified; application run commands belong to D02 and later |
+| 1.5 working demo; 1.6 sample config | Pending | Synthetic dependency fixtures are not a product demo or application configuration |
+| 1.7 license; 1.9 roadmap | Completed for this run | Existing MIT license and four milestone references retained |
+| 1.8 contribution instructions | Pending for full app setup | Bootstrap/dependency guidance updated; future app checks and review remain |
+| 1.10 unfamiliar-user product install | Pending | Clean temporary dependency install was automated, not an independent user's product trial |
+| 2.1, 2.2, 2.3, 2.4, 2.6, 2.7 | Completed for this run | Reproducibility need, search, existing backlog/milestone context, selected scope and checks |
+| 2.5 bug reproduction | Not applicable | New toolchain baseline rather than a reported product defect |
+| 3.1 useful complete PR; 3.3 external feedback | Not applicable | No PR or independent review claimed; user requested local commit |
+| 3.2 behavior verified; 3.4 attribution/references | Completed for this run | Bootstrap/dependency positive and negative checks, docs and unchanged identity |
+| 3.5 merged result | Pending | No merge or product behavior demonstrated |
+| Phase 3 numbered workflow | Completed for applicable local steps | Scoped implementation, checks, documentation and self-review; public push intentionally deferred and no release issue closed |
+| 4.1–4.7 product install/examples/version/notes/distribution/demo/release link | Pending | No product release; toolchain archive and isolated fixture are not project distributions |
+| 4.8 problem reporting | Completed for this run | Existing issue-reporting instructions retained |
+| 5.1, 5.2, 5.4–5.8 | Pending | No pinning/tutorial/community sharing/trials/support/outside contribution/review in this run |
+| 5.3 code/install links | Pending for the product | Canonical source and actual bootstrap instructions exist; runnable product installation remains future work |
+| 6.1 triage; 6.3 dependency compatibility | Completed for this run | D01.3 tracking search and exact dependency/engine/peer/native/type/frozen checks |
+| 6.2 bug priority; 6.4 recurring examples; 6.5 fix release; 6.6–6.8 upstream work | Not applicable | No reported product defect, recurring user issue or upstream defect requiring contribution |
+| 7.1–7.5 outcomes/scans/categories/comparisons/investigation | Pending | No fresh user outcomes or scoring evidence |
+| 7.6 next useful work | Completed for this run | D02.1 is next and not started |
+| 7.7 multi-year maintenance | Pending | Requires continued maintenance over time |
+
+The reusable PR checklist's problem/change/checks/references are covered by this record. Self-verification is explicit; independent review, product tests, adoption and score improvements were not invented.
+
+### Limitations, commit and handoff
+
+Compatibility is demonstrated on Linux x64 for the pinned baseline and synthetic fixtures. It does not establish Turbopack, other platforms, a running project, database behavior or release acceptance.
+
+Terminal push preflight (`GIT_TERMINAL_PROMPT=0 git push --dry-run origin main`) failed because HTTPS credentials were unavailable. The connected GitHub account is `empiricinfotech`; checking access to the configured personal fork returned integration HTTP 403. The user then explicitly requested: **“Keep the verified commit local for now.”** Accordingly, only a local task commit is made; no push to the fork or company upstream and no remote mutation is performed in this run. Final report supplies the local commit hash.
+
+**Blockers:** none for D01.3's implementation acceptance. Publication is deferred by the user; terminal authentication will be needed for a future authorized push to origin.
+
+**Next task: D02.1**, not started. Stop after D01.3.

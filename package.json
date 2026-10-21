@@ -1,0 +1,45 @@
+{
+  "name": "empiric-webhook-inbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/empiricinfotech/webhook-inbox.git"
+  },
+  "packageManager": "npm@11.19.1",
+  "engines": {
+    "node": "24.22.0",
+    "npm": "11.19.1"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "11.19.1",
+      "onFail": "error"
+    }
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "npm ci",
+    "check:toolchain": "node --version && npm --version",
+    "check:dependencies": "npm ls --all && node scripts/check-dependencies.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

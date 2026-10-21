@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** repository foundation and product planning. The directory layout, documentation, MIT license and task labels are in place. There is no runnable application, dependency manifest, installation script or published release yet.
+**Status:** dependency bootstrap and product planning. Runtime/package-manager pins, five workspace manifests, a lockfile and dependency compatibility checks are in place alongside the repository layout, MIT license and task labels. There is no runnable product application or published release yet.
 
 ## Why this project exists
 
@@ -20,11 +20,25 @@ cd webhook-inbox
 git status
 ```
 
-### Installation and run status
+### Install the pinned toolchain and bootstrap
 
-Application install, bootstrap, development and test commands are **not available yet**. Do not assume that `npm install`, `npm run dev` or the suggested scripts in the plan work today.
+Use **Node.js 24.22.0** and **npm 11.19.1**, bundled together in the official Node release. If you already use nvm:
 
-D01.3 will pin the runtime and package manager, verify compatible packages and introduce the lockfile. D02 will add the application skeleton and startup configuration. The plan proposes Node.js 24 LTS and MongoDB; no runtime version or application dependencies have been installed or verified in this foundation task.
+```bash
+nvm install
+nvm use
+node --version
+npm --version
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+```
+
+Other version managers may use [.node-version](.node-version); install the same exact Node/npm pair. See [Toolchain and dependency baseline](docs/TOOLCHAIN.md) for installation details, the compatibility matrix and verification evidence.
+
+`npm run bootstrap` runs `npm ci` across all five workspaces using the committed `package-lock.json`. Engine and peer-version checks are strict; wrong Node/npm versions and an out-of-sync lockfile are rejected. Do not bypass these checks to install different versions.
+
+These commands install and verify dependencies only. `npm run dev`, application builds, database startup, capture endpoints and application tests are **not available yet**. D02.1 will create the application shell and startup code; later tasks add their corresponding checks.
 
 ## Planned architecture
 
@@ -58,7 +72,7 @@ infra/            Future Compose and reverse-proxy configuration
 .github/          Task-label manifest and repository metadata
 ```
 
-No package/workspace configuration, runtime pin, application source, fixtures, containers or CI workflow is included yet. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder environment examples can be committed when their schemas are defined.
+Workspace package manifests now declare exact foundation dependencies, and root scripts verify bootstrap/toolchain compatibility. Application source, fixtures, containers and CI workflows remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder environment examples can be committed when their schemas are defined.
 
 ## Release roadmap
 
@@ -71,7 +85,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.3 is next; it has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.3 is complete; D02.1 is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -86,6 +100,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project brief](docs/PROJECT_BRIEF.md): users, first capture journey, scope and milestone criteria.
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
+- [Toolchain and dependency baseline](docs/TOOLCHAIN.md): exact versions, bootstrap commands and compatibility limits.
 - [Contributing](CONTRIBUTING.md): task selection, current checks, review expectations and issue-label usage.
 - [Task labels](.github/README.md): configured labels and their local manifest.
 - [Growth checklist](docs/EMPIRIC_PROJECT_GROWTH_CHECKLIST.md): evidence-based project upkeep; no score gains are promised.
