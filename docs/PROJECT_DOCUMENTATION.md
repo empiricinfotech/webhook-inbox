@@ -1,8 +1,8 @@
 # Empiric Webhook Inbox Project Documentation
 
-MERN implementation plan and 40 day development backlog
+MERN implementation with a Next.js frontend and 40 day development backlog
 
-Version 1.0 | 21 October 2026 | Prepared for Empiric Infotech
+Version 1.1 | 21 October 2026 | Prepared for Empiric Infotech
 
 Build a public, self-hostable developer tool that receives webhook messages, makes them easy to inspect, and helps a small team debug integrations. Deliver a working local version first, then add authenticated workspaces, controlled replay, and a documented public release. Use this document to understand the system, select the next task, and verify that each increment works.
 
@@ -73,10 +73,10 @@ Usage and reliability matter first. GHFind score movement is a separate observat
 | Layer | Choice | Purpose |
 |---|---|---|
 | Language | TypeScript throughout | Shared types and clearer refactoring |
-| Runtime | Node.js 24 LTS baseline | API and background worker runtime |
-| Frontend | React with Vite and React Router | Dashboard, routes and interaction |
+| Runtime | Node.js 24 LTS baseline | Next.js frontend server, API and background worker runtime |
+| Frontend | Next.js with React, TypeScript and App Router | Dashboard, file-based routes, layouts and interaction |
 | Styling | Tailwind CSS | Responsive layout and consistent styles |
-| Server state | TanStack Query | Fetching, mutations and cache invalidation |
+| Server state | TanStack Query in Client Components | Fetching, mutations and browser cache invalidation |
 | Backend | Express | REST API, capture route and event stream |
 | Database | MongoDB with Mongoose | Workspace data, messages, sessions and jobs |
 | Validation | Zod | Request contracts and environment validation |
@@ -93,9 +93,19 @@ Node's official release page lists version 24 as LTS on the research date. Confi
 
 MongoDB keeps the first release within MERN. The job worker polls durable job records and claims work atomically; Redis and a separate queue service are not required. This choice limits initial throughput but reduces operational complexity for a small debugging tool.
 
+### Frontend routing and rendering
+
+Use the Next.js App Router for file-based pages, shared layouts, navigation, loading states and error boundaries. Use Next.js Link and navigation APIs for frontend routing. Server Components provide page and layout composition; put interactive forms, TanStack Query providers, event inspection controls and SSE subscriptions behind explicit Client Component boundaries.
+
+Express remains the source of truth for authentication, authorization, database access, capture, replay and management endpoints. Keep those operations in the existing backend; the Next.js frontend consumes its API. UI route guards improve navigation but do not replace backend permission checks.
+
+For v1.0, load private dashboard data through the authenticated API from Client Components. If a later page fetches private data in a Server Component, forward only that user's required session context and use request-specific, uncached fetching. Never place private event data in a shared page or data cache. Clear browser query caches and close SSE subscriptions on logout or workspace changes.
+
+Keep secrets in server-only configuration. Any NEXT_PUBLIC_ variable is browser-visible; use it only for non-sensitive values. Browser requests use the same-origin /api/v1 prefix. Configure a development reverse proxy or Next.js rewrite for that prefix, and send provider capture requests directly to Express so their raw bytes reach the signature verifier unchanged.
+
 ### Runtime components
 
-1. The React client calls the authenticated management API under /api/v1.
+1. The Next.js application renders the frontend; its interactive Client Components call the Express management API under /api/v1.
 2. A provider sends requests to /capture/:token without a browser session.
 3. The API validates limits, checks inbox configuration, verifies signatures where enabled, redacts data, and persists the event.
 4. The API acknowledges capture only after the event is stored.
@@ -110,7 +120,7 @@ Provider ----> Express capture route ----> Mongo events
                     |                         |
                     +--> capture response     |
                                               v
-React dashboard <---- Express management API and SSE
+Next.js dashboard <-- Express management API and SSE
                               |
                               v
                        Mongo replay jobs
@@ -122,12 +132,15 @@ React dashboard <---- Express management API and SSE
                       Approved destination
 ```
 
-Production uses one HTTPS origin with /api, /capture and the client routed through a reverse proxy. The initial beta uses one API instance and one worker. Avoid adding multiple API replicas until live fan-out and rate-limit coordination are implemented. Sessions are database-backed; an instance restart does not by itself delete session records.
+Production uses one HTTPS origin through a reverse proxy. Route /api/v1, /capture and /health to Express, and route frontend pages and /_next assets to the Next.js server. Pass the Express SSE stream through without response buffering. The initial beta uses one Next.js frontend instance, one API instance and one worker. Avoid adding multiple API replicas until live fan-out and rate-limit coordination are implemented. Sessions are database-backed; an instance restart does not by itself delete session records.
 
 ### Repository structure
 
 ```text
-apps/web/src/           React routes and feature modules
+apps/web/src/app/       Next.js App Router pages and layouts
+apps/web/src/features/  Interactive Client Components and hooks
+apps/web/src/components/ Shared frontend components
+apps/web/src/lib/       API client and browser query providers
 apps/api/src/           Express routes and domain services
 apps/worker/src/        Job claims, replay and cleanup
 packages/contracts/    Shared schemas and API types
@@ -205,11 +218,11 @@ Each module has a purpose, defined behaviour and a completion check. Day referen
 
 Provide a repeatable TypeScript monorepo and local stack.
 
-**Features:** Environment validation, scripts, shared contracts, API health, client routing and CI.
+**Features:** Environment validation, scripts, shared contracts, API health, Next.js App Router pages and layouts, Client Component query providers and CI.
 
 **Rules and edge cases:** A missing required variable stops startup with a clear message. A fresh clone can start using the documented commands.
 
-**Completion check:** Build, type checks and a health smoke test pass.
+**Completion check:** The Next.js production build, type checks and Express health smoke test pass; direct navigation to a frontend route works.
 
 ### M02 Workspace and inbox management
 
@@ -583,7 +596,7 @@ Logs include request ID, route template, duration, status and safe workspace ide
 
 ### Deployment and recovery approach
 
-Use Compose for self-hosting: reverse proxy, web build, API, worker and Mongo with a persistent volume. Hosted environments need HTTPS, backup storage, runtime secrets and an operator allowlist for replay. Validate environment configuration at startup. Use the Node 24 LTS baseline and a pinned container image revision where practical.
+Use Compose for self-hosting: reverse proxy, a Next.js frontend server built with next build and run with next start or standalone output, Express API, worker and Mongo with a persistent volume. The frontend runs as a separate Node.js service. Hosted environments need HTTPS, backup storage, runtime secrets and an operator allowlist for replay. Validate environment configuration at startup. Use the Node 24 LTS baseline and a pinned container image revision where practical.
 
 Back up data and encrypted-secret keys through separate controlled procedures. Document that backups can retain data beyond live TTL until backup expiry. On restore, disable outbound replay, reconcile queued and dispatching records, verify keys and memberships, then enable the worker deliberately. Use backward-compatible schema changes in v1.0; maintain a migration version and test the prior release against restored data before rollback.
 
@@ -611,13 +624,13 @@ Prerequisite: None. Modules: M01 M18. Planned effort: 5 to 6 hours.
 
 Prerequisite: D01. Modules: M01. Planned effort: 5 to 6 hours.
 
-- [ ] **D02.1** Create React routes, Express startup, shared TypeScript configuration and environment schemas.
+- [ ] **D02.1** Create the Next.js App Router shell with pages, layouts and a Client Component provider boundary, plus Express startup, shared TypeScript configuration and environment schemas.
 
 - [ ] **D02.2** Connect Mongo locally and expose health routes without printing connection credentials.
 
-- [ ] **D02.3** Add lint, typecheck, build scripts and a sample configuration file with placeholders.
+- [ ] **D02.3** Add ESLint, typecheck, Next.js and Express build scripts, same-origin development API routing and sample environment configuration with placeholders.
 
-**Acceptance:** Client and API start from a clean checkout; missing required configuration fails clearly.
+**Acceptance:** Next.js frontend and Express API start from a clean checkout; direct frontend navigation and same-origin API requests work, and missing required configuration fails clearly.
 
 #### Day 03 Contracts and automated checks
 
@@ -627,7 +640,7 @@ Prerequisite: D02. Modules: M01. Planned effort: 5 to 6 hours.
 
 - [ ] **D03.2** Add unit and API test harnesses with disposable Mongo test data.
 
-- [ ] **D03.3** Create PR automation for installation, type checks, tests and builds.
+- [ ] **D03.3** Create PR automation for installation, ESLint, type checks, tests, the Next.js production build and backend builds.
 
 **Acceptance:** A deliberately invalid contract test fails in CI and passes after the correction.
 
@@ -1025,7 +1038,7 @@ Prerequisite: D34. Modules: M16. Planned effort: 5 to 6 hours.
 
 Prerequisite: D35. Modules: M17. Planned effort: 5 to 6 hours.
 
-- [ ] **D36.1** Complete Compose services, volumes, proxy configuration and production environment examples.
+- [ ] **D36.1** Complete Compose services for the Next.js frontend, Express API, worker and Mongo, including volumes, reverse-proxy routes, unbuffered SSE and production environment examples.
 
 - [ ] **D36.2** Document first-owner creation, secrets, destination allowlist and image version selection.
 
@@ -1143,9 +1156,11 @@ Known limitations and follow-up issue links
 ### Suggested project scripts
 
 ```text
-dev              Start web and API for development
+dev              Start Next.js frontend and Express API for development
 dev:worker       Start the background worker
-build            Build deployable applications
+build            Run the Next.js production build and backend builds
+start:web        Run the built Next.js frontend service
+lint             Run ESLint explicitly across application packages
 typecheck        Check all TypeScript packages
 test             Run fast unit and API checks
 test:e2e         Run browser journeys
@@ -1197,6 +1212,8 @@ Webhook: an HTTP message sent when an event occurs. Inbox: a named endpoint and 
 These sources support the platform facts and design constraints. Module choices, limits, estimates and task sequencing are proposed decisions for this project.
 
 - Node.js release status: https://nodejs.org/en/about/previous-releases
+- Next.js Server and Client Components: https://nextjs.org/docs/app/getting-started/server-and-client-components
+- Next.js self-hosting and environment configuration: https://nextjs.org/docs/app/guides/self-hosting
 - GitHub webhook testing: https://docs.github.com/en/webhooks/testing-and-troubleshooting-webhooks
 - GitHub signature validation: https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
 - MongoDB TTL behaviour: https://www.mongodb.com/docs/manual/core/index-ttl/
