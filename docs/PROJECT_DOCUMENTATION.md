@@ -612,7 +612,7 @@ For each day, allocate roughly three to four hours for implementation and one to
 
 Prerequisite: None. Modules: M01 M18. Planned effort: 5 to 6 hours.
 
-- [ ] **D01.1** Write the target user, first capture journey, scope boundaries and four milestone issues.
+- [x] **D01.1** Write the target user, first capture journey, scope boundaries and four milestone issues. [Brief and milestone issue evidence](PROJECT_BRIEF.md).
 
 - [ ] **D01.2** Create the public repository structure, README skeleton, license choice and task labels.
 
