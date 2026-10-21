@@ -108,7 +108,11 @@ The reusable PR checklist's problem/change/verification/related-issue fields are
 
 ### Commit, publication and handoff
 
-Only the three D01.1 documents are included. The authorized publication uses the GitHub connector on `empiricinfotech/webhook-inbox` and a fast-forward local synchronization because terminal HTTPS push credentials were unavailable in the setup session. Git author/credential settings are not changed. The final run report supplies the resulting commit hash and verified publication status; `git rev-parse HEAD origin/main` checks local/remote alignment.
+The D01.1 planning commit is `a2da02c` (`docs(D01.1): define project brief and four release milestone issues`); it contains only the three documents above. It was published to `empiricinfotech/webhook-inbox` through the GitHub connector and fetched locally. The published tree matched the verified local index exactly.
+
+During publication, the remotes were independently changed: `origin` now points to `https://github.com/empwebdev/webhook-inbox.git`, and `upstream` points to the original company repository, `https://github.com/empiricinfotech/webhook-inbox.git`. Both remotes and the existing branch tracking configuration were preserved. Git author/credential settings were not changed. The company repository and local `main` were verified at the planning commit using `git rev-parse HEAD upstream/main`; the fork remained at `ab41b7e`.
+
+An attempted additional push to the new origin fork was rejected by automatic approval review because publishing to that extra repository was outside the company-repository authorization. No fork push occurred. Fork synchronization requires separate user approval and is not a blocker to D01.1 in the authorized company repository. This follow-up record documents the remote change and publication result; the final run report supplies its commit hash and verifies `HEAD` against `upstream/main`.
 
 **Blockers:** none for D01.1. Product implementation, clean-install validation, release evidence, independent review, adoption and a fresh scoring baseline remain future work rather than blockers to this planning task.
 
