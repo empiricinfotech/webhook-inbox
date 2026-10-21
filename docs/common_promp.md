@@ -24,6 +24,9 @@ Complete exactly ONE implementation task per run, such as D01.1—not an entire 
 - Treat existing implementation as completed only when there is evidence.
 - Briefly announce the selected task ID, intended result, and acceptance checks.
 - Do not stop at a plan; proceed with implementation.
+- Use acceptance criteria appropriate to the individual task.
+- Day-level acceptance may depend on all three tasks for that day.
+- Do not repeat completed tasks or require later features to complete an earlier task.
 
 3. Implement the selected task
 
