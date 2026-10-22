@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** dependency bootstrap and product planning. Runtime/package-manager pins, five workspace manifests, a lockfile and dependency compatibility checks are in place alongside the repository layout, MIT license and task labels. There is no runnable product application or published release yet.
+**Status:** local application foundation. D02.1 adds a runnable Next.js overview/setup shell and separate Express startup with validated environment configuration. Inbox creation, capture, MongoDB integration and releases remain future work.
 
 ## Why this project exists
 
@@ -38,9 +38,25 @@ Other version managers may use [.node-version](.node-version); install the same 
 
 `npm run bootstrap` runs `npm ci` across all five workspaces using the committed `package-lock.json`. Engine and peer-version checks are strict; wrong Node/npm versions and an out-of-sync lockfile are rejected. Do not bypass these checks to install different versions.
 
-These commands install and verify dependencies only. `npm run dev`, application builds, database startup, capture endpoints and application tests are **not available yet**. D02.1 will create the application shell and startup code; later tasks add their corresponding checks.
+### Run the local shell
 
-## Planned architecture
+After bootstrap, use two terminals from the repository root (POSIX shell):
+
+```bash
+# Terminal one
+API_PORT=4000 npm run dev:api
+```
+
+```bash
+# Terminal two
+npm run dev:web
+```
+
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
+
+Express currently returns 404 for every route; the frontend makes no API requests. This local shell has no inbox/capture/storage behavior. [Local development](docs/LOCAL_DEVELOPMENT.md) documents environment rules, direct compiler/build checks and current limits. Mongo/health is D02.2; consolidated lint/build/typecheck scripts, same-origin API routing and placeholder environment files are D02.3.
+
+## Architecture
 
 - **Frontend:** Next.js with React, TypeScript and App Router. Interactive forms, query providers and event subscriptions belong in Client Components.
 - **API:** a separate Express service owns authentication, authorization, database access, bounded capture and management endpoints under `/api/v1`.
@@ -48,11 +64,11 @@ These commands install and verify dependencies only. `npm run dev`, application 
 - **Data and worker:** MongoDB/Mongoose stores sanitized events and durable jobs; a separate Node worker will handle retention cleanup and controlled replay.
 - **Hosting:** a shared origin will route frontend pages to Next.js and API/capture/health paths to Express. UI route guards do not replace API permission checks.
 
-These are design decisions, not implemented services. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
+The frontend shell and Express startup are implemented; domain services, data storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
 
 ## Repository layout
 
-The directories below are tracked using empty `.gitkeep` files where needed. They reserve the planned boundaries without application scaffolding.
+The directories below follow the planned boundaries. The web/API shell and shared environment schemas now contain source; future feature, worker, fixture and infrastructure directories retain placeholders.
 
 ```text
 apps/
@@ -72,7 +88,7 @@ infra/            Future Compose and reverse-proxy configuration
 .github/          Task-label manifest and repository metadata
 ```
 
-Workspace package manifests now declare exact foundation dependencies, and root scripts verify bootstrap/toolchain compatibility. Application source, fixtures, containers and CI workflows remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder environment examples can be committed when their schemas are defined.
+Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and the D02.1 foundation; fixtures, containers, CI and later application features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder environment examples can be committed when their schemas are defined.
 
 ## Release roadmap
 
@@ -85,7 +101,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.3 is complete; D02.1 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.1 are complete. D02.2 is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -100,6 +116,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project brief](docs/PROJECT_BRIEF.md): users, first capture journey, scope and milestone criteria.
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
+- [Local development](docs/LOCAL_DEVELOPMENT.md): shell startup, environment schemas, boundaries and foundation verification.
 - [Toolchain and dependency baseline](docs/TOOLCHAIN.md): exact versions, bootstrap commands and compatibility limits.
 - [Contributing](CONTRIBUTING.md): task selection, current checks, review expectations and issue-label usage.
 - [Task labels](.github/README.md): configured labels and their local manifest.

@@ -32,7 +32,10 @@
   "scripts": {
     "bootstrap": "npm ci",
     "check:toolchain": "node --version && npm --version",
-    "check:dependencies": "npm ls --all && node scripts/check-dependencies.mjs"
+    "check:dependencies": "npm ls --all && node scripts/check-dependencies.mjs",
+    "dev:web": "npm run dev --workspace=@empiric-webhook-inbox/web",
+    "dev:api": "npm run dev --workspace=@empiric-webhook-inbox/api",
+    "check:foundation": "tsx --tsconfig tests/tsconfig.json --test tests/foundation.test.ts"
   },
   "devDependencies": {
     "@types/node": "24.19.2",

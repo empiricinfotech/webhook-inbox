@@ -337,3 +337,124 @@ Terminal push preflight (`GIT_TERMINAL_PROMPT=0 git push --dry-run origin main`)
 **Blockers:** none for D01.3's implementation acceptance. Publication is deferred by the user; terminal authentication will be needed for a future authorized push to origin.
 
 **Next task: D02.1**, not started. Stop after D01.3.
+
+## 2026-10-22 — D02.1: Next.js/Express application skeleton
+
+**Status: completed.** Exactly one implementation task was selected. D02.2 and D02.3 remain unstarted.
+
+### Inspection and selection
+
+- Read the complete project plan, entire growth checklist, contribution guidance and previous progress history. No repository/ancestor AGENTS.md or TASK_BOARD.md existed at inspection. Consulted the installed Next.js AGENTS.md and its version-specific guides before writing frontend code. Next dev subsequently generated its managed apps/web/AGENTS.md; it was read and retained for future version-matched guidance.
+- Started on clean `main` at `dc3358a`. Company `upstream/main` was fetched and matches that commit, confirming D01.3 publication after the prior local-only run. The earlier deferred-publication record is retained as history.
+- Verified D01.1 brief/milestone references, D01.2 layout/license/labels manifest, and D01.3 exact manifests, toolchain pins, lockfile and dependency smoke implementation. D02.1 was the earliest eligible unfinished task; source directories still contained placeholders.
+- Existing Git identity is now `empiricinfotech <empiricinfotech@gmail.com>`; it was preserved. The configured origin had reverted to a placeholder repository path. Publication targets the company repository selected explicitly in the preceding conversation; origin will use its canonical credential-free URL, with upstream retained.
+- GitHub issue and PR searches for D02.1 returned no equivalents. Reused the existing ordered backlog and [v0.1 milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1); no additional issue/PR/release/tag/public post was created. All four milestone issues are preserved.
+
+### Work and files
+
+| Files | Change |
+|---|---|
+| `apps/web/src/app/{layout,page,not-found}.tsx`, `setup/page.tsx`, `globals.css` | Server Component shell, overview/local setup pages, Next Link navigation, accessible skip link, responsive styling and missing-page recovery |
+| `apps/web/src/lib/query-provider.tsx` | Explicit Client Component provider; lazy QueryClient per mounted tree, without process-wide private cache |
+| `apps/web/{next.config.ts,postcss.config.mjs,tsconfig.json,AGENTS.md}`, `src/lib/environment.ts` | Next configuration/environment validation, existing Tailwind integration and strict frontend TypeScript |
+| `apps/api/src/{app,server,index}.ts`, `config/environment.ts`, `tsconfig.json` | Separate Express construction/startup, loopback-only validated configuration, sanitized logs, bounded shutdown and safe default 404s |
+| `packages/contracts/src/environment.ts`, `tsconfig.json`, `package.json` | Shared Zod parsing/error helper and source export; errors name fields without input values |
+| `tsconfig.base.json`, `tests/{foundation.test.ts,tsconfig.json}` | Shared strict compiler rules and five behavior checks using existing tsx/Node test APIs |
+| Root/web/API `package.json`, `package-lock.json` | Separate dev commands, foundation check, exact internal workspace links and web's explicit Zod declaration; no external version/resolution change |
+| `.gitignore`, replaced placeholder files | Ignore generated Next type bridge; remove only placeholders replaced by this task's source |
+| [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md), [README.md](../README.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [TOOLCHAIN.md](TOOLCHAIN.md), [PROJECT_BRIEF.md](PROJECT_BRIEF.md), [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) | Actual startup/config/check instructions, architecture limits, updated capability status and only D02.1 newly checked |
+| [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) | Append this evidence/checkpoint record; preserve previous history |
+
+No Mongo connection, health endpoint, capture/inbox implementation, API proxy, example environment file, ESLint/consolidated build/typecheck script, worker startup or Vitest/Supertest/Playwright harness was added. Required startup scripts and task-scoped checks support D02.1; D02.3 retains its tooling/proxy/configuration scope.
+
+### Acceptance and verification
+
+- **Pass — clean startup:** a fresh temporary source copy installed using `npm run bootstrap`. Both documented development commands start on loopback; the browser shell loads without Mongo or other credentials.
+- **Pass — routes/layout:** `/` and `/setup` render with shared navigation. Browser verified Next Link navigation, direct `/setup` reload, 404 recovery and matching titles. No warning/error console entries occurred during the successful navigation flows.
+- **Pass — provider:** the actual Client Component provider supports a consumer and creates distinct QueryClients across two independent SSR trees. No shared cache is introduced.
+- **Pass — configuration/failures:** ports must be decimal integers 1–65535; API_HOST is restricted to loopback. Missing API_PORT, invalid port/NODE_ENV and non-loopback host are rejected. Real API configuration failures exit 1 without binding or echoing synthetic values. Actual Next configuration also rejects invalid NODE_ENV without printing its value.
+- **Pass — API lifecycle:** live requests return safe 404s without request data or X-Powered-By. Existing health/management/capture paths are deliberately absent. Occupied port returns a sanitized EADDRINUSE failure; SIGTERM exits successfully, and the listener stops.
+- **Pass — compilation/build:** API, contracts, web and tests compile under shared strict TypeScript, ES2024 libraries and `skipLibCheck: false`. The actual shell's production webpack build generates `/`, `/setup` and the missing-page route. Turbopack dev startup was separately exercised.
+- **Pass — dev/build coexistence:** checking both generated output trees initially exposed duplicate Next global LayoutProps declarations. The config excludes generated output from root discovery and loads active declarations through Next's generated type bridge. After clearing this run's stale compiler metadata, strict checking passes with both output directories present; source/library errors are not suppressed.
+- **Pass — basic accessibility/responsiveness:** keyboard Tab reaches the skip link and Enter focuses main; semantic navigation/headings and visible focus styling are present. Both pages were checked at a 390px viewport with no document overflow; code blocks can scroll horizontally. This is a limited shell check, not full release accessibility certification.
+- **Pass — repeatability/dependencies:** clean-copy bootstrap, dependency checks, all five foundation tests, production build and all four compiler checks passed. The frozen lockfile remained unchanged at SHA-256 `2a371362b9d5ea39968f8389605b380c5fc1771ae37c53bc74961bf04812316a`. npm audited 170 packages and reported zero vulnerabilities at this run's install time.
+- **Pass — review:** local documentation links, task counts/status, manifest/lockfile consistency, unchanged external dependency resolutions, ignored generated output and staged diff/secret scope are checked before commit. The author identity and unrelated existing work are retained.
+- **Day 02 aggregate is pending:** Mongo/health and same-origin API requests require D02.2/D02.3. They are not prerequisites for completing the shell/startup task.
+
+Commands used (pinned Node/npm active):
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run check:foundation
+API_PORT=4000 npm run dev:api
+npm run dev:web
+npm exec -- tsc -p packages/contracts/tsconfig.json
+npm exec -- tsc -p apps/api/tsconfig.json
+npm exec -- tsc -p apps/web/tsconfig.json
+npm exec -- tsc -p tests/tsconfig.json
+npm exec --workspace=@empiric-webhook-inbox/web -- next build --webpack
+python3 /tmp/webhook-d021-verify-clean.py
+git diff --check
+git diff --cached --check
+```
+
+The clean-copy runner and screenshots/logs were temporary verification artifacts, not committed dependencies or a new test framework. Build resource limiting used `CIRCLE_NODE_TOTAL=2` only in the verification environment. Initial provider-test failures were JSX transform and mixed CJS/ESM test-context mismatches; the final check uses compatible React imports and the same ESM query context as the provider. No failed check is treated as a pass.
+
+### Growth-checklist evaluation
+
+Every checkbox and the numbered Phase 3 workflow were evaluated. Status applies only to this run; no whole lifetime phase, release, adoption metric or score improvement is claimed complete.
+
+| Phase | Status for this run | Evidence/remaining limits |
+|---|---|---|
+| 0: public scope/baseline | Pending | Synthetic public scope and attribution preserved; usable capture workflow and fresh scan pending |
+| 1: usable repository | Pending | Runnable shell setup, environment contract and checks documented; capture example, full config templates and independent setup trial remain |
+| 2: plan improvement | Completed for this run | D02.1 need/scope, duplicate searches, existing tracking and observable checks recorded |
+| 3: build/check/review/merge | Completed for applicable implementation/check/self-review steps | Current-branch workflow authorized; no PR, external review or merge result invented |
+| 4: release | Pending | Foundation clean install/build exercised; no stable capture release, tag or distribution |
+| 5: discovery/adoption | Pending | Source/setup links maintained; no outreach or user adoption measured |
+| 6: maintenance | Completed for applicable compatibility checks; other work pending/not applicable | Frozen existing dependency graph and strict checks preserved; no user defect/upstream fix claim |
+| 7: longitudinal review | Pending | D02.2 selected for handoff; scans and long-term outcomes remain pending |
+
+Checkpoint numbers follow checkbox order in the original checklist.
+
+| Checkpoint(s) | Status | Reason |
+|---|---|---|
+| 0.1 public scope; 0.2 private-data boundary; 0.4 scored account; 0.5 attribution | Completed for this run | Existing project/account decisions retained; synthetic tests only; existing author settings preserved |
+| 0.3 independent product usefulness; 0.6 fresh scan; 0.7 scan status | Pending | Shell is runnable but capture journey and scan evidence are absent |
+| 1.1 description/topics | Pending | Metadata not changed; no discovery claim |
+| 1.2 README; 1.3 actual current install/run; 1.4 toolchain/dependencies | Completed for this run | Real repository/startup commands and exact supported versions documented and exercised for the shell |
+| 1.5 working example/screenshots | Pending for product | Shell/browser proof exists; no working capture example/demo yet |
+| 1.6 placeholder configuration | Pending | Environment contract documented; example files belong to D02.3 |
+| 1.7 license; 1.8 contribution guidance; 1.9 roadmap | Completed for this run | MIT retained; current setup/check/review guidance updated; original release issues retained |
+| 1.10 unfamiliar-user setup | Pending | Automated clean-copy checks are not an independent person's trial |
+| 2.1 need; 2.2 duplicate search; 2.3 useful tracking; 2.4 expected result; 2.6 criteria; 2.7 scope | Completed for this run | Runnable local foundation needed; no equivalents found; existing backlog/milestone reused; scoped acceptance demonstrated |
+| 2.5 bug reproduction | Not applicable | Initial implementation, not a reported user bug |
+| 3.1 useful complete PR; 3.3 review feedback | Not applicable | No PR/external reviewer; honest self-verification under authorized current-branch workflow |
+| 3.2 behavior; 3.4 authorship/links | Completed for this run | Positive/negative checks, browser flow and attribution/reference review |
+| 3.5 merged result | Not applicable | No merge performed; pushed commit verification is reported separately |
+| Phase 3 numbered steps 1, 6–7, 9–10 | Not applicable where branch/PR/merge/closure-specific | Current main suitable and authorized; no PR, review feedback or release issue closure fabricated |
+| Phase 3 numbered steps 2–5, 8 | Completed for this run | Coherent implementation, meaningful checks, documentation and self-review |
+| 4.1 clean product workflow; 4.2 release examples | Pending | Clean foundation install/build passed; main capture workflow still absent |
+| 4.3 version/tag; 4.4 release notes; 4.5 distribution; 4.6 demo; 4.7 release link | Pending | No release is due for this foundation task |
+| 4.8 report problems | Completed for this run | Existing README/contribution issue-reporting route retained |
+| 5.1 pin; 5.2 tutorial; 5.4 sharing; 5.5 trial invitations; 5.6 support; 5.7 external tasks; 5.8 contribution review | Pending | No real outreach, user report or outside contribution in this run |
+| 5.3 source/install links | Completed for current shell | Canonical repository and tested setup commands maintained; product adoption still pending |
+| 6.1 triage | Pending beyond task search | D02.1 issue/PR equivalents checked; broader ongoing triage not claimed |
+| 6.2 user-blocking bugs; 6.4 recurring examples; 6.5 fix releases | Not applicable | No user defect or repeated question reported for this increment |
+| 6.3 compatible dependencies/checks | Completed for this run | Exact external versions unchanged; workspace links, strict compile/build, frozen install and smoke tests passed |
+| 6.6 dependency-origin diagnosis; 6.7 upstream discussion; 6.8 upstream fix | Not applicable | Generated-type collision handled in local configuration; no verified upstream defect contribution undertaken |
+| 7.1 product outcomes; 7.2 fresh scan; 7.3 categories/deductions; 7.4 comparable scans; 7.5 evidence investigation | Pending | No product trial or new score data gathered/interpreted |
+| 7.6 next useful improvement | Completed for this run | D02.2 identified without starting Mongo work |
+| 7.7 maintenance across years | Pending | Requires continued real maintenance over time |
+
+The reusable PR checklist's problem, change, verification and tracking references are covered above. Self-review is recorded; no independent review/merge, users, adoption or score gains are claimed.
+
+### Publication, limitations and handoff
+
+Changes are committed selectively on existing `main` with a D02.1 commit message, then pushed to the authorized company repository when access permits. The final run report records the exact commit and read-back verification; a failed push leaves the local commit intact.
+
+**Implementation blockers:** none. Verification covers Linux x64 and the local shell, not database readiness, capture correctness, authenticated access, worker behavior or release gates. Next generated dev/build output must be ignored and loaded through its active type bridge as documented.
+
+**Next eligible task: D02.2 — connect Mongo locally and expose health routes without printing connection credentials.** Not started. Stop after D02.1.

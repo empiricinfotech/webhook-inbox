@@ -2,7 +2,7 @@
 
 D01.3 | Verified 21 October 2026 | Linux x64
 
-This is a dependency/bootstrap baseline for the existing Next.js frontend and separate Express backend architecture. It does not implement or certify an application, health endpoint, database connection or capture flow.
+This records the D01.3 dependency/bootstrap baseline. D02.1 subsequently adds the application shell and startup checks documented in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md); health, database and capture remain pending.
 
 ## Runtime and package manager
 
@@ -55,13 +55,13 @@ All direct dependencies are exact versions, with transitive resolutions and inte
 | @types/react / @types/react-dom | 19.3.0 / 19.3.0 | web: matching React 19 type declarations |
 | express / @types/express | 5.3.0 / 5.0.6 | api: Express 5 runtime and type declarations |
 | mongoose | 9.11.2 | api, worker: Mongo models (no connection/configuration yet) |
-| zod | 4.6.7 | api, worker, contracts: future shared validation |
+| zod | 4.6.7 | api, web, worker, contracts: shared validation (web added in D02.1) |
 | pino | 10.4.0 | api, worker: logging library |
 | typescript | 7.0.2 | root: compiler shared by workspaces |
 | @types/node | 24.19.2 | root: Node 24 declarations, rather than current Node 26 types |
 | tsx | 4.23.15 | root: TypeScript execution for later startup tooling |
 
-The test-data workspace is registered with no dependencies or fixtures. Internal package exports, shared TypeScript configurations, Next.js pages, Express startup, environment validation, Mongo connection and test harnesses remain later tasks. Dependencies for later authentication, tests or deployment are introduced only when needed.
+The test-data workspace is registered with no dependencies or fixtures. D02.1 now adds shared environment exports, TypeScript configurations, Next.js pages, Express startup and foundation checks. Mongo connection and the broader application test harness remain later tasks. Dependencies for later authentication, tests or deployment are introduced only when needed.
 
 Package engine requirements fit Node 24.22.0: Next.js requires at least Node 20.9.0, Express at least Node 18 and Mongoose at least Node 20.19.0 in the inspected registry metadata. Next.js accepts React 19, React DOM's React range includes 19.3.1, and TanStack Query accepts React 19. Strict npm resolution checked the complete installed graph.
 
@@ -78,7 +78,7 @@ Package engine requirements fit Node 24.22.0: Next.js requires at least Node 20.
 
 The first strict type fixture used ES2022 library definitions and exposed Next.js declarations requiring `PromiseWithResolvers`. Using ES2024 definitions resolved the missing ambient type; it was not hidden with `skipLibCheck`. D02.1 should use appropriate modern frontend library definitions (ES2024 or Next.js's ESNext defaults) when it introduces project TypeScript configuration.
 
-Verification applies to the selected package/toolchain combination on Linux x64. The production build above uses an isolated fixture and webpack; it does not establish project UI behavior, production deployment, Turbopack behavior, cross-platform installation or any release milestone. Application builds/tests will be added and verified at their own tasks.
+Verification applies to the selected package/toolchain combination on Linux x64. The production build above uses an isolated fixture and webpack; it does not establish project UI behavior, production deployment, Turbopack behavior, cross-platform installation or any release milestone. D02.1 shell build and foundation-check evidence is recorded separately in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md).
 
 ## Updating this baseline
 
@@ -93,3 +93,7 @@ Keep the lockfile, all affected workspace manifests and script-policy changes in
 - [Express installation requirements](https://expressjs.com/en/starter/installing/).
 - [npm package metadata / devEngines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/), [npm workspaces](https://docs.npmjs.com/cli/v11/using-npm/workspaces/), [npm ci](https://docs.npmjs.com/cli/v11/commands/npm-ci/) and [npm configuration](https://docs.npmjs.com/cli/v11/using-npm/config/).
 - Exact-version engine, peer and license metadata from the [npm registry](https://registry.npmjs.org/), inspected during this task; manifests and the lockfile identify the selected versions.
+
+## D02.1 workspace update
+
+API and web now depend on the private contracts workspace at exact version 0.0.0. Web directly declares Zod 4.6.7 for its environment schema. The lockfile records these links; no external package resolution or version changed. The D01.3 lock hash above is historical; the updated D02.1 lock is verified through a frozen install.

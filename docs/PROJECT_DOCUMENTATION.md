@@ -624,7 +624,7 @@ Prerequisite: None. Modules: M01 M18. Planned effort: 5 to 6 hours.
 
 Prerequisite: D01. Modules: M01. Planned effort: 5 to 6 hours.
 
-- [ ] **D02.1** Create the Next.js App Router shell with pages, layouts and a Client Component provider boundary, plus Express startup, shared TypeScript configuration and environment schemas.
+- [x] **D02.1** Create the Next.js App Router shell with pages, layouts and a Client Component provider boundary, plus Express startup, shared TypeScript configuration and environment schemas. [Local development and verification](LOCAL_DEVELOPMENT.md).
 
 - [ ] **D02.2** Connect Mongo locally and expose health routes without printing connection credentials.
 
