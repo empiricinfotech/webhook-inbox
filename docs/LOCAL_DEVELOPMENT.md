@@ -1,12 +1,12 @@
-# Local development shell
+# Local development foundation
 
-D02.1 | Verified 22 October 2026 | Linux x64
+D02.1–D02.2 | Verified 22 October 2026 | Linux x64
 
 The repository now starts a Next.js App Router shell and a separate Express process.
 The shell has an overview (`/`), local setup (`/setup`), shared layout/navigation,
-and a missing-page view. It does not create inboxes, capture events or connect to
-MongoDB. D02.2 adds Mongo/health; D02.3 adds lint/build/typecheck scripts, the
-same-origin development API route and placeholder environment files.
+and a missing-page view. Express now connects to MongoDB and exposes health
+routes; it does not create inboxes or capture events. D02.3 adds lint/build/
+typecheck scripts, the same-origin API route and placeholder environment files.
 
 ## Start from a clean checkout
 
@@ -20,10 +20,17 @@ npm run check:dependencies
 npm run check:foundation
 ```
 
-In one terminal, start the API (POSIX shell):
+Start the local Mongo service first (Docker Engine/Compose required):
 
 ```bash
-API_PORT=4000 npm run dev:api
+docker compose -f infra/compose.mongo.yaml up -d --wait mongo
+```
+
+See [local MongoDB and health](MONGODB_LOCAL.md) for ports, persistent volumes,
+native Mongo support and outage semantics. In one terminal, start the API (POSIX shell):
+
+```bash
+MONGODB_URI=mongodb://127.0.0.1:27017/webhook_inbox API_PORT=4000 npm run dev:api
 ```
 
 In another terminal, start the frontend:
@@ -39,10 +46,12 @@ The API also handles SIGTERM and gives active connections up to five seconds
 before forced shutdown with a failing exit status.
 
 These are separate services. The frontend currently makes no management API
-requests, and Express deliberately returns plain 404 responses for all paths.
+requests. Express exposes `/health/live` and `/health/ready`; other paths
+return plain 404 responses.
 For example, `curl -i http://127.0.0.1:4000/api/v1/inboxes` returns 404.
-Health, capture, persistence and same-origin proxying have not been implemented;
-a successful process start is not dependency readiness or capture success.
+Liveness is 200 while the process runs; readiness is 200 only if Mongo answers
+a bounded ping, otherwise 503. Capture persistence and same-origin proxying
+remain pending; a healthy API does not demonstrate capture success.
 The unauthenticated foundation is for local development only.
 
 ## Environment contract
@@ -52,6 +61,7 @@ The unauthenticated foundation is for local development only.
 | `NODE_ENV` | API and Next configuration | `development`, `test` or `production`; defaults to development when parsed directly; the Next CLI selects its normal mode when unset |
 | `API_PORT` | API | Required decimal integer string, 1–65535; no implicit default |
 | `API_HOST` | API | `127.0.0.1` (default) or `::1`; non-loopback binding is rejected |
+| `MONGODB_URI` | API | Required MongoDB URI, at most 4096 characters; never logged |
 
 API configuration is supplied through the process environment. There is no
 automatic API dotenv loading in this task. Next.js uses its normal environment
@@ -66,7 +76,8 @@ before binding if a required field is missing or invalid. Binding failures
 report an error code (for example `EADDRINUSE`) and exit with code 1.
 Next configuration also fails if its environment schema rejects a value.
 
-No Mongo URL, session key or other future credential is required yet. No server
+Mongo must be reachable at the supplied URI before the API binds. Session keys
+and other future credentials are not required yet. No server
 configuration is passed into the Client Component provider or exposed using
 `NEXT_PUBLIC_` variables. Placeholder environment files remain D02.3 work.
 
@@ -83,7 +94,8 @@ configuration is passed into the Client Component provider or exposed using
   Bundler resolution and DOM/ES2024 libraries; API/contracts use NodeNext.
   Strictness includes `skipLibCheck: false`.
 - Tailwind's existing pinned PostCSS plugin processes the shell stylesheet.
-  No font service, analytics, database or external runtime request is needed.
+  No font service, analytics or external browser request is needed. The API
+  requires the configured local MongoDB service.
 - Express startup and app construction are separate for verification. No global
   JSON parser is installed: later capture verification needs original bytes.
 - The worker remains a dependency-only placeholder and is not started.
@@ -93,8 +105,9 @@ configuration is passed into the Client Component provider or exposed using
 `npm run check:foundation` uses the existing tsx runner and Node's built-in test
 API; it does not introduce the Vitest/Supertest/database harness planned for
 D03.2. Its five checks cover valid/invalid configuration, sanitized failure
-output, query-cache isolation across render trees, real API startup, safe 404s,
-port conflicts and graceful shutdown.
+output, query-cache isolation and injected health/HTTP behavior.
+`npm run check:mongo` adds real database startup/failure/outage/recovery/shutdown
+checks using an isolated native MongoDB process; see [the prerequisites](MONGODB_LOCAL.md#verification).
 
 Until D02.3 adds consolidated scripts, use these direct compiler checks from the
 root:
@@ -121,8 +134,9 @@ Verification demonstrated the production webpack build, Turbopack development
 startup, direct `/setup` reload, Next Link navigation in both directions,
 missing-page recovery, keyboard skip-link focus and both pages at a 390px
 viewport without document overflow. Browser warning/error logs were empty
-during those flows. This is shell verification, not an inbox/capture release,
-a database readiness check or an independent fresh-user trial.
+during those flows. This is shell verification, not an inbox/capture release or
+an independent fresh-user trial. D02.2 database/readiness verification is recorded
+in [MONGODB_LOCAL.md](MONGODB_LOCAL.md).
 
 ## References
 

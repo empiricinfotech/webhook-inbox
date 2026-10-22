@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** local application foundation. D02.1 adds a runnable Next.js overview/setup shell and separate Express startup with validated environment configuration. Inbox creation, capture, MongoDB integration and releases remain future work.
+**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Inbox creation, capture and releases remain future work.
 
 ## Why this project exists
 
@@ -40,11 +40,15 @@ Other version managers may use [.node-version](.node-version); install the same 
 
 ### Run the local shell
 
-After bootstrap, use two terminals from the repository root (POSIX shell):
+After bootstrap, start MongoDB with Docker Engine/Compose, then use two terminals for the API and frontend (POSIX shell):
+
+```bash
+docker compose -f infra/compose.mongo.yaml up -d --wait mongo
+```
 
 ```bash
 # Terminal one
-API_PORT=4000 npm run dev:api
+MONGODB_URI=mongodb://127.0.0.1:27017/webhook_inbox API_PORT=4000 npm run dev:api
 ```
 
 ```bash
@@ -54,7 +58,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express currently returns 404 for every route; the frontend makes no API requests. This local shell has no inbox/capture/storage behavior. [Local development](docs/LOCAL_DEVELOPMENT.md) documents environment rules, direct compiler/build checks and current limits. Mongo/health is D02.2; consolidated lint/build/typecheck scripts, same-origin API routing and placeholder environment files are D02.3.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. Other routes return 404 and the frontend makes no API requests. There is no inbox/capture behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents environment rules, direct compiler/build checks and current limits. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes, configuration and real-database checks. Consolidated lint/build/typecheck scripts, same-origin API routing and placeholder environment files are D02.3.
 
 ## Architecture
 
@@ -64,7 +68,7 @@ Express currently returns 404 for every route; the frontend makes no API request
 - **Data and worker:** MongoDB/Mongoose stores sanitized events and durable jobs; a separate Node worker will handle retention cleanup and controlled replay.
 - **Hosting:** a shared origin will route frontend pages to Next.js and API/capture/health paths to Express. UI route guards do not replace API permission checks.
 
-The frontend shell and Express startup are implemented; domain services, data storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
+The frontend shell, Express startup, MongoDB connection and health checks are implemented; domain services, event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
 
 ## Repository layout
 
@@ -88,7 +92,7 @@ infra/            Future Compose and reverse-proxy configuration
 .github/          Task-label manifest and repository metadata
 ```
 
-Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and the D02.1 foundation; fixtures, containers, CI and later application features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder environment examples can be committed when their schemas are defined.
+Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while fixtures, full application containers, CI and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder application environment files remain D02.3 work.
 
 ## Release roadmap
 
@@ -101,7 +105,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.1 are complete. D02.2 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.2 are complete. D02.3 is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -116,6 +120,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project brief](docs/PROJECT_BRIEF.md): users, first capture journey, scope and milestone criteria.
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
+- [Local MongoDB and health](docs/MONGODB_LOCAL.md): local service, connection lifecycle and safe health checks.
 - [Local development](docs/LOCAL_DEVELOPMENT.md): shell startup, environment schemas, boundaries and foundation verification.
 - [Toolchain and dependency baseline](docs/TOOLCHAIN.md): exact versions, bootstrap commands and compatibility limits.
 - [Contributing](CONTRIBUTING.md): task selection, current checks, review expectations and issue-label usage.

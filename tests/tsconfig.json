@@ -1,5 +1,12 @@
 {
   "extends": "../tsconfig.base.json",
-  "compilerOptions": { "lib": ["ES2024", "DOM"] },
-  "include": ["foundation.test.ts"]
+  "compilerOptions": {
+    "lib": [
+      "ES2024",
+      "DOM"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ]
 }

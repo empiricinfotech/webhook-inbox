@@ -458,3 +458,137 @@ Changes are committed selectively on existing `main` with a D02.1 commit message
 **Implementation blockers:** none. Verification covers Linux x64 and the local shell, not database readiness, capture correctness, authenticated access, worker behavior or release gates. Next generated dev/build output must be ignored and loaded through its active type bridge as documented.
 
 **Next eligible task: D02.2 — connect Mongo locally and expose health routes without printing connection credentials.** Not started. Stop after D02.1.
+
+## 2026-10-22 — D02.2: local MongoDB connection and safe health routes
+
+**Status: completed locally. Publication: blocked by missing terminal Git HTTPS credentials; the user authorized retaining the verified local commit if pushing remains blocked.**
+
+### Inspection and task selection
+
+- Read the project documentation, entire growth checklist, existing implementation history and contribution/local setup guidance. No ancestor/root AGENTS.md or TASK_BOARD.md exists; the web directory's managed Next.js AGENTS.md applies to its setup-page edit, and installed version-specific guides had been consulted.
+- Started with a clean worktree/index on `main` at `909a18c`. Fetching origin confirms the published D02.1 commit. Both remotes point to `https://github.com/empiricinfotech/webhook-inbox.git`; their URLs and Git identity `empiricinfotech <empiricinfotech@gmail.com>` are preserved.
+- Verified actual D01 brief/layout/license/lock/toolchain files and D02.1 application/provider/env/startup implementation before selecting D02.2 as the earliest unfinished eligible task. No earlier unfinished increment was found.
+- GitHub issue/PR searches found no D02.2 equivalent. Reused the ordered backlog and [v0.1 milestone #1](https://github.com/empiricinfotech/webhook-inbox/issues/1); did not create activity-only tracking. Existing four milestone issues, labels and release criteria were untouched.
+- Local MongoDB 8.0.32 and Docker/Compose are available. All verification databases used temporary ports/directories or a unique disposable Compose project. No existing project database or normal development data volume was used.
+
+### Work performed and files
+
+| Path(s) | Change |
+|---|---|
+| `apps/api/src/database.ts` | Owned Mongoose connection, bounded selection/connect timeouts, disabled buffering/automatic creation, real bounded readiness ping, safe error boundary and pool closure |
+| `apps/api/src/{app,server,index}.ts` | Separate liveness/readiness routes; connect before HTTP listen; 503 during outage; safe startup failures; pool cleanup on bind failure and shutdown |
+| `apps/api/src/config/environment.ts` | Required, bounded MONGODB_URI field; only Mongo URI schemes without whitespace; values excluded from validation logs |
+| `infra/compose.mongo.yaml` | Official Mongo 8.0.32 image pinned by manifest digest, loopback-only port, persistent named data/config volumes and ping health check; replaces infra placeholder |
+| `tests/foundation.test.ts`, `helpers/api-process.ts`, `mongo.test.ts`, `tsconfig.json` | Update existing database-independent checks; add actual isolated-Mongo startup, failure, bounded-stall, outage/reconnect and shutdown checks using existing Node/tsx tooling |
+| Root `package.json` | Add task-scoped `check:mongo`; no new npm dependency or lockfile resolution |
+| `apps/web/src/app/setup/page.tsx` | Correct existing setup instructions for Mongo startup, required URI and health endpoints |
+| [MONGODB_LOCAL.md](MONGODB_LOCAL.md), [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md), [README.md](../README.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [TOOLCHAIN.md](TOOLCHAIN.md), [PROJECT_BRIEF.md](PROJECT_BRIEF.md) | Current installation/run requirements, health contracts, lifecycle, verification prerequisites and boundaries |
+| [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md), [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) | Only D02.2 newly checked; preserve prior history and record evidence/handoff |
+
+No domain model, captured event storage, worker, authentication, same-origin proxy, ESLint/consolidated build/typecheck script or placeholder environment file was added. The broader Vitest/Supertest/data harness remains D03.2 work. The local Mongo-only Compose service is not a full application deployment.
+
+### Acceptance and verification results
+
+- **Pass — local connection and startup:** the actual API connects to isolated MongoDB before binding and returns safe health snapshots. Verified both native MongoDB 8.0.32 and the pinned official Docker image through the same startup implementation.
+- **Pass — environment failures:** missing/invalid MONGODB_URI, port or NODE_ENV fails with field names only. No credential-bearing URL or raw validation input is printed.
+- **Pass — connection failures/private output:** actual authentication, URI-option/parser and unreachable-server failures exit 1 with MONGODB_CONNECTION_FAILED. Synthetic usernames/passwords, host/URI/database names and arbitrary option values do not appear in API logs. Failed startup does not open an HTTP listener.
+- **Pass — health contract:** GET /health/live returns 200/live while the process is serving; GET /health/ready returns 200/ready only after a real ping, otherwise 503/not_ready. Both use Cache-Control: no-store, disclose no connection metadata and omit X-Powered-By. HEAD has no body; other routes remain 404.
+- **Pass — bounded stalled ping:** pausing only the test-owned Mongo process produces readiness 503 in approximately one second (within the 2.5-second check bound), while process liveness remains 200.
+- **Pass — outage and recovery:** stopping the native Mongo process and the separate Compose test service each produces readiness 503/liveness 200; restarting Mongo restores readiness 200 without restarting the API.
+- **Pass — lifecycle:** occupied API port closes the newly opened Mongo pool and exits 1; SIGTERM drains HTTP, closes the pool and permits a natural API exit 0. A five-second shutdown deadline remains in place.
+- **Pass — tests:** five foundation checks and the real-Mongo parent/five subchecks (six reported tests) pass. Also reran the real-Mongo suite with the safe logger restored and TSX transform cache disabled. Initial exploratory startup failures were not accepted as passes; they did not reproduce in the later cold-transform and clean-copy runs. No diagnostic logging remains in source.
+- **Pass — clean copy/compatibility:** frozen bootstrap, dependency smoke, foundation/Mongo checks, actual Next.js production webpack build and strict compilation of API/contracts/web/tests pass from a fresh temporary source copy. Lockfile is unchanged at SHA-256 `2a371362b9d5ea39968f8389605b380c5fc1771ae37c53bc74961bf04812316a`; direct/transitive npm versions are unchanged. The clean install reported zero vulnerabilities at verification time.
+- **Pass — Compose:** config validation and actual healthy startup succeeded with a unique project/loopback port. Read back the published loopback address and container health. Removed only test-owned containers, network and volumes; no normal development data was deleted.
+- **Pass — changed UI instructions:** browser direct /setup navigation and links in both directions work; displayed Mongo/API commands match docs. At 390px there is no document overflow, and console warnings/errors are absent. Long code lines scroll within their blocks.
+- **Pass — final review:** Markdown links, task counts, preserved history/documents, staged scope, whitespace, ignored runtime output and secret-pattern checks pass. No secrets, data files, generated dependencies or unrelated work are committed.
+- **Day 02 aggregate remains pending:** same-origin API routing and consolidated tooling/sample configuration belong to D02.3. Completing D02.2 does not complete that task or any release.
+
+Verification commands (pinned Node/npm active):
+
+```text
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run check:foundation
+npm run check:mongo
+TSX_DISABLE_CACHE=1 npm run check:mongo
+docker compose -f infra/compose.mongo.yaml config --quiet
+docker compose -p <isolated-test-project> -f infra/compose.mongo.yaml up -d --wait mongo
+MONGODB_URI=<isolated-local-test-uri> API_PORT=<free-test-port> npm run dev:api
+npm exec -- tsc -p packages/contracts/tsconfig.json
+npm exec -- tsc -p apps/api/tsconfig.json
+npm exec -- tsc -p apps/web/tsconfig.json
+npm exec -- tsc -p tests/tsconfig.json
+npm exec --workspace=@empiric-webhook-inbox/web -- next build --webpack
+python3 /tmp/webhook-d022-verify-clean.py
+git diff --check
+git diff --cached --check
+```
+
+Temporary Compose/clean-copy scripts, database files, logs, image downloads and screenshots remain outside version control. Native checks require a MongoDB 8 binary (MONGOD_BINARY can select its path); they never use the caller's MONGODB_URI. Verification ran on Linux x64; other platforms are not claimed.
+
+### Growth-checklist evaluation for this run
+
+Every phase, checkbox and the numbered Phase 3 workflow was evaluated. Completed means applicable work for this increment only, not permanent completion of a lifetime phase.
+
+| Phase | Status for this run | Evidence and pending work |
+|---|---|---|
+| 0: public scope/baseline | Pending | Public scope/private-data boundaries and author identity retained; capture usefulness and fresh score baseline absent |
+| 1: usable repository | Pending | Current Mongo/API setup and health examples are real and checked; full product examples, environment templates and independent trial remain |
+| 2: plan an improvement | Completed for this run | D02.2 need, prerequisites, duplicate searches, reused tracking, boundaries and acceptance evidence recorded |
+| 3: build/check/review/merge | Completed for applicable local steps; publication blocked | Implementation, meaningful tests, build/docs/self-review complete; no PR, external review or merge claimed |
+| 4: release | Pending | Clean foundation setup/health checked; capture release, tag, notes and distribution not ready |
+| 5: discovery/adoption | Pending | Source/setup links maintained; no outreach or user/adoption result claimed |
+| 6: maintenance | Completed for applicable compatibility work | Exact dependency baseline and new Mongo service verified; unrelated triage/upstream/release work not claimed |
+| 7: longitudinal review | Pending | Next useful task identified; no new scan or long-term outcome |
+
+Checkpoint numbers follow checkbox order in the original checklist.
+
+| Checkpoint(s) | Status | Reason |
+|---|---|---|
+| 0.1 scope; 0.2 private material; 0.4 scored account; 0.5 attribution | Completed for this run | Existing single public project/account decisions retained; synthetic inputs only; Git identity preserved |
+| 0.3 independently useful product; 0.6 fresh scan; 0.7 scan freshness | Pending | Operational foundation exists; no capture journey or fresh scoring evidence |
+| 1.1 description/topics | Pending | Repository metadata untouched in this task |
+| 1.2 README; 1.3 install/run; 1.4 runtime/dependencies | Completed for current increment | Actual Mongo/Node requirements, commands and dated compatibility evidence documented |
+| 1.5 working example/demo | Completed for health example; product demo pending | Real health cURL responses and setup screenshot verified; capture demo remains future work |
+| 1.6 sample placeholder configuration | Pending | Local Compose values/URI example are public and safe; application environment templates remain D02.3 |
+| 1.7 license; 1.8 contribution instructions; 1.9 roadmap | Completed for this run | Existing MIT and milestone issues retained; Mongo image has its own license; checks/setup/handoff updated |
+| 1.10 unfamiliar-user clean setup | Pending | Automated clean-copy verification is not another developer's independent trial |
+| 2.1 need; 2.2 duplicates; 2.3 useful tracking; 2.4 expected result; 2.6 criteria; 2.7 scope | Completed for this run | Local database/health increment required; task searches empty; backlog/milestone reused and individual checks demonstrated |
+| 2.5 bug reproduction | Not applicable | Foundation implementation, not a reported product defect |
+| 3.1 complete PR; 3.3 review feedback | Not applicable | Current main authorized; self-review recorded without a fabricated reviewer/PR |
+| 3.2 behavior verified; 3.4 authorship/links | Completed for this run | Positive/negative integration/HTTP/browser checks and attribution/reference review |
+| 3.5 merged result | Not applicable | No merge performed; local commit/publication status reported separately |
+| Phase 3 numbered steps 1, 6–7, 9–10 | Not applicable where branch/PR/merge/closure-specific | Existing main suitable; no release issue closed; publication blocked by credentials |
+| Phase 3 numbered steps 2–5, 8 | Completed for applicable local work | Coherent implementation, regression checks, documentation and honest self-verification |
+| 4.1 clean product workflow; 4.2 release examples | Pending | Clean database/API foundation checked, but first capture workflow and release examples are incomplete |
+| 4.3 version/tag; 4.4 notes; 4.5 distribution; 4.6 demo; 4.7 release link | Pending | No usable capture release is due for D02.2 |
+| 4.8 issue-reporting route | Completed for this run | Existing safe issue/contribution instructions retained |
+| 5.1 pin; 5.2 tutorial; 5.4 sharing; 5.5 trial invitation; 5.6 support; 5.7 outside tasks; 5.8 contribution review | Pending | No outreach, user reports or outside contribution work occurred |
+| 5.3 source/install links | Completed for current foundation | Real repository and tested Mongo/API instructions maintained; adoption remains unmeasured |
+| 6.1 triage | Pending beyond selected-task inspection | D02.2 duplicates searched; broader ongoing repository triage not claimed |
+| 6.2 prioritize user bugs; 6.4 recurring examples; 6.5 release fixes | Not applicable | No user defect/repeated question/fix release in scope |
+| 6.3 compatibility | Completed for this run | Frozen npm graph, strict compile/build, real Mongoose/Mongo behavior and pinned official image checked |
+| 6.6 dependency diagnosis; 6.7 upstream discussion; 6.8 upstream fix | Not applicable | No confirmed external dependency defect or upstream contribution undertaken |
+| 7.1 product outcomes; 7.2 fresh scan; 7.3 categories/deductions; 7.4 comparable scans; 7.5 scoring evidence | Pending | No independent capture trial or score data collected/interpreted |
+| 7.6 next useful improvement | Completed for this run | D02.3 identified without starting its implementation |
+| 7.7 multi-year maintenance | Pending | Requires continued real work over time |
+
+Reusable PR checklist: problem/change/verification/tracking references are recorded above. No external review, merged PR, capture release, users, adoption, contribution credit beyond actual authorship or GHFind score gain is asserted.
+
+### Commit, publication blocker and handoff
+
+Terminal preflight `GIT_TERMINAL_PROMPT=0 git push --dry-run origin main` failed:
+`fatal: could not read Username for 'https://github.com': terminal prompts disabled`.
+The user replied: **“Keep the verified commit local if pushing remains blocked.”**
+The implementation is committed selectively on main with a D02.2 message. A final
+normal push is attempted if access permits; failure preserves the verified local
+commit. No connector commit with different authorship, remote change, force push
+or history rewrite is used to work around missing terminal authentication.
+
+**Implementation blockers:** none. **Publication blocker:** terminal GitHub HTTPS
+authentication unavailable. The run report provides the exact commit and final
+push result. The task remains a local development foundation, not hosted readiness
+or capture/replay completion.
+
+**Next eligible task: D02.3 — tooling/build/typecheck scripts, same-origin development API routing and placeholder configuration.** Not started. Stop after D02.2.

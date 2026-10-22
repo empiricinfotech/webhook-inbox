@@ -2,7 +2,7 @@
 
 Task: **D01.1**. Planning baseline: [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md), version 1.1, 21 October 2026, especially sections 1, 2, 3, 7 and 8.
 
-This brief defines the product contract and four future release outcomes. D01.2 added the repository layout, README, MIT license and task labels; D01.3 added the pinned toolchain, dependency manifests and lockfile. D02.1 adds the Next.js overview/setup shell and separate Express startup with shared TypeScript/environment schemas. The sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
+This brief defines the product contract and four future release outcomes. D01.2 added the repository layout, README, MIT license and task labels; D01.3 added the pinned toolchain, dependency manifests and lockfile. D02.1 adds the Next.js overview/setup shell and separate Express startup with shared TypeScript/environment schemas. D02.2 adds a local MongoDB connection and safe liveness/readiness routes. The sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
 
 ## Problem and intended outcome
 
@@ -157,4 +157,4 @@ Tasks: D31.1–D40.3. v0.3 acceptance and D30 complete; D40 also requires D38 co
 
 D01.1 is complete when this user/problem/journey/scope contract and all four published planning issues are verified against the source plan. See [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md) for the checks and checkpoint evaluation.
 
-The aggregate Day 01 acceptance is now supported by the documented first-release scope and the dependency-only `npm run bootstrap` command verified in D01.3. D01.1, D01.2 and D01.3 are complete. D02.1 shell/startup verification is documented in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md). D02.2 (Mongo/health) is next and has not been started.
+The aggregate Day 01 acceptance is now supported by the documented first-release scope and the dependency-only `npm run bootstrap` command verified in D01.3. D01.1, D01.2 and D01.3 are complete. D02.1 shell/startup verification is documented in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md). D02.2 connection/health evidence is in [MONGODB_LOCAL.md](MONGODB_LOCAL.md). D02.3 is next and has not been started.
