@@ -628,7 +628,7 @@ Prerequisite: D01. Modules: M01. Planned effort: 5 to 6 hours.
 
 - [x] **D02.2** Connect Mongo locally and expose health routes without printing connection credentials. [Local MongoDB and health evidence](MONGODB_LOCAL.md).
 
-- [ ] **D02.3** Add ESLint, typecheck, Next.js and Express build scripts, same-origin development API routing and sample environment configuration with placeholders.
+- [x] **D02.3** Add ESLint, typecheck, Next.js and Express build scripts, same-origin development API routing and sample environment configuration with placeholders. [Tooling, routing and clean-start evidence](LOCAL_DEVELOPMENT.md).
 
 **Acceptance:** Next.js frontend and Express API start from a clean checkout; direct frontend navigation and same-origin API requests work, and missing required configuration fails clearly.
 

@@ -33,15 +33,26 @@
     "bootstrap": "npm ci",
     "check:toolchain": "node --version && npm --version",
     "check:dependencies": "npm ls --all && node scripts/check-dependencies.mjs",
-    "dev:web": "npm run dev --workspace=@empiric-webhook-inbox/web",
-    "dev:api": "npm run dev --workspace=@empiric-webhook-inbox/api",
-    "check:foundation": "tsx --tsconfig tests/tsconfig.json --test tests/foundation.test.ts",
-    "check:mongo": "tsx --tsconfig tests/tsconfig.json --test tests/mongo.test.ts"
+    "dev:web": "npm run build:contracts && npm run dev --workspace=@empiric-webhook-inbox/web",
+    "dev:api": "npm run build:contracts && npm run dev --workspace=@empiric-webhook-inbox/api",
+    "check:foundation": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/foundation.test.ts",
+    "check:mongo": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/mongo.test.ts",
+    "build:contracts": "npm run build --workspace=@empiric-webhook-inbox/contracts",
+    "build:api": "npm run build:contracts && npm run build --workspace=@empiric-webhook-inbox/api",
+    "build:web": "npm run build:contracts && npm run build --workspace=@empiric-webhook-inbox/web",
+    "build": "npm run build:contracts && npm run build --workspace=@empiric-webhook-inbox/api && npm run build --workspace=@empiric-webhook-inbox/web",
+    "start:api": "npm run start --workspace=@empiric-webhook-inbox/api",
+    "start:web": "npm run start --workspace=@empiric-webhook-inbox/web",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "npm run build:contracts && npm run typecheck --workspaces --if-present && tsc -p tests/tsconfig.json",
+    "check:routing": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/routing.test.ts",
+    "check:compiled-api": "npm run build:api && node scripts/check-compiled-api.mjs"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
     "tsx": "4.23.15",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "@empiric-webhook-inbox/lint-config": "0.0.0"
   },
   "allowScripts": {
     "esbuild@0.28.2": true

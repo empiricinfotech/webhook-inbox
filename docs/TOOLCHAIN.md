@@ -37,7 +37,7 @@ Expected versions are `v24.22.0` and `11.19.1`.
 - `check:dependencies` runs `npm ls --all` and synthetic in-memory import/behavior checks in `scripts/check-dependencies.mjs`.
 - `.npmrc` enforces engines and strict peer resolution and saves new direct dependencies as exact versions.
 - npm's version-bound `allowScripts` entry covers `esbuild@0.28.2` for tsx; no blanket lifecycle-script allowance is used.
-- All five workspaces and the root are `private` npm packages to prevent accidental package publication. This does not alter GitHub repository visibility.
+- All six workspaces and the root are `private` npm packages to prevent accidental package publication. This does not alter GitHub repository visibility.
 
 Do not omit optional dependencies: Next.js, Tailwind and TypeScript use platform-specific packages. `npm ls --all` can show **UNMET OPTIONAL DEPENDENCY** for other platforms, which is expected; missing required dependencies, invalid peers or a nonzero exit status are not accepted.
 
@@ -97,3 +97,42 @@ Keep the lockfile, all affected workspace manifests and script-policy changes in
 ## D02.1 workspace update
 
 API and web now depend on the private contracts workspace at exact version 0.0.0. Web directly declares Zod 4.6.7 for its environment schema. The lockfile records these links; no external package resolution or version changed. The D01.3 lock hash above is historical; the updated D02.1 lock is verified through a frozen install.
+
+## D02.3 tooling update
+
+Verified 23 October 2026. Application/runtime package pins and the root
+TypeScript 7.0.2 compiler remain unchanged. A sixth private workspace,
+`packages/lint-config`, isolates tooling with these exact dev dependencies:
+
+| Package | Version | Purpose |
+|---|---|---|
+| eslint / @eslint/js | 10.13.0 / 10.0.1 | Supported flat-config CLI and JS rules |
+| typescript-eslint | 8.72.0 | Recommended TypeScript syntax rules |
+| typescript | 6.0.3 | Parser-only JS compiler API, isolated from application compiler 7 |
+| eslint-plugin-react-hooks | 7.1.1 | React Hooks recommended rules |
+| globals | 16.5.0 | Node/browser globals |
+
+The lint parser declares TypeScript >=4.8.4 <6.1.0; TypeScript 7's native
+compiler does not provide that JS parser API. Nested lint dependencies preserve
+strict peers and let application/build commands continue using TypeScript 7.
+The root lint launcher resolves the workspace CLI explicitly. The committed
+lockfile preserves this placement; normal `npm ci` needs no install flags.
+When intentionally regenerating lint dependencies, use the pinned npm with
+`npm install --workspace=@empiric-webhook-inbox/lint-config --install-strategy=nested`.
+Do not force or disable peer checks.
+
+The full Next ESLint preset is deliberately not installed: its legacy React/a11y
+plugin peers reject ESLint 10 under strict resolution, and the version-matched
+Next plugin introduces unpatched braces advisory
+[GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
+The selected JS/TS/Hooks rules, strict Next types/build and browser verification
+cover this increment. Next-specific lint rules and automated accessibility
+rules are not claimed; revisit the preset once its dependency constraints and
+advisory are resolved. No advisory suppression or dependency override is used.
+
+New tooling packages report MIT, except TypeScript (Apache-2.0). Engines fit
+the pinned Node runtime. Frozen installation, dependency smoke, lint, strict
+typecheck, production builds and source/compiled API and routing checks are
+recorded in [the progress log](IMPLEMENTATION_PROGRESS.md). npm audit reports
+zero vulnerabilities for the final selected graph at verification time.
+Historical audit results and hashes above describe their original commits.

@@ -20,6 +20,9 @@
     "postcss": "8.5.31"
   },
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1"
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build --webpack",
+    "typecheck": "next typegen && tsc --noEmit",
+    "start": "next start --hostname 127.0.0.1"
   }
 }

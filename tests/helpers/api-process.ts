@@ -14,7 +14,10 @@ export function launchApi(extra: Record<string, string | undefined>) {
   delete env.MONGODB_URI;
   env.NODE_ENV = "test";
   Object.assign(env, extra);
-  const child = spawn(process.execPath, ["--import", "tsx", "apps/api/src/index.ts"], {
+  const args = process.env.WEBHOOK_TEST_API_MODE === "compiled"
+    ? ["--no-experimental-strip-types", "apps/api/dist/index.js"]
+    : ["--import", "tsx", "apps/api/src/index.ts"];
+  const child = spawn(process.execPath, args, {
     cwd: root, env, stdio: ["ignore", "pipe", "pipe"],
   });
   let output = "";

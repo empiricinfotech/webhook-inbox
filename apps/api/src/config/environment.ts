@@ -15,7 +15,7 @@ export const apiEnvironmentSchema = z.object({
 
 export type ApiEnvironment = z.output<typeof apiEnvironmentSchema>;
 
-export function readApiEnvironment(source = process.env): ApiEnvironment {
+export function readApiEnvironment(source: Record<string, string | undefined> = process.env): ApiEnvironment {
   return parseEnvironment(apiEnvironmentSchema, {
     NODE_ENV: source.NODE_ENV,
     MONGODB_URI: source.MONGODB_URI,

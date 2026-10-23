@@ -6,7 +6,7 @@ The repository is in its foundation stage. Read the [README](README.md), [projec
 
 Search existing issues and PRs before opening anything new. The four existing milestone issues track release outcomes, not completed implementation. Keep their acceptance checks pending until evidence supports them.
 
-Use the next eligible task in the plan and finish its prerequisites first. Keep one implementation task in progress per developer, reference its task ID and stop at the agreed scope. D01.3 pins Node.js 24.22.0, npm 11.19.1 and the foundation dependencies. D02.1 adds the Next.js shell, Express startup, shared TypeScript settings and environment schemas. D02.2 adds local Mongo connectivity and health routes; D02.3 tooling/proxy/configuration is next.
+Use the next eligible task in the plan and finish its prerequisites first. Keep one implementation task in progress per developer, reference its task ID and stop at the agreed scope. D01.3 pins Node.js 24.22.0, npm 11.19.1 and the foundation dependencies. D02.1 adds the Next.js shell, Express startup, shared TypeScript settings and environment schemas. D02.2 adds local Mongo connectivity and health routes; D02.3 adds lint/typecheck/build commands, development API routing and sample configuration. D03.1 contracts/correlation IDs is next.
 
 Create an issue when useful using these fields:
 
@@ -26,18 +26,22 @@ npm run bootstrap
 npm run check:toolchain
 npm run check:dependencies
 npm run check:foundation
+npm run lint
+npm run typecheck
+npm run build
+npm run check:routing
 git diff --check
 git diff --cached --check
 git status --short
 ```
 
-Bootstrap installs the locked dependencies of all five private workspaces. Dependency checks validate the resolved package tree and exercise library imports with synthetic in-memory values; they do not start an application or connect to MongoDB.
+Bootstrap installs the locked dependencies of all six private workspaces. Dependency checks validate the resolved package tree and exercise library imports with synthetic in-memory values; they do not start an application or connect to MongoDB.
 
 Preserve `package-lock.json` and use `npm ci` for repeatable installs. Add or update an exact dependency only when it belongs to the selected task, and regenerate the lockfile with the pinned npm version. Recheck engines, peers, dependency smoke behavior, affected application checks and package licenses when changing the baseline.
 
 An exact `esbuild@0.28.2` install-script allowance is recorded for the tsx toolchain. Review script-policy changes when a dependency update introduces or changes a lifecycle script; do not replace the policy with a blanket allowance.
 
-See [local development](docs/LOCAL_DEVELOPMENT.md) for `dev:web`, `dev:api`, environment rules and direct TypeScript/Next build commands. The five foundation checks use the existing tsx runner and Node test API. Run `npm run check:mongo` for connection/readiness changes; it requires a native MongoDB 8 binary and creates only isolated test data, as described in [Mongo verification](docs/MONGODB_LOCAL.md#verification). Consolidated build/typecheck/lint scripts, same-origin routing, example configuration and the Vitest/Supertest/browser harness remain later tasks. Do not infer working capture or a release from shell startup.
+See [local development](docs/LOCAL_DEVELOPMENT.md) for `dev:web`, `dev:api`, environment rules and consolidated build/check commands. The five foundation checks use the existing tsx runner and Node test API. Run `npm run check:mongo` for connection/readiness changes; it requires a native MongoDB 8 binary and creates only isolated test data, as described in [Mongo verification](docs/MONGODB_LOCAL.md#verification). `npm run check:compiled-api` rebuilds the backend and repeats the Mongo checks against its emitted JavaScript with Node TypeScript stripping disabled. `check:routing` starts isolated Next/transport fixtures; it requires no running API/database and never copies local environment files. The broader Vitest/Supertest/browser harness remains D03.2 work. Do not infer working capture or a release from shell startup.
 
 Stage only the intended files and preserve unrelated work and Git identity settings. For documentation-only edits, use relevant link/content/whitespace checks; run the dependency checks when manifests or the lockfile change.
 

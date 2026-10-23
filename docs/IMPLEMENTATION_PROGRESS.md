@@ -592,3 +592,130 @@ push result. The task remains a local development foundation, not hosted readine
 or capture/replay completion.
 
 **Next eligible task: D02.3 — tooling/build/typecheck scripts, same-origin development API routing and placeholder configuration.** Not started. Stop after D02.2.
+
+## 2026-10-23 — D02.3: quality checks, production builds and development API routing
+
+**Status: completed.** D02.3 is the only implementation task completed in this run.
+
+### Inspection, selection and scope
+
+- Read the authoritative project plan, entire growth checklist and previous progress; no TASK_BOARD.md or ancestor/root AGENTS.md exists. Read the applicable web AGENTS.md and installed Next.js 16.4.2 guides on configuration, environment, rewrites, TypeScript and ESLint before edits.
+- Started clean on existing main, tracking origin/main at `377ca9985ffc86183fe7c6e4a438858ffb0a4517`. Inspected recent commits, actual D01/D02 source/configuration and both remotes before selecting earliest unfinished D02.3. Prior tasks have implementation and verification evidence; initialization was not substituted for feature completion.
+- **D02.2 publication follow-up:** origin/main contains 377ca99. The previous run's authentication blocker was resolved by the later push; its historical local-only record above is preserved. This run's fetch and normal push dry-run succeeded.
+- Git identity `empiricinfotech <empiricinfotech@gmail.com>`, remote URLs/settings and existing branch preserved. No unrelated initial changes existed. No new branch needed under the authorized current-branch workflow.
+- GitHub issue and PR searches found no D02.3 equivalent. Reused this ordered backlog and [v0.1 issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1). Existing milestone issues, release criteria and labels remain unchanged; no issue/PR created for activity.
+- Acceptance: runnable ESLint/typecheck scripts; ordered contracts/API/Next production builds; API runs emitted JS; required configuration fails safely; placeholder files load using documented commands; development same-origin management transport works without routing capture through Next; fresh install and UI instructions agree.
+
+### Work and files
+
+| Files | Result |
+|---|---|
+| Root/app/contracts package manifests, package-lock.json | Build/start/typecheck/lint scripts with contracts compiled first; six private workspaces; application dependency resolutions unchanged |
+| `packages/lint-config/{package.json,eslint.config.mjs}`, root `eslint.config.mjs`, `scripts/lint.mjs` | Supported ESLint 10 JS/TS and frontend Hooks rules; parser-only TS6 isolated from application compiler TS7; generated files ignored and warnings rejected |
+| API/contracts `tsconfig.build.json`, contracts exports | NodeNext JavaScript output; shared declarations; API runtime needs no tsx/TypeScript stripping |
+| API/web `.env.example`, API dev/start scripts | Public credential-free loopback examples; optional API `.env.local` loading with process overrides; Next native env-file support |
+| Web `next.config.ts`, `src/lib/environment.ts`; API env-reader parameter type | Required safe loopback API_ORIGIN for development; only /api/v1 paths rewritten; config values excluded from errors; env-reader inputs model unvalidated strings independently of Next's ProcessEnv augmentation |
+| `tests/routing.test.ts`, `tests/tsconfig.json` | Three validation/config/real-Next transport checks; mixed Next imports checked using Bundler resolution with library checking retained |
+| `tests/helpers/api-process.ts`, `scripts/check-compiled-api.mjs` | Reuse meaningful real-Mongo lifecycle checks against compiled API with Node type stripping disabled |
+| Web setup page, README, CONTRIBUTING, LOCAL_DEVELOPMENT, MONGODB_LOCAL, TOOLCHAIN, PROJECT_BRIEF | Exact new setup/check/build commands, shared compilation and development/production routing boundaries; lint dependency decision and limitations |
+| PROJECT_DOCUMENTATION, IMPLEMENTATION_PROGRESS | Only D02.3 newly checked; current evidence, every growth checkpoint, publication and next-task handoff |
+
+No domain endpoint, shared domain error/pagination contract, request ID, authentication, capture model, worker, CI, deployment or later test harness was implemented. D03.1 and later tasks remain unchecked.
+
+The full Next lint preset was not adopted: strict legacy React/a11y peer constraints conflict with supported ESLint 10, and the version-matched Next plugin introduces an unpatched braces advisory. No peer bypass/audit suppression is used. The smaller JS/TS/Hooks stack installs with valid peers and zero reported vulnerabilities. [TOOLCHAIN.md](TOOLCHAIN.md#d023-tooling-update) records versions, advisory source and later reconsideration. Next-specific lint and automated accessibility rule coverage are not claimed.
+
+### Acceptance and verification
+
+All task acceptance checks pass on Linux x64 with pinned Node 24.22.0/npm 11.19.1:
+
+- **Frozen clean bootstrap:** copied tracked/task source only to a new temporary directory, with no node_modules, dist/.next, local configuration or database files. Normal npm ci installed 323 packages, audited 330 and reported zero vulnerabilities. npm ls --all and synthetic dependency behavior checks pass. No pre-existing external lock resolution changed. Lock SHA-256 remained `fc7d09870825ea4db9eacb0987fea4c1e81d2da898d151a87dccd42aef16ab2d` after bootstrap.
+- **Quality gates:** lint and strict root/workspace/test typecheck pass. Disposable undefined-variable and string/number mismatch fixtures each made the respective script fail; fixtures were removed. No check was disabled to hide a failure. Root compiler remains TS7.0.2; parser TS6 is confined to lint dependencies.
+- **Production output:** ordered contracts, Express and Next webpack builds pass, including generated route types, strict library checks and static pages. One worker was selected through temporary CIRCLE_NODE_TOTAL=2. Production routes manifest contains no /api/v1 development rewrite.
+- **Behavior:** five foundation checks and three routing checks pass. Real Next transport forwards GET/POST, base /api/v1 and nested paths, encoded queries, exact bodies, incoming cookies, response cookies/headers and status 207 from a synthetic fixture. Capture, health and /api/v10 remain excluded. This proves transport without adding a later product endpoint.
+- **Real data service:** source API Mongo suite and compiled API Mongo suite each pass six reported tests (parent plus five subchecks): startup/bind failure, sanitized auth/parser failures, bounded stalled ping, outage/reconnect and clean shutdown. Compiled child runs plain JavaScript with `--no-experimental-strip-types`, proving contracts resolve to JS. Only isolated temporary Mongo data/ports were used.
+- **Actual commands/config files:** real npm dev:api/dev:web fail without required fields and identify API_PORT/MONGODB_URI or API_ORIGIN. In the clean copy, public examples copied to ignored .env.local load successfully. API start reads the file and honors process API_PORT/NODE_ENV overrides; compiled startup returns real Mongo readiness 200. No existing user environment file is read/changed by the checks.
+- **Development/production runtime:** next start serves direct /setup from production output; its /api/v1 request remains Next 404 with no dev proxy. Default Turbopack dev starts with file-based API_ORIGIN; a same-origin /api/v1/inboxes request returns the real Express plain `Not found` 404, as expected before management endpoints exist. Positive transport is independently covered by the 207 fixture. The API and Mongo processes used free ports and disposable data.
+- **Browser:** updated /setup direct load/reload, navigation to overview and back, all four displayed setup commands, and default-width layout pass (1265px content equals viewport; no page overflow). Shell console warnings/errors are absent. Browser viewing of the plain API 404 was blocked by the in-app browser (`ERR_BLOCKED_BY_CLIENT`); forwarding was instead verified over actual HTTP as above. No browser API-success claim is made. Screenshot saved outside Git as verification evidence.
+- **Review:** link/content/whitespace checks, task scope, changed dependency metadata/licenses, generated-file exclusion and secret review completed before commit. No local configuration, tokens, private payloads, dependencies, build output or temporary fixtures included.
+- **Day 02 acceptance:** clean frontend/API startup, direct frontend navigation, same-origin management transport and clear missing-config failures now demonstrated. This completes the foundation acceptance, not inbox/capture/release acceptance.
+
+Commands used (pinned toolchain active):
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run build
+npm run check:foundation
+npm run check:routing
+npm run check:mongo
+npm run check:compiled-api
+npm run dev:api
+npm run dev:web
+npm run start:api
+npm run start:web
+python3 /tmp/webhook-d023-clean.py
+python3 /tmp/webhook-d023-runtime.py
+git diff --check
+git diff --cached --check
+```
+
+Negative fixtures and runtime orchestration scripts are temporary verification aids, not committed product code. The routing regression and compiled-API check remain reusable repository checks. Temporary services are stopped without affecting the user's running frontend or database.
+
+### Growth-checklist evaluation
+
+Every phase, checkbox and Phase 3 numbered step evaluated; completed means applicable work for this increment only, not permanent phase completion.
+
+| Phase | Run status | Evidence / remaining work |
+|---|---|---|
+| 0 public scope/baseline | Pending | Existing scope/account/attribution preserved; capture usefulness and score baseline absent |
+| 1 usable repository | Pending | Current setup, templates, checks/builds and UI instructions completed; product demo and independent trial pending |
+| 2 real improvement | Completed for this run | One documented task, duplicates checked, existing tracking reused, observable criteria verified |
+| 3 build/check/review/merge | Completed for applicable steps | Implementation, regression checks, clean setup, docs and self-review; authorized main publication, no PR/external review/merge claim |
+| 4 release | Pending | Foundation builds/run checked; usable capture release not ready |
+| 5 discovery/adoption | Pending | Source/install links maintained; no outreach/adoption work |
+| 6 maintenance | Completed for applicable compatibility work | Strict lint dependency isolation, safe audited stack, preserved application pins and passing checks |
+| 7 monthly/long-term review | Pending | Next eligible task identified; no scan or multi-year outcome |
+
+Checkbox numbers follow order in the original checklist.
+
+| Checkpoint(s) | Status | Reason |
+|---|---|---|
+| 0.1 public scope; 0.2 private data; 0.4 account; 0.5 authorship | Completed for this run | Existing single public project/account retained; synthetic inputs; identity untouched |
+| 0.3 standalone usefulness; 0.6 fresh scan; 0.7 scan status | Pending | No implemented first capture journey or new scoring evidence |
+| 1.1 description/topics | Pending | Metadata outside selected task, unchanged |
+| 1.2 README; 1.3 exact install/run; 1.4 runtimes/dependencies; 1.6 sample configuration | Completed for this run | Updated commands/templates and actual clean installation/build/start checks |
+| 1.5 example/screenshots | Completed for foundation only; product pending | Setup screenshot and real transport/health examples; capture demo still absent |
+| 1.7 license; 1.8 contributions; 1.9 roadmap | Completed for this run | MIT retained; new dependency licenses checked; current commands/handoff updated; original milestone issues preserved |
+| 1.10 independent setup trial | Pending | Automated clean copy and self-verification are not another developer's trial |
+| 2.1 need; 2.2 duplicates; 2.3 useful tracking; 2.4 expected result; 2.6 acceptance; 2.7 coherent scope | Completed for this run | D02.3 quality/config/transport need, empty task searches, reused backlog/#1, focused checked outcome |
+| 2.5 bug reproduction | Not applicable | Foundation increment; dependency compatibility conditions documented, no reported product bug |
+| 3.1 complete PR; 3.3 review feedback | Not applicable | No PR or external reviewer; honest self-review under authorized main workflow |
+| 3.2 behavior; 3.4 authorship/issue links | Completed for this run | Real runtime/HTTP/browser and regression checks; preserved attribution and useful tracking |
+| 3.5 merged result | Not applicable | No merge performed; published main commit checked separately |
+| Phase 3 steps 1, 6–7, 9–10 | Not applicable where branch/PR/merge/closure-specific | Suitable existing main used; no fabricated review/merge or premature milestone closure |
+| Phase 3 steps 2–5, 8 | Completed for this run | Coherent implementation, meaningful tests/checks, affected flow, docs and self-verification |
+| 4.1 clean product install/workflow; 4.2 release examples | Pending | Clean foundation verified; capture/release workflow not implemented |
+| 4.3 tag/version; 4.4 notes; 4.5 distribution; 4.6 demo; 4.7 release link | Pending | No release due for this increment |
+| 4.8 report problems | Completed for this run | Existing issue-reporting route and private-data guidance retained |
+| 5.1 pin; 5.2 tutorial; 5.4 share; 5.5 invitations; 5.6 reports; 5.7 outside tasks; 5.8 contribution reviews | Pending | No outreach, real user report or outside contribution occurred |
+| 5.3 code/install links | Completed for foundation | Canonical URL and tested current instructions retained; adoption unmeasured |
+| 6.1 ongoing triage | Pending beyond selected-task search | Only task duplicates inspected; broader ongoing triage not claimed |
+| 6.2 user bugs; 6.4 recurring questions; 6.5 fix release | Not applicable | No reported user defect/repeated question/release in scope |
+| 6.3 compatibility; 6.6 dependency diagnosis | Completed for this run | TS parser/ESLint peer constraints and advisory evaluated; compatible smaller tooling graph passes checks with unchanged application pins |
+| 6.7 upstream discussion; 6.8 upstream fix | Not applicable | No upstream contribution undertaken; existing advisory referenced without creating duplicate activity |
+| 7.1 product outcome; 7.2 scan; 7.3 categories/deductions; 7.4 comparison; 7.5 attribution investigation | Pending | No independent product trial or scoring data gathered/interpreted |
+| 7.6 next useful improvement | Completed for this run | D03.1 identified without implementation |
+| 7.7 multi-year maintenance | Pending | Requires continuing real work over time |
+
+The reusable PR template's problem/change/verification/related tracking and self-review fields are covered above. No independent review, adoption, release, artificial activity or GHFind score improvement is claimed.
+
+### Publication and handoff
+
+Stage only the D02.3 code/configuration/tests/docs and commit on main with D02.3 in the message. Push normally to the existing configured origin/main and read back its commit; exact hash and push result are provided in the final run report. No URL/configuration change, force push or history rewrite authorized or used.
+
+**Implementation blockers:** none. **Limitations:** Next-specific lint preset/accessibility lint remains deferred for the recorded upstream constraints; production shared-origin reverse proxy and product APIs are later work. In-app browser blocks direct plain 404 viewing, with transport verified by HTTP. Linux x64 only verified; no hosted deployment or independent user trial claimed.
+
+**Next eligible task: D03.1 — shared error, identifier and pagination contracts and request correlation IDs.** Not started. Stop after D02.3.

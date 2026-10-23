@@ -53,8 +53,10 @@ MONGODB_URI=mongodb://127.0.0.1:27017/webhook_inbox API_PORT=4000 npm run dev:ap
 
 The example URI has no credentials. Supply real configuration through your
 local secret mechanism; do not paste credential-bearing URLs into issues or
-screenshots. API environment files are not automatically loaded yet; placeholder
-configuration files and consolidated scripts remain D02.3 work.
+screenshots. D02.3 also provides `apps/api/.env.example`: copy it to
+`apps/api/.env.local` and run `npm run dev:api` without inline values. The API
+start/dev scripts load that optional file; process environment values take
+precedence. See [local development](LOCAL_DEVELOPMENT.md) for the full setup.
 
 `MONGODB_URI` is required, bounded to 4096 characters and accepts MongoDB URI
 schemes without whitespace. The Mongo driver validates detailed URI options and

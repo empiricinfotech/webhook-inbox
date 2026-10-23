@@ -8,6 +8,13 @@
     "zod": "4.6.7"
   },
   "exports": {
-    "./environment": "./src/environment.ts"
+    "./environment": {
+      "types": "./dist/environment.d.ts",
+      "default": "./dist/environment.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json"
   }
 }

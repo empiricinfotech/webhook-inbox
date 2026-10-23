@@ -2,7 +2,7 @@
 
 Task: **D01.1**. Planning baseline: [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md), version 1.1, 21 October 2026, especially sections 1, 2, 3, 7 and 8.
 
-This brief defines the product contract and four future release outcomes. D01.2 added the repository layout, README, MIT license and task labels; D01.3 added the pinned toolchain, dependency manifests and lockfile. D02.1 adds the Next.js overview/setup shell and separate Express startup with shared TypeScript/environment schemas. D02.2 adds a local MongoDB connection and safe liveness/readiness routes. The sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
+This brief defines the product contract and four future release outcomes. D01.2 added the repository layout, README, MIT license and task labels; D01.3 added the pinned toolchain, dependency manifests and lockfile. D02.1 adds the Next.js overview/setup shell and separate Express startup with shared TypeScript/environment schemas. D02.2 adds a local MongoDB connection and safe liveness/readiness routes. D02.3 adds checked lint/typecheck/build commands, same-origin development management routing and placeholder environment files. The sample capture flow and releases are not implemented or verified yet. Repository initialization alone did not complete D01.1.
 
 ## Problem and intended outcome
 

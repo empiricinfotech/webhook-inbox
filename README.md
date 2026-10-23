@@ -36,11 +36,16 @@ npm run check:dependencies
 
 Other version managers may use [.node-version](.node-version); install the same exact Node/npm pair. See [Toolchain and dependency baseline](docs/TOOLCHAIN.md) for installation details, the compatibility matrix and verification evidence.
 
-`npm run bootstrap` runs `npm ci` across all five workspaces using the committed `package-lock.json`. Engine and peer-version checks are strict; wrong Node/npm versions and an out-of-sync lockfile are rejected. Do not bypass these checks to install different versions.
+`npm run bootstrap` runs `npm ci` across all six workspaces using the committed `package-lock.json`. Engine and peer-version checks are strict; wrong Node/npm versions and an out-of-sync lockfile are rejected. Do not bypass these checks to install different versions.
 
 ### Run the local shell
 
-After bootstrap, start MongoDB with Docker Engine/Compose, then use two terminals for the API and frontend (POSIX shell):
+After bootstrap, copy the placeholder configuration (preserve existing local files), start MongoDB with Docker Engine/Compose, then use two terminals for the API and frontend (POSIX shell):
+
+```bash
+cp apps/api/.env.example apps/api/.env.local
+cp apps/web/.env.example apps/web/.env.local
+```
 
 ```bash
 docker compose -f infra/compose.mongo.yaml up -d --wait mongo
@@ -48,7 +53,7 @@ docker compose -f infra/compose.mongo.yaml up -d --wait mongo
 
 ```bash
 # Terminal one
-MONGODB_URI=mongodb://127.0.0.1:27017/webhook_inbox API_PORT=4000 npm run dev:api
+npm run dev:api
 ```
 
 ```bash
@@ -58,7 +63,15 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. Other routes return 404 and the frontend makes no API requests. There is no inbox/capture behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents environment rules, direct compiler/build checks and current limits. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes, configuration and real-database checks. Consolidated lint/build/typecheck scripts, same-origin API routing and placeholder environment files are D02.3.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes correctly return Express 404. Capture and health URLs are accessed directly on Express. There is no inbox/capture behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+The build emits shared contracts, Express JavaScript and the Next.js production application in order. `npm run start:api` and `npm run start:web` start built services; production shared-origin routing requires the later reverse-proxy configuration.
 
 ## Architecture
 
@@ -86,13 +99,14 @@ apps/
 packages/
   contracts/      Shared schemas and API types
   test-data/      Synthetic webhook fixtures
+  lint-config/    Isolated ESLint/parser tooling
 docs/             Product plan, brief and implementation history
 tests/e2e/        Future browser journeys
-infra/            Future Compose and reverse-proxy configuration
+infra/            Local Mongo Compose; future app/reverse proxy
 .github/          Task-label manifest and repository metadata
 ```
 
-Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while fixtures, full application containers, CI and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); placeholder application environment files remain D02.3 work.
+Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while fixtures, full application containers, CI and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); only public placeholder application environment examples are committed.
 
 ## Release roadmap
 
@@ -105,7 +119,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.2 are complete. D02.3 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.3 are complete. D03.1 is next and has not been started.
 
 ## Data and scope boundaries
 
