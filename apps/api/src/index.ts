@@ -12,8 +12,11 @@ try {
   const connectedDatabase = await connectDatabase(environment.MONGODB_URI);
   database = connectedDatabase;
   let stopping = false;
-  const server = await startServer(environment, () =>
-    stopping ? Promise.resolve(false) : connectedDatabase.isReady());
+  const server = await startServer(
+    environment,
+    () => stopping ? Promise.resolve(false) : connectedDatabase.isReady(),
+    logger,
+  );
   logger.info(
     { host: environment.API_HOST, port: environment.API_PORT },
     "API listening",

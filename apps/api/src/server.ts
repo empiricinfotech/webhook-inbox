@@ -1,12 +1,14 @@
 import { createServer, type Server } from "node:http";
 import { createApp, type ReadinessProbe } from "./app.js";
+import type { RequestLogger } from "./request-context.js";
 import type { ApiEnvironment } from "./config/environment.js";
 
 export function startServer(
   environment: ApiEnvironment,
   isDatabaseReady: ReadinessProbe,
+  logger?: RequestLogger,
 ): Promise<Server> {
-  const server = createServer(createApp(isDatabaseReady));
+  const server = createServer(createApp(isDatabaseReady, logger));
   return new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(environment.API_PORT, environment.API_HOST, () => {

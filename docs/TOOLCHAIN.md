@@ -136,3 +136,17 @@ typecheck, production builds and source/compiled API and routing checks are
 recorded in [the progress log](IMPLEMENTATION_PROGRESS.md). npm audit reports
 zero vulnerabilities for the final selected graph at verification time.
 Historical audit results and hashes above describe their original commits.
+
+## 26 October 2026 audit finding (D03.1)
+
+D03.1 adds no dependency and leaves the lockfile and all package pins unchanged.
+Clean installation and a fresh `npm audit --json` now report one high-severity
+advisory in the existing Express transitive `body-parser@2.3.0`:
+[GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828).
+The upstream advisory identifies compressed-body inflation as the affected
+usage and lists 2.4.0 as patched. The current API installs no body-parser,
+express.json or urlencoded middleware; this task preserves original-byte capture
+boundaries. A compatible dependency refresh remains a maintenance finding to
+resolve before adding parser middleware or a hosted release. No audit fix,
+override, unrelated upgrade or zero-vulnerability claim is made for this run.
+The zero-advisory results above are historical, dated observations.

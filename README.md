@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes correctly return Express 404. Capture and health URLs are accessed directly on Express. There is no inbox/capture behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. There is no inbox/capture behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -119,7 +119,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D02.3 are complete. D03.1 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D03.1 are complete. D03.2 is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -135,6 +135,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
 - [Local MongoDB and health](docs/MONGODB_LOCAL.md): local service, connection lifecycle and safe health checks.
+- [API contracts](docs/API_CONTRACTS.md): shared identifiers, errors, pagination and request correlation.
 - [Local development](docs/LOCAL_DEVELOPMENT.md): shell startup, environment schemas, boundaries and foundation verification.
 - [Toolchain and dependency baseline](docs/TOOLCHAIN.md): exact versions, bootstrap commands and compatibility limits.
 - [Contributing](CONTRIBUTING.md): task selection, current checks, review expectations and issue-label usage.

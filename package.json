@@ -46,7 +46,8 @@
     "lint": "node scripts/lint.mjs",
     "typecheck": "npm run build:contracts && npm run typecheck --workspaces --if-present && tsc -p tests/tsconfig.json",
     "check:routing": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/routing.test.ts",
-    "check:compiled-api": "npm run build:api && node scripts/check-compiled-api.mjs"
+    "check:compiled-api": "npm run build:api && node scripts/check-compiled-api.mjs",
+    "check:contracts": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/contracts.test.ts"
   },
   "devDependencies": {
     "@types/node": "24.19.2",

@@ -1,10 +1,13 @@
 import express from "express";
+import { requestContext, type RequestLogger } from "./request-context.js";
+import { errorHandler, notFound } from "./errors.js";
 
 export type ReadinessProbe = () => Promise<boolean>;
 
-export function createApp(isDatabaseReady: ReadinessProbe) {
+export function createApp(isDatabaseReady: ReadinessProbe, logger?: RequestLogger) {
   const app = express();
   app.disable("x-powered-by");
+  app.use(requestContext(logger));
 
   app.get("/health/live", (_request, response) => {
     response.set("Cache-Control", "no-store").json({ data: { status: "live" } });
@@ -23,9 +26,8 @@ export function createApp(isDatabaseReady: ReadinessProbe) {
   });
 
   // Capture will need bounded original bytes; do not install a global body parser.
-  app.use((_request, response) => {
-    response.status(404).type("text/plain").send("Not found\n");
-  });
+  app.use(notFound);
+  app.use(errorHandler(logger));
 
   return app;
 }

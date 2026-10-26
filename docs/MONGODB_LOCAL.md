@@ -84,8 +84,10 @@ curl -i http://127.0.0.1:4000/health/ready
 
 Health snapshots contain no connection metadata and use `Cache-Control:
 no-store`. Express's HEAD behavior returns the corresponding status without a
-body. Other routes still return plain 404. These operational snapshots do not
-implement the shared management error/correlation contract planned in D03.1.
+body. Since D03.1, all responses include a generated `X-Request-Id`; health
+bodies retain the operational shape above, including readiness 503. Unimplemented
+routes now return the shared JSON `NOT_FOUND` error with that same ID. See
+[API contracts](API_CONTRACTS.md) for the error and correlation rules.
 
 Readiness performs a real Mongo ping with a 1000ms client operation budget when
 connected, rather than trusting a stale connected flag. On disconnect it fails

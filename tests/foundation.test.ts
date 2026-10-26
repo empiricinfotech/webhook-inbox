@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { apiErrorResponseSchema } from "@empiric-webhook-inbox/contracts/errors";
 import { useQueryClient } from "@tanstack/react-query";
 import { EnvironmentConfigurationError } from "@empiric-webhook-inbox/contracts/environment";
 import { readApiEnvironment } from "../apps/api/src/config/environment.js";
@@ -120,7 +121,9 @@ test("HTTP health separates liveness/readiness, handles probe errors safely and 
   for (const path of ["/", "/health", "/api/v1/inboxes", "/capture/synthetic-private-value"]) {
     const response = await fetch(base + path, { headers: { authorization: "Bearer synthetic-private-value" } });
     assert.equal(response.status, 404);
-    assert.equal(await response.text(), "Not found\n");
+    const body = apiErrorResponseSchema.parse(await response.json());
+    assert.equal(body.error.code, "NOT_FOUND");
+    assert.equal(body.error.requestId, response.headers.get("x-request-id"));
   }
   await assert.rejects(startServer(environment, probe), { code: "EADDRINUSE" });
 });

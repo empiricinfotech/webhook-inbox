@@ -719,3 +719,136 @@ Stage only the D02.3 code/configuration/tests/docs and commit on main with D02.3
 **Implementation blockers:** none. **Limitations:** Next-specific lint preset/accessibility lint remains deferred for the recorded upstream constraints; production shared-origin reverse proxy and product APIs are later work. In-app browser blocks direct plain 404 viewing, with transport verified by HTTP. Linux x64 only verified; no hosted deployment or independent user trial claimed.
 
 **Next eligible task: D03.1 — shared error, identifier and pagination contracts and request correlation IDs.** Not started. Stop after D02.3.
+
+## 2026-10-26 — D03.1: shared contracts and request correlation IDs
+
+**Implementation: completed. Publication tracked separately below.** Only D03.1 is selected in this run.
+
+### Inspection and scope
+
+Started clean on main at c6283d7, tracking origin/main. Read the full project plan,
+growth checklist, previous progress, README, contribution and local-development
+instructions; inspected source, tests, scripts and .github (no CI workflow yet).
+No ancestor/root AGENTS.md or TASK_BOARD.md exists. No web source changed; its
+managed Next instructions remain untouched. Source/configuration and a fresh
+foundation run support D01/D02 completion; origin contains the published D02.3
+commit. Fetch found no divergence or unfinished publication handoff.
+
+D03.1 is the earliest unfinished eligible task, with D02 satisfied. Acceptance:
+bounded reusable identifiers/list contracts, safe consistent errors, generated
+response/log correlation, async isolation, health regression and normal checks.
+D03.2's broader harness, D03.3's CI and D08.2's cursor traversal are outside scope.
+GitHub issue/PR searches found no D03.1 equivalent; reused the ordered backlog and
+[v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No activity-only issue/PR, milestone closure or release created.
+
+### Changes and decisions
+
+| Paths | Work |
+|---|---|
+| packages/contracts/src/{identifiers,errors,pagination}.ts; contracts package.json | Pure Zod schemas/types and compiled exports: canonical 24-hex IDs, UUID v4 request IDs, strict public errors/catalog, 25/default and 100/max list limits, bounded opaque cursor and page response |
+| apps/api/src/{request-context,errors}.ts | Per-request AsyncLocalStorage, server-generated IDs, safe completed-request metadata, known/validation/unknown error handling and sanitized late-error delegation |
+| apps/api/src/{app,server,index}.ts | Wire middleware and real Pino logger; JSON NOT_FOUND replaces plain 404; health bodies remain unchanged |
+| tests/contracts.test.ts; root package.json | Six focused existing-runner tests and check:contracts script; no new framework/dependency |
+| tests/{foundation,mongo}.test.ts | Update missing-route contract assertions; verify actual source/compiled API response IDs while retaining health/lifecycle tests |
+| docs/API_CONTRACTS.md; README; CONTRIBUTING; LOCAL_DEVELOPMENT; MONGODB_LOCAL; PROJECT_BRIEF | Current behavior, public examples, commands, boundaries and handoff; reconcile an old brief reference that still called D02.3 unstarted |
+| PROJECT_DOCUMENTATION; TOOLCHAIN; IMPLEMENTATION_PROGRESS | Only D03.1 newly checked; schema-valid synthetic IDs in examples; dated existing-dependency finding and current evidence |
+
+Incoming request IDs are always replaced, including valid UUIDs. Error text is
+selected from a fixed catalog; Zod validation errors become generic 400 and
+unknown thrown values become generic 500 without honoring arbitrary status or
+header properties. Completion logs allowlist ID/method/registered template or
+unmatched/status/duration only; no URL, params, query, headers, body or exception
+object. No verified workspace exists yet to attach to logs. Headers-sent failures
+are delegated using a generic replacement error. No global JSON/body parser is
+introduced; raw-byte capture boundaries are preserved.
+
+Pagination defines transport shape only. It does not decode cursor positions,
+query Mongo, implement authorization or claim stable event traversal. No product
+domain endpoint, database model, auth, UI, worker, CI or later task implemented.
+
+### Verification
+
+Pinned official Node 24.22.0/npm 11.19.1 restored in /tmp, archive checked against
+published SHA-256; no global tool settings changed. A new temporary source copy
+excluded ignored dependencies, local config, build outputs and data. Results:
+
+- **Passed:** frozen bootstrap, toolchain/dependency smoke and valid full peer graph; ESLint; strict workspace/test TypeScript; contracts/API/Next production builds (temporary CIRCLE_NODE_TOTAL=2 for one worker).
+- **Passed:** six D03.1 checks: ID normalization/rejections; strict page/query boundaries and limits; error envelopes/status catalog; real health/404/HEAD headers; twenty concurrent async contexts, fresh IDs despite spoofed headers, safe expected/validation/unexpected errors and logs; sanitized late-error delegation.
+- **Passed:** five foundation checks, three real Next routing checks and six reported source-Mongo plus six compiled-Mongo checks. Both API modes return schema-valid NOT_FOUND and matching header IDs. Existing bounded readiness, private connection failures, outage/reconnect and shutdown checks pass. Compiled children use plain JS with TypeScript stripping disabled. Only disposable data/ports used.
+- **Passed:** in the disposable copy, changing the expected default limit from 25 to 26 made check:contracts fail; restoring the original assertion passed. This is local evidence, **not CI**.
+- **Passed:** unchanged lockfile SHA-256 `fc7d09870825ea4db9eacb0987fea4c1e81d2da898d151a87dccd42aef16ab2d`; no package resolution, version, peer policy or install-script allowance changed.
+- **Passed:** self-review of full/staged diff, links, task counts, history preservation, secrets and ignored-output boundaries before publication.
+- **Not run:** browser UI checks (no UI change); CI (none exists, D03.3 pending); broader Vitest/Supertest/data harness (D03.2 pending); product auth/capture/release journeys (not implemented).
+- **Finding, unresolved:** npm audit reports one high severity in pre-existing body-parser 2.3.0; no zero-advisory claim. See TOOLCHAIN and limitation below.
+
+Exact repository checks in the clean copy:
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run build
+npm run check:contracts
+npm run check:foundation
+npm run check:routing
+npm run check:mongo
+npm run check:compiled-api
+npm audit --json
+python3 /tmp/webhook-d031-checks.py
+git diff --check
+git diff --cached --check
+```
+
+All required **individual D03.1** acceptance passes. Day 03's deliberate invalid
+contract failure/pass **in CI** remains pending until D03.3. An existing runner
+and regression tests do not complete D03.2 or D03.3.
+
+### Growth checklist — every checkpoint accounted for
+
+Statuses below apply only to this run. C = completed for applicable work;
+P = pending; N/A = not applicable. No entire lifetime phase is declared complete.
+
+| Phase | Run status and checkpoint results |
+|---|---|
+| 0 scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — public scope/synthetic data/account retained, effective author/committer inspected and unchanged. P: 0.3, 0.6, 0.7 — capture usefulness and fresh scan/status not established; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — current README/setup/runtime/config/license/contribution/roadmap maintained. 1.5: C for actual error/schema example, P for product demo. P: 1.1 metadata not changed; 1.10 independent new-user trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — real contract/correlation need, duplicate searches, reused tracking, expected behavior, criteria and one scope. N/A: 2.5 — initial feature, no reported bug requiring reproduction. |
+| 3 implementation/review | **C for applicable implementation/self-review; no independent review/merge claim.** C: 3.2, 3.4 — behavior verified and attribution/links checked. N/A: 3.1, 3.3, 3.5 — no PR, external feedback or merge; authorized main publication recorded separately. Numbered steps 2–5, 8 completed; 1, 6–7, 9 N/A under suitable-current-branch workflow; step 10 default-branch verification applies, release-issue closure N/A. |
+| 4 release | **P.** 4.1–4.7 pending: clean foundation verified, first capture/release workflow, tag/notes/distribution/demo/link not ready. C: 4.8 — existing safe issue-reporting route retained. |
+| 5 discovery/adoption | **P.** C: 5.3 — source/install links maintained. P: 5.1–5.2, 5.4–5.8 — no pinning, outreach, invitations, user reports, outside tasks/contributions or reviews in this run. |
+| 6 maintenance | **P overall.** C: 6.3 for compatible unchanged graph/passing checks, 6.6 for upstream advisory diagnosis; dependency refresh remains pending. P: 6.1 beyond selected-task searches. N/A: 6.2, 6.4–6.5 — no reported user defect, recurring question or fix release; 6.7–6.8 — existing upstream patch/advisory, no discussion/fix contribution undertaken. |
+| 7 longer-term review | **P.** C: 7.6 — next eligible D03.2 selected without starting. P: 7.1–7.5, 7.7 — no independent product trial, scan/category/deduction/comparison result or multi-year history claim. |
+
+The reusable PR template's problem/change/verification/tracking/self-review fields
+are covered above; external review and PR/merge fields are N/A. No activity,
+community, adoption, contribution credit or score improvement is invented.
+
+### Authorship, findings and publication handoff
+
+Effective author and committer remain `empiricinfotech <empiricinfotech@gmail.com>`.
+GitHub maps the latest published c6283d7 author/committer to empiricinfotech.
+Repository ownership and push identity are not used as substitutes for this
+attribution check; no invented coauthor or history rewrite. The final new commit
+and its GitHub attribution are checked after publication when accessible.
+
+Both fetch/push destinations were inspected with credentials redacted and match
+the expected empiricinfotech/webhook-inbox repository. GitHub reports main
+unprotected and no rulesets; no existing CI or required PR workflow found.
+Existing main is suitable under the user's authorization. Publication uses one
+D03.1 commit and a normal push to the existing origin/main, followed by read-back
+of the actual remote SHA. Exact commit/push outcome is provided separately in
+the final run report; a failed push preserves the local commit.
+
+**Implementation blockers:** none. **Unrelated maintenance findings:**
+
+- Existing body-parser 2.3.0 has [GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828), fixed upstream in 2.4.0. The advisory concerns installed body-parsing middleware with compressed inflation; the current API installs no such middleware. This is a usage-based scope assessment, not a clean security audit. Resolve a compatible refresh before adding parser middleware or hosting. No unrelated dependency upgrade performed.
+- Local `.git/config` remote.origin.url contains embedded credentials. Values were never printed or added to files/commits; recommend secure credential-manager storage. URL/credentials and identity remain untouched as instructed.
+
+Remaining limits: local-only unauthenticated foundation, opaque cursor shape only,
+no browser UI change or distributed tracing, no independent review/adoption claim.
+Prior lint-preset constraints remain as documented; Linux x64 verified.
+
+**Next eligible task: D03.2 — unit and API test harnesses with disposable Mongo test data.** D02 and D03.1 prerequisites satisfied; not started. Stop after D03.1.

@@ -11,6 +11,18 @@
     "./environment": {
       "types": "./dist/environment.d.ts",
       "default": "./dist/environment.js"
+    },
+    "./identifiers": {
+      "types": "./dist/identifiers.d.ts",
+      "default": "./dist/identifiers.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "default": "./dist/pagination.js"
     }
   },
   "scripts": {

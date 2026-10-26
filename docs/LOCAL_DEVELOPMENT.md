@@ -1,6 +1,6 @@
 # Local development foundation
 
-D02.1–D02.3 | Verified 23 October 2026 | Linux x64
+D02.1–D03.1 | Updated 26 October 2026 | Linux x64
 
 Next.js serves the overview (`/`), setup (`/setup`) and missing-page shell.
 Express owns the MongoDB connection and health routes. Development management
@@ -71,7 +71,10 @@ curl -i http://127.0.0.1:3000/api/v1/inboxes
 
 Readiness returns 200/ready after a bounded Mongo ping, or 503/not_ready during
 an outage; liveness is `/health/live`. The second request currently returns
-Express's plain `404 Not found` because management features are unimplemented.
+Express's JSON `NOT_FOUND` error because management features are unimplemented.
+The response header `X-Request-Id` matches `error.requestId`; IDs are generated
+by Express and incoming client IDs are ignored. See [API contracts](API_CONTRACTS.md)
+for schemas, safe errors and request log correlation.
 That is an expected transport check, not successful inbox creation. Future
 providers send original requests directly to Express `/capture/:token`.
 
@@ -127,6 +130,7 @@ test reports are ignored; warnings fail the lint command.
 
 ```bash
 npm run check:foundation
+npm run check:contracts
 npm run check:routing
 npm run check:mongo
 npm run check:compiled-api
@@ -149,6 +153,9 @@ copies and actual dev/prod startup. Browser checks cover direct setup reload,
 navigation and current configuration instructions. Actual HTTP checks verify
 forwarded Express 404s; the in-app browser blocks direct viewing of that plain
 404 response.
+D03.1 subsequently changes Express 404s to the shared JSON error format, adds
+request IDs and six contract/error/correlation checks. HTTP checks and both API
+Mongo suites verify the new response; health bodies remain unchanged.
 No inbox capture, independent user trial, hosted deployment or release is claimed.
 On this constrained verification host, CIRCLE_NODE_TOTAL=2 limits build workers;
 no resource override is committed. Detailed results are in

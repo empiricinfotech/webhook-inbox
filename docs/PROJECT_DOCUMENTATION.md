@@ -538,10 +538,10 @@ All management paths in this inventory have the /api/v1 prefix. Capture and heal
 ```json
 {
   "createInbox": {"name": "GitHub staging", "retentionDays": 7},
-  "captureResponse": {"data": {"eventId": "example-event-id", "captured": true}},
-  "createReplay": {"destinationId": "example-destination-id"},
-  "replayResponse": {"data": {"jobId": "example-job-id", "state": "queued"}},
-  "error": {"code": "PAYLOAD_TOO_LARGE", "message": "Request body exceeds the configured limit", "requestId": "example-request-id"}
+  "captureResponse": {"data": {"eventId": "0123456789abcdef01234567", "captured": true}},
+  "createReplay": {"destinationId": "0123456789abcdef01234568"},
+  "replayResponse": {"data": {"jobId": "0123456789abcdef01234569", "state": "queued"}},
+  "error": {"code": "PAYLOAD_TOO_LARGE", "message": "Request body exceeds the configured limit", "requestId": "d9291b26-40f2-4b1b-8fa9-6d11e790b6f5"}
 }
 ```
 
@@ -636,7 +636,7 @@ Prerequisite: D01. Modules: M01. Planned effort: 5 to 6 hours.
 
 Prerequisite: D02. Modules: M01. Planned effort: 5 to 6 hours.
 
-- [ ] **D03.1** Define shared error, identifier and pagination contracts and request correlation IDs.
+- [x] **D03.1** Define shared error, identifier and pagination contracts and request correlation IDs. [Contract and correlation evidence](API_CONTRACTS.md).
 
 - [ ] **D03.2** Add unit and API test harnesses with disposable Mongo test data.
 

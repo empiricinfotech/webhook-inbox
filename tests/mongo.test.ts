@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { apiErrorResponseSchema } from "@empiric-webhook-inbox/contracts/errors";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
@@ -73,6 +74,14 @@ test("real Mongo startup, safe failures, outage/recovery and shutdown", {
     const live = await fetch(base + "/health/live");
     assert.equal(live.status, 200);
     assert.deepEqual(await live.json(), { data: { status: "live" } });
+    const missing = await fetch(base + "/api/v1/inboxes", {
+      headers: { "X-Request-Id": "synthetic-untrusted-id" },
+    });
+    const body = apiErrorResponseSchema.parse(await missing.json());
+    assert.equal(missing.status, 404);
+    assert.equal(body.error.code, "NOT_FOUND");
+    assert.equal(body.error.requestId, missing.headers.get("x-request-id"));
+    assert.notEqual(body.error.requestId, "synthetic-untrusted-id");
     assert.doesNotMatch(api.output(), /mongodb:\/\/|webhook_inbox_check/);
 
     const conflict = launchApi({ API_PORT: String(port), MONGODB_URI: uri });
