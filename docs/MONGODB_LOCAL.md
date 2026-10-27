@@ -103,6 +103,12 @@ also closes the newly opened pool before exiting.
 
 ## Verification
 
+D03.2 also provides the reusable Vitest/Supertest harness described in
+[TESTING.md](TESTING.md). Its Mongo fixture creates an owned native process,
+random database and temporary directory per test; it accepts no database URI.
+The original lifecycle suite below shares the native startup helper and retains
+its outage/recovery/compiled-output checks.
+
 ```bash
 npm run check:foundation
 npm run check:mongo
@@ -122,9 +128,9 @@ shutdown, then removes only its test data. It deliberately pauses/stops only
 the Mongo process it created. It does not read a caller's MONGODB_URI, drop an
 existing database, or connect to your development service.
 
-These checks use the existing Node test/tsx tooling. They do not install
-Vitest/Supertest or implement D03.2's broader disposable-data harness. The
-Compose service was additionally started under a unique test project/port and
+The original lifecycle checks use Node test/tsx tooling; D03.2's separate
+Vitest/Supertest/disposable-data harness is now documented above. During D02.2,
+the Compose service was additionally started under a unique test project/port and
 checked through the actual API; its disposable containers/volumes were removed
 after verification. Normal development data volumes were untouched.
 

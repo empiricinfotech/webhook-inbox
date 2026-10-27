@@ -1,38 +1,14 @@
 import assert from "node:assert/strict";
 import { apiErrorResponseSchema } from "@empiric-webhook-inbox/contracts/errors";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import test from "node:test";
+import { startMongo } from "./helpers/mongo-process.js";
 import {
   availablePort, launchApi, stopProcess, waitForApi,
 } from "./helpers/api-process.js";
-
-async function startMongo(directory: string, port: number) {
-  const log = join(directory, "mongod.log");
-  const child = spawn(process.env.MONGOD_BINARY || "mongod", [
-    "--dbpath", directory, "--bind_ip", "127.0.0.1", "--port", String(port),
-    "--nounixsocket", "--logpath", log, "--logappend", "--quiet",
-  ], { stdio: "ignore" });
-  const exited = once(child, "exit") as Promise<[number | null, NodeJS.Signals | null]>;
-  // Attach a rejection handler immediately so a missing binary is reported cleanly.
-  void exited.catch(() => {});
-  const deadline = Date.now() + 15000;
-  try {
-    while (!(await readFile(log, "utf8").catch(() => "")).includes("Waiting for connections")) {
-      assert.equal(child.exitCode, null, "mongod stopped before accepting connections");
-      assert.ok(Date.now() < deadline, "mongod did not become ready; install MongoDB or set MONGOD_BINARY");
-      await delay(50);
-    }
-    return { child, exited };
-  } catch (error) {
-    await stopProcess(child);
-    throw error;
-  }
-}
 
 async function waitForHealth(base: string, status: number) {
   const deadline = Date.now() + 20000;

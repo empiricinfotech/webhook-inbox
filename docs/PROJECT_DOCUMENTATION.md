@@ -638,7 +638,7 @@ Prerequisite: D02. Modules: M01. Planned effort: 5 to 6 hours.
 
 - [x] **D03.1** Define shared error, identifier and pagination contracts and request correlation IDs. [Contract and correlation evidence](API_CONTRACTS.md).
 
-- [ ] **D03.2** Add unit and API test harnesses with disposable Mongo test data.
+- [x] **D03.2** Add unit and API test harnesses with disposable Mongo test data. [Harness and disposable-data evidence](TESTING.md).
 
 - [ ] **D03.3** Create PR automation for installation, ESLint, type checks, tests, the Next.js production build and backend builds.
 

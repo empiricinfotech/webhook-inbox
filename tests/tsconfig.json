@@ -9,6 +9,7 @@
     "moduleResolution": "Bundler"
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../vitest.config.ts"
   ]
 }

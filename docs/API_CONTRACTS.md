@@ -124,15 +124,16 @@ finish and startup failures are outside completed-response logging.
 
 ## Verification and pending work
 
-`npm run check:contracts` builds shared JS first and runs six focused Node tests:
+`npm run check:contracts` builds shared JS first and runs the six original
+contract regressions under Vitest (four unit and two HTTP tests):
 identifier/query/page/error boundaries, real application success/404/HEAD,
 expected statuses, validation/unknown async errors, twenty overlapping requests,
 context cleanup, header spoofing, log redaction and sanitized late-error delegation.
 Existing foundation and source/compiled Mongo suites verify health regression
-and the real API's new missing-route envelope. No additional test dependency is
-introduced. See [progress](IMPLEMENTATION_PROGRESS.md) for exact checks/results.
+and the real API's new missing-route envelope. D03.2 adds the planned Vitest/Supertest dependencies; see
+[testing](TESTING.md) and [progress](IMPLEMENTATION_PROGRESS.md) for checks/results.
 
-No frontend UI changes are needed. D03.2 introduces the broader disposable-data
+No frontend UI changes are needed. D03.2 now provides the disposable-data
 unit/API harness; D03.3 adds CI. The Day 03 deliberate-failure-in-CI acceptance
 remains pending until that automation exists.
 

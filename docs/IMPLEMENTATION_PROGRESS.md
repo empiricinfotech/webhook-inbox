@@ -852,3 +852,153 @@ no browser UI change or distributed tracing, no independent review/adoption clai
 Prior lint-preset constraints remain as documented; Linux x64 verified.
 
 **Next eligible task: D03.2 — unit and API test harnesses with disposable Mongo test data.** D02 and D03.1 prerequisites satisfied; not started. Stop after D03.1.
+
+## 2026-10-27 — D03.2: unit/API test harnesses and disposable Mongo data
+
+**Implementation: completed. Publication: normal main/origin handoff below.**
+D03.2 is the only selected implementation task; D03.3 is not started.
+
+### Inspection, selection and authorship
+
+Read the request, project architecture/backlog, complete growth checklist,
+previous progress, README, contribution/local-development and testing boundaries.
+No ancestor/root AGENTS.md or TASK_BOARD.md exists. Read the managed web AGENTS.md;
+no web source changed. Inspected main/upstream/remotes/recent commits, implemented
+schemas/middleware and all test scripts/helpers; .github has no CI workflow.
+Started clean at ff9a3ae, tracking origin/main. Fetch/read-back confirms D03.1 is
+already published; fresh existing contract checks pass, so no publication-only
+handoff remains. D03.2 is the earliest unfinished eligible task with D02/D03.1
+satisfied. Tests already using temporary Mongo did not alone complete this
+broader unit/API harness task.
+
+Effective author/committer remains empiricinfotech <empiricinfotech@gmail.com>;
+GitHub maps ff9a3ae's author/committer to empiricinfotech. Identity is unchanged,
+with no invented coauthor or attribution rewrite. Origin/upstream fetch/push
+paths were safely redacted and match empiricinfotech/webhook-inbox. Origin's
+embedded credential location remains .git/config remote.origin.url; values were
+never output/committed or changed. Credential-manager storage is recommended.
+GitHub reports main unprotected with no rulesets; the current-branch publication
+workflow is suitable under the user's authorization.
+
+D03.2 issue/PR searches found no duplicate. Reused the ordered backlog and
+[v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No artificial issue/PR, milestone closure, release or external post created.
+
+Acceptance: separate runnable unit/API projects, preserved prior regressions,
+real HTTP/API assertions, owned disposable Mongo data, isolation/reset/reseed,
+startup/failing-test cleanup, failing command exit semantics, frozen clean setup
+and normal lint/type/build checks. Day 03's CI acceptance remains D03.3.
+
+### Work and decisions
+
+| Files | Result |
+|---|---|
+| package.json, package-lock.json | Exact Vitest 5.0.5, Vite 8.3.5, Supertest 7.3.1, @types/supertest 7.2.1 dev dependencies; test/test:unit/test:api and compatible check:contracts scripts |
+| vitest.config.ts, tests/tsconfig.json | Node/fork unit/API projects, bounded workers/timeouts, strict discovery/focus handling, mock/env restoration and config included in strict types |
+| tests/unit/contracts.test.ts, tests/api/contracts.test.ts; removed old tests/contracts.test.ts | Split the six existing regressions into four unit/two API checks; original six test bodies preserved exactly, with runner/context/import plumbing adapted |
+| tests/helpers/{mongo-process,mongo-fixture,api-fixture}.ts; tests/mongo.test.ts | Share legacy native startup; new per-test owned Mongo process/directory/random DB, connection/reset/idempotent teardown, API/Supertest fixture and loopback listen lifecycle |
+| tests/fixtures/synthetic-records.ts; tests/api/database.test.ts; tests/unit/mongo-fixture.test.ts | Synthetic insert/read/reset/reseed, simultaneous resource/data isolation, ignored caller URI, real readiness/error/HEAD behavior, failure cleanup and liveness after pool closure |
+| README, CONTRIBUTING, API_CONTRACTS, LOCAL_DEVELOPMENT, MONGODB_LOCAL, PROJECT_BRIEF, TOOLCHAIN, new TESTING.md | Current commands, native Mongo prerequisite, migration/dependency evidence, ownership/cleanup rules and remaining boundaries |
+| PROJECT_DOCUMENTATION, IMPLEMENTATION_PROGRESS | Only D03.2 newly checked; preserve prior history and record results/handoff |
+
+No application runtime code, domain schema/route, capture, auth, worker, browser
+harness or CI added. Fixtures never accept a database URI or read MONGODB_URI/
+dotenv; reset and directory removal target only resources they created. API
+fixture uses the actual connectDatabase/createApp, awaits a loopback server,
+then provides Supertest. Dependency cleanup precedes Mongo/data cleanup even
+after assertion failure; setup failures also clean up. The dependency-free
+Vitest fixture's required empty destructuring has a single documented lint
+exception; no global lint, type or test check was disabled.
+
+The pinned runtime was restored only in /tmp from the official Node distribution
+with published SHA-256 verification. Registry engines/peers/licenses were checked
+before installation: all four new direct packages report MIT and support the
+existing Node/types/tsx baseline. npm deduplicated four nested lint entries to
+matching hoisted versions; every pre-existing external name/version pair remains.
+Root TS7, parser-only TS6, application pins, strict peers/engines and the exact
+esbuild lifecycle allowance are unchanged.
+
+### Verification results
+
+A fresh source-only temporary copy excluded real env files, dependencies,
+generated output and database files. All required checks pass on Linux x64 with
+Node 24.22.0/npm 11.19.1 and native MongoDB 8.0.32:
+
+- Frozen bootstrap installed 371/audited 378 packages; full dependency tree/smoke passes. Lock SHA-256 stayed `1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6` after npm ci.
+- ESLint, strict workspace/test/config TypeScript and contracts/API/Next webpack production builds pass. CIRCLE_NODE_TOTAL=2 temporarily limited Next build workers; no resource override committed.
+- Unit project: **5 passed** without a working native Mongo binary. API project: **7 passed** with owned Mongo data. Combined: **12 passed**, none skipped. check:contracts selects the six preserved earlier regressions and passes.
+- Legacy foundation **5 passed**, real Next routing **3 passed**, source Mongo **6 reported tests passed** and compiled API Mongo **6 passed**. Existing auth/parser-error privacy, stalled ping, outage/recovery and shutdown evidence remains covered; compiled children disable Node TypeScript stripping.
+- Data tests demonstrate empty per-test fixtures, synthetic insert/read, reset/reseed, independent simultaneous fixtures, idempotent close, protected second fixture, removed owned data, ignored caller MONGODB_URI and readiness 503/liveness 200 after API pool closure. No tenant authorization/capture claim.
+- In the disposable copy only, an assertion intentionally failed after allocating Mongo/API fixtures. The command failed; a server-close marker, refused owned HTTP/Mongo ports and removed Mongo directory proved cleanup. The restored complete suite passed. Empty discovery and focused .only probes each failed as intended; probes were removed, never committed.
+- Failure-startup test uses its own temporary root and missing binary, rejects promptly and removes partial data. Test hooks restore environment stubs; no normal development data/service was used or stopped.
+- Link/content/task-count checks, prior-history preservation, complete/staged diff, secret/generated-clutter review and Git-configuration preservation completed before publication.
+- Audit: **one existing high body-parser advisory remains**; no new audit finding or clean-security claim. No unrelated audit fix/upgrade performed.
+
+Commands (pinned toolchain active):
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run build
+npm run test:unit
+npm run test:api
+npm test
+npm run check:contracts
+npm run check:foundation
+npm run check:routing
+npm run check:mongo
+npm run check:compiled-api
+npm audit --json
+python3 /tmp/webhook-d032-checks.py
+node node_modules/vitest/vitest.mjs run --project unit no-such-task-test-file
+node node_modules/vitest/vitest.mjs run --project api tests/api/intentional-cleanup.test.ts
+node node_modules/vitest/vitest.mjs run --project unit tests/unit/focused-probe.test.ts
+git diff --check
+git diff --cached --check
+```
+
+Last three Vitest commands above are deliberate failing probes only in the
+throwaway copy; their files do not exist in the product repository. No raw logs,
+fixture data, binaries, generated dependencies or local configuration committed.
+**Not run:** UI/browser journeys (no UI change); CI (absent until D03.3); later
+capture/auth/tenant/release acceptance (unimplemented). Individual D03.2 passes;
+the Day 03 deliberate-failure/pass **in CI** criterion remains pending.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These are per-run results, not lifetime phase completion or scoring evidence.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — existing public scope/account, synthetic data and inspected attribution retained. P: 0.3, 0.6, 0.7 — usable capture product and fresh scan/status absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — current README/install/runtime/config/license/contribution/roadmap maintained and test setup documented. 1.5 C for working harness example, P for product demo. P: 1.1 metadata unchanged; 1.10 independent new-user trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing reusable harness/data isolation, duplicate searches, reused tracking, one scope and acceptance evidence. N/A: 2.5 — initial harness feature, no reported product bug. |
+| 3 build/check/review | **C for applicable steps.** C: 3.2, 3.4 — real test/data/failure flow and attribution/links checked. N/A: 3.1, 3.3, 3.5 — no PR, independent feedback or merge; authorized direct-main publication separate. Numbered steps 2–5, 8 completed; 1, 6–7, 9 N/A under current-branch workflow; step 10 default-branch verification applies, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain product/release gates: clean test foundation checked, main capture workflow/tag/notes/distribution/demo/link not ready. C: 4.8 — safe issue-reporting route retained. |
+| 5 discovery/adoption | **P.** C: 5.3 source/install links. P: 5.1–5.2, 5.4–5.8 — no pinning, tutorial/outreach/invitations, real reports, outside task/contribution review work occurred. |
+| 6 maintenance | **P overall.** C: 6.3 for compatible pinned tooling/passing regressions; security refresh still pending. P: 6.1 beyond task duplicate search. N/A: 6.2, 6.4–6.5 — no user report/recurring question/fix release. C: 6.6 existing advisory status checked; 6.7–6.8 N/A — no new upstream diagnosis/discussion/fix contribution required by this task. |
+| 7 long-term review | **P.** C: 7.6 — D03.3 handoff identified without starting. P: 7.1–7.5, 7.7 — no independent product trial, scan/categories/deductions/comparison evidence or multi-year result. |
+
+Reusable PR checklist problem/change/verification/tracking/self-review are covered;
+PR/independent review/merge fields N/A. No activity, adoption, stars, reviews,
+upstream contribution, release or GHFind improvement invented.
+
+### Publication, limitations and handoff
+
+One coherent D03.2 commit on main is authorized for normal push to the existing
+origin/main; no remote/identity change, force push or history rewrite. Read back
+the actual remote SHA and GitHub attribution after pushing; exact commit/push
+result is reported separately in the final run response. If push fails, preserve
+the implementation commit and report publication blocked with its safe reason.
+
+**Implementation blockers:** none. Native MongoDB 8 and process/loopback binding
+permissions are required for API tests; unit tests remain independent. Linux x64
+verified; no browser/hosted deployment or independent review claimed. Existing
+body-parser advisory and embedded-origin-credential storage findings remain as
+recorded under D03.1/TOOLCHAIN; no unrelated change made to resolve them.
+
+**Next eligible task: D03.3 — PR automation for installation, lint, types, tests, Next production and backend builds.** D02, D03.1 and D03.2 prerequisites satisfied; not started. Stop after D03.2.

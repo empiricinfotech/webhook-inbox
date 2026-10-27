@@ -150,3 +150,16 @@ boundaries. A compatible dependency refresh remains a maintenance finding to
 resolve before adding parser middleware or a hosted release. No audit fix,
 override, unrelated upgrade or zero-vulnerability claim is made for this run.
 The zero-advisory results above are historical, dated observations.
+
+## D03.2 test-tooling update
+
+27 October 2026: exact root dev dependencies Vitest 5.0.5, Vite 8.3.5,
+Supertest 7.3.1 and @types/supertest 7.2.1 added after inspecting registry engines,
+peers and MIT licenses. Vitest accepts Node 24 and Vite 8; Vite's optional tsx,
+esbuild and Node-types peers match the existing pinned packages. Application
+versions and compiler/lint-parser separation are unchanged. npm deduplicated
+four existing nested lint dependency entries to matching hoisted versions; no
+pre-existing external package version was upgraded. The lockfile records all
+new exact resolutions. Frozen bootstrap and strict dependency/type/build/test
+checks are recorded in IMPLEMENTATION_PROGRESS. The previously recorded
+body-parser advisory remains pending; no blanket audit fix or peer bypass used.

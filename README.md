@@ -68,8 +68,11 @@ Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo pin
 ```bash
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
+
+`npm run test:unit` works without Mongo. `npm test` and `test:api` require a native MongoDB 8 binary and create their own disposable instances; the Docker development service alone does not provide that binary. See [testing](docs/TESTING.md) for fixture ownership and requirements.
 
 The build emits shared contracts, Express JavaScript and the Next.js production application in order. `npm run start:api` and `npm run start:web` start built services; production shared-origin routing requires the later reverse-proxy configuration.
 
@@ -119,7 +122,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D03.1 are complete. D03.2 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D03.2 are complete. D03.3 is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -135,6 +138,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
 - [Local MongoDB and health](docs/MONGODB_LOCAL.md): local service, connection lifecycle and safe health checks.
+- [Testing](docs/TESTING.md): Vitest unit/API projects, Supertest and owned disposable Mongo fixtures.
 - [API contracts](docs/API_CONTRACTS.md): shared identifiers, errors, pagination and request correlation.
 - [Local development](docs/LOCAL_DEVELOPMENT.md): shell startup, environment schemas, boundaries and foundation verification.
 - [Toolchain and dependency baseline](docs/TOOLCHAIN.md): exact versions, bootstrap commands and compatibility limits.

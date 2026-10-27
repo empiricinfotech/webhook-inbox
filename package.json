@@ -47,13 +47,20 @@
     "typecheck": "npm run build:contracts && npm run typecheck --workspaces --if-present && tsc -p tests/tsconfig.json",
     "check:routing": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/routing.test.ts",
     "check:compiled-api": "npm run build:api && node scripts/check-compiled-api.mjs",
-    "check:contracts": "npm run build:contracts && tsx --tsconfig tests/tsconfig.json --test tests/contracts.test.ts"
+    "check:contracts": "npm run build:contracts && vitest run tests/unit/contracts.test.ts tests/api/contracts.test.ts",
+    "test": "npm run build:contracts && vitest run",
+    "test:unit": "npm run build:contracts && vitest run --project unit",
+    "test:api": "npm run build:contracts && vitest run --project api"
   },
   "devDependencies": {
+    "@empiric-webhook-inbox/lint-config": "0.0.0",
     "@types/node": "24.19.2",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "@empiric-webhook-inbox/lint-config": "0.0.0"
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
   },
   "allowScripts": {
     "esbuild@0.28.2": true
