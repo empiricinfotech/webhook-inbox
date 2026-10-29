@@ -67,7 +67,13 @@ RED/GREEN evidence. Its overall success means the rejection and correction
 behaved as expected; it does not label the deliberately invalid assertion as a
 passing test. The failing probe is generated only during verification.
 
-Publication/hosted-run evidence is recorded in [implementation progress](IMPLEMENTATION_PROGRESS.md).
+[Hosted run #1](https://github.com/empiricinfotech/webhook-inbox/actions/runs/40818118823)
+passed on implementation commit 8f72291. Its decoded job log shows RED (npm test
+exit 1, intended assertion) then GREEN (exit 0, all 13 tests). All normal gates
+and checkout integrity passed on Ubuntu 24.04, including the downloaded Mongo
+8.0.32 executable. This is an observed push run; the PR trigger is configured
+and statically checked, with no PR run claimed. Further evidence is in
+[implementation progress](IMPLEMENTATION_PROGRESS.md).
 A configured YAML file or a local success alone is not evidence of a hosted CI run.
 
 ## Local reproduction and limitations

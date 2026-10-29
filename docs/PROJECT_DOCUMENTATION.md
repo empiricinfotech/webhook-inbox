@@ -640,7 +640,7 @@ Prerequisite: D02. Modules: M01. Planned effort: 5 to 6 hours.
 
 - [x] **D03.2** Add unit and API test harnesses with disposable Mongo test data. [Harness and disposable-data evidence](TESTING.md).
 
-- [ ] **D03.3** Create PR automation for installation, ESLint, type checks, tests, the Next.js production build and backend builds.
+- [x] **D03.3** Create PR automation for installation, ESLint, type checks, tests, the Next.js production build and backend builds. [CI and failure/correction evidence](CI.md).
 
 **Acceptance:** A deliberately invalid contract test fails in CI and passes after the correction.
 

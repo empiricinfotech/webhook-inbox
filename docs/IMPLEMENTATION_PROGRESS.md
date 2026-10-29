@@ -1006,7 +1006,7 @@ recorded under D03.1/TOOLCHAIN; no unrelated change made to resolve them.
 
 ## 2026-10-29 — D03.3: PR automation for foundation checks
 
-**Implementation: in progress — local checks and hosted acceptance below. Publication: pending.**
+**Implementation: completed. Publication: implementation pushed to origin/main; hosted CI passed. Final evidence-record push below.**
 D03.3 is the only selected task. No D04 implementation is started.
 
 ### Inspection and acceptance
@@ -1077,7 +1077,7 @@ copy unrelated failing test made the probe fail with its specific guard and
 removed the generated probe, confirming arbitrary errors cannot satisfy RED.
 The intentional unrelated assertion was removed; it is not committed.
 
-Hosted result remains pending below. Logs, installed
+Hosted result is verified below. Logs, installed
 packages, binaries, fixtures and reports stay in /tmp/ignored paths. Required
 commands use Node 24.22.0/npm 11.19.1 in a source-only disposable checkout:
 
@@ -1102,8 +1102,10 @@ git diff --cached --check
 Official Node and actionlint downloads are checksum verified in /tmp. Workflow
 Mongo archive checksum and documentation/status/link checks pass. Its Ubuntu 24.04
 executable cannot run on this Ubuntu 22.04/glibc 2.35 host (requires GLIBC_2.38);
-that OS-specific execution check is pending on the configured hosted runner.
-Local fixture checks use the existing compatible native MongoDB 8.0.32 binary. Local Next production build bounds worker count with CIRCLE_NODE_TOTAL=2;
+the configured Ubuntu 24.04 hosted runner successfully executes the binary and
+all native-Mongo checks, resolving that environment-specific verification.
+Local fixture checks use the existing compatible native MongoDB 8.0.32 binary.
+Local Next production build bounds worker count with CIRCLE_NODE_TOTAL=2;
 CI uses the hosted runner's default. Normal local development services/data are
 preserved. UI/browser and later capture/auth/tenant/replay/release acceptance are
 **not run**: this task changes automation only and those features are future work.
@@ -1118,7 +1120,7 @@ Statuses apply to this run, not permanent phase completion or scoring evidence.
 | 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — retained public scope/account, synthetic data and checked authorship. P: 0.3, 0.6, 0.7 — usable capture product, fresh scan/categories and scan freshness absent; no scan requested. |
 | 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — README/setup/runtime/config/license/contribution/roadmap retained and CI commands documented. 1.5 C for runnable probe example, P for product demo. P: 1.1 metadata unchanged; 1.10 independent new-developer trial absent. |
 | 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing PR quality gates, duplicate search, reused milestone/backlog, expected result and one acceptance scope. N/A: 2.5 — no reported product bug to reproduce. |
-| 3 build/check/review | **P until hosted verification.** C: 3.2, 3.4 — local behavior checks and attribution/links; hosted result recorded below. N/A: 3.1, 3.3, 3.5 — no PR, independent review/feedback or merge under authorized direct-main workflow. Numbered steps 2–5, 8 are self-verification; 1, 6–7, 9 N/A for this workflow; step 10 applies to default-branch/CI verification, milestone closure N/A. |
+| 3 build/check/review | **C for applicable steps.** C: 3.2, 3.4 — local and hosted behavior checks and attribution/links; hosted result recorded below. N/A: 3.1, 3.3, 3.5 — no PR, independent review/feedback or merge under authorized direct-main workflow. Numbered steps 2–5, 8 are self-verification; 1, 6–7, 9 N/A for this workflow; step 10 applies to default-branch/CI verification, milestone closure N/A. |
 | 4 release | **P.** 4.1–4.7 remain product/release gates: clean foundation install tested but no capture journey, version/tag/notes/distribution/demo/release link. C: 4.8 issue reporting route retained. |
 | 5 discovery/adoption | **P.** C: 5.3 existing source/install links. P: 5.1–5.2, 5.4–5.8 — no profile pinning, product tutorial/outreach/invitation, real support reports or outside contribution/review evidence. |
 | 6 maintenance | **P overall.** C: 6.3 compatible pinned tooling/regressions (security refresh remains pending). P: 6.1 beyond task duplicate check. N/A: 6.2, 6.4–6.5 — no user report, recurring question or fix release. C: 6.6 existing dependency finding retained; 6.7–6.8 N/A — no new upstream diagnosis/discussion/fix required. |
@@ -1130,14 +1132,36 @@ upstream contribution, release or GHFind score gain is claimed.
 
 ### Publication and handoff
 
-Implementation commit and hosted CI acceptance are pending at this record's
-initial publication. Completion must be finalized from the actual hosted run;
-D03.3 stays unchecked until then. If pushing/CI access fails, preserve the local
-commit and record the concrete blocker. No force push, history rewrite, remote,
-identity, visibility or branch-protection change is authorized or performed.
+Implementation commit [8f72291](https://github.com/empiricinfotech/webhook-inbox/commit/8f7229114c86194986c5fb951a6419a23b8c7257)
+is pushed to the unchanged origin/main; git ls-remote confirms the exact SHA.
+GitHub maps both its author and committer to empiricinfotech. No PR/merge was
+required under the authorized direct-main workflow; PR trigger configuration is
+validated, while the observed hosted event is push (not a claimed PR run).
+
+[Hosted run #1](https://github.com/empiricinfotech/webhook-inbox/actions/runs/40818118823),
+[job and logs](https://github.com/empiricinfotech/webhook-inbox/actions/runs/40818118823/job/123263935296),
+completed **success** on the exact implementation commit. All check and cleanup
+steps passed, including exact Node/npm, checksum-pinned native Mongo 8.0.32,
+12 normal tests, lint, types, startup, source/compiled API lifecycle/outage,
+Next production build/routing and clean tracked/untracked checkout integrity.
+Read the decoded job log: RED reports npm test exit 1 with the intended actual
+assertion failure; GREEN reports exit 0 and all 13 corrected/normal tests passed.
+This demonstrates the Day 03 failure/correction criterion inside hosted CI.
+
+The local archive executable attempt failed only because this host has older
+glibc; the target runner execution succeeds. No required task check remains
+failed or blocked. The completed job log directly verifies RED/GREEN.
+No independent review, PR run, release, security-audit success or capture journey
+is inferred from this result.
+
+A documentation-only D03.3 follow-up records this post-publication evidence and
+checks D03.3 in the ordered plan; its actual commit/push and CI result are reported
+in the final response. This necessary evidence update does not split product
+scope or rewrite the published implementation commit. No force push, identity,
+remote, visibility or branch-protection change is performed.
 
 Existing body-parser advisory remains in TOOLCHAIN.md; origin credential storage
 remains a local configuration finding. No unrelated fix/upgrade is bundled.
-**Next eligible task after completed D03.3: D04.1 — workspace and inbox schemas
-with timestamps and explicit validation**, requiring all D03 tasks. Until hosted
-acceptance is demonstrated, resume D03.3. Stop after this task.
+**Next eligible task: D04.1 — workspace and inbox schemas with timestamps and
+explicit validation.** D01–D03 prerequisites are complete. D04.1 is not started;
+stop after D03.3.
