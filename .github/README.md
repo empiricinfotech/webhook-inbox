@@ -8,4 +8,4 @@ Each of the four existing milestone issues has its corresponding release label. 
 
 The manifest documents the live configuration; it does not run an automatic label-sync workflow. Maintainers should compare existing labels before applying a later change and preserve unrelated labels. See [CONTRIBUTING.md](../CONTRIBUTING.md) for usage.
 
-CI workflows and issue/PR templates will be added at their planned tasks. No automation or application checks are configured by this directory yet.
+[Foundation CI](workflows/ci.yml) checks pull requests, pushes to main and manual runs. See [CI setup and acceptance](../docs/CI.md). Issue/PR templates remain later work.

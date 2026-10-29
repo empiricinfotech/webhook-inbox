@@ -72,6 +72,8 @@ npm test
 npm run build
 ```
 
+[Foundation CI](docs/CI.md) runs the locked installation, lint, strict types, tests and production builds on pull requests and pushes to main. Its contract probe demonstrates assertion failure and correction without committing a failing test.
+
 `npm run test:unit` works without Mongo. `npm test` and `test:api` require a native MongoDB 8 binary and create their own disposable instances; the Docker development service alone does not provide that binary. See [testing](docs/TESTING.md) for fixture ownership and requirements.
 
 The build emits shared contracts, Express JavaScript and the Next.js production application in order. `npm run start:api` and `npm run start:web` start built services; production shared-origin routing requires the later reverse-proxy configuration.
@@ -106,7 +108,7 @@ packages/
 docs/             Product plan, brief and implementation history
 tests/e2e/        Future browser journeys
 infra/            Local Mongo Compose; future app/reverse proxy
-.github/          Task-label manifest and repository metadata
+.github/          CI workflow, task-label manifest and repository metadata
 ```
 
 Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while fixtures, full application containers, CI and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); only public placeholder application environment examples are committed.

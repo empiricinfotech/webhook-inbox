@@ -1002,3 +1002,142 @@ body-parser advisory and embedded-origin-credential storage findings remain as
 recorded under D03.1/TOOLCHAIN; no unrelated change made to resolve them.
 
 **Next eligible task: D03.3 — PR automation for installation, lint, types, tests, Next production and backend builds.** D02, D03.1 and D03.2 prerequisites satisfied; not started. Stop after D03.2.
+
+
+## 2026-10-29 — D03.3: PR automation for foundation checks
+
+**Implementation: in progress — local checks and hosted acceptance below. Publication: pending.**
+D03.3 is the only selected task. No D04 implementation is started.
+
+### Inspection and acceptance
+
+Read the request, project architecture/backlog, entire growth checklist, prior
+progress, README, contribution/local-development/testing instructions and managed
+web AGENTS.md. No ancestor/root AGENTS.md or TASK_BOARD.md exists. Inspected
+scripts, contracts, Vitest/Mongo fixtures and .github; no previous CI workflow
+existed. Started clean on main at c081f1f tracking origin/main. Fresh fetch and
+GitHub read-back show the same SHA (0 ahead/behind); D03.2 is already published,
+and a fresh baseline npm test passes all 12 tests. D03.3 is the earliest eligible
+unfinished task with D02/D03.1/D03.2 satisfied.
+
+GitHub D03.3 issue/PR searches returned no equivalents. Reuse the ordered backlog
+and [v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1),
+which remains open. Main is unprotected, with no rulesets; the user's authorized
+current-branch workflow remains suitable. No artificial tracking issue or PR,
+review, milestone closure, release, tag or public post is created.
+
+Author and committer remain empiricinfotech <empiricinfotech@gmail.com>; GitHub
+maps the previous c081f1f commit's author/committer to empiricinfotech. Push
+credentials and repository ownership are separate from authorship. Identity and
+remote configuration are unchanged, with no invented coauthor. Safely inspected
+origin/upstream destinations match empiricinfotech/webhook-inbox. Origin's
+embedded credential location remains .git/config remote.origin.url; no value
+was output or committed. Credential-manager storage remains recommended.
+
+Individual acceptance: locked install with pinned Node/npm; PR/push automation
+for ESLint, strict types, fast unit/API tests, shared/Express/Next production
+builds; native disposable Mongo provision; real contract assertion rejection
+and correction inside hosted CI. Additional existing foundation, database,
+compiled-API and routing regressions are retained. Day 03's final criterion
+requires observed hosted RED/GREEN evidence, not just local YAML or tests.
+
+### Work and decisions
+
+| Files | Work |
+|---|---|
+| .github/workflows/ci.yml | One bounded Ubuntu 24.04 x64 job on pull_request, main pushes and manual dispatch; SHA-pinned official checkout/setup-node, exact runtime checks, npm ci, lint/types/tests/builds and legacy regressions |
+| scripts/check-ci-contract-gate.mjs; package.json | Acceptance probe generates an owned synthetic contract test, verifies the real npm test command rejects exactly its wrong assertion, corrects it and requires the whole suite to pass; finally removes owned files/reports |
+| docs/CI.md | Gates, local reproduction, permissions, isolation, probe interpretation and limits |
+| README.md; CONTRIBUTING.md; .github/README.md; docs/TESTING.md | Consistent implemented CI/testing instructions and links |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Task status/evidence and this preserved-history run record |
+
+Read-only contents permission; no secrets, persistent checkout credentials,
+pull_request_target, write job, deployment or artifact upload. Fresh install has
+no automatic npm cache. Mongo 8.0.32 comes from the official Ubuntu 24.04 archive
+with a verified committed SHA-256, matching the local foundation version. Its
+binary lives under RUNNER_TEMP; fixtures own loopback processes/data. No normal
+Mongo database/volume or real .env file is used. No application dependency,
+lockfile, stack, worker scaffold or future product functionality changes.
+
+The ordinary suite must pass separately. The probe never uses continue-on-error
+or accepts arbitrary failures: it asserts the expected failing test and message,
+then the exact corrected test's passed result and a zero suite exit. No failing
+assertion is committed. A successful probe is evidence that rejection works,
+not a claim that the invalid assertion passed. Existing source/tests are untouched.
+
+### Verification
+
+**Local checks passed:** clean npm ci; dependency tree/import checks; ESLint;
+strict types; 12 normal Vitest tests; contract probe RED exit 1 then GREEN
+exit 0 with 13 tests; foundation/startup, source Mongo lifecycle/outage, shared/
+Express/Next production builds, emitted API and Next routing regressions.
+Actionlint 1.7.12, Markdown links/fences, 120-task inventory, credential-pattern
+scan and whitespace pass; lockfile SHA-256 is unchanged. A separate disposable-
+copy unrelated failing test made the probe fail with its specific guard and
+removed the generated probe, confirming arbitrary errors cannot satisfy RED.
+The intentional unrelated assertion was removed; it is not committed.
+
+Hosted result remains pending below. Logs, installed
+packages, binaries, fixtures and reports stay in /tmp/ignored paths. Required
+commands use Node 24.22.0/npm 11.19.1 in a source-only disposable checkout:
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+/tmp/webhook-d033-tools/actionlint .github/workflows/ci.yml
+git diff --check
+git diff --cached --check
+```
+
+Official Node and actionlint downloads are checksum verified in /tmp. Workflow
+Mongo archive checksum and documentation/status/link checks pass. Its Ubuntu 24.04
+executable cannot run on this Ubuntu 22.04/glibc 2.35 host (requires GLIBC_2.38);
+that OS-specific execution check is pending on the configured hosted runner.
+Local fixture checks use the existing compatible native MongoDB 8.0.32 binary. Local Next production build bounds worker count with CIRCLE_NODE_TOTAL=2;
+CI uses the hosted runner's default. Normal local development services/data are
+preserved. UI/browser and later capture/auth/tenant/replay/release acceptance are
+**not run**: this task changes automation only and those features are future work.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+Statuses apply to this run, not permanent phase completion or scoring evidence.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — retained public scope/account, synthetic data and checked authorship. P: 0.3, 0.6, 0.7 — usable capture product, fresh scan/categories and scan freshness absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — README/setup/runtime/config/license/contribution/roadmap retained and CI commands documented. 1.5 C for runnable probe example, P for product demo. P: 1.1 metadata unchanged; 1.10 independent new-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing PR quality gates, duplicate search, reused milestone/backlog, expected result and one acceptance scope. N/A: 2.5 — no reported product bug to reproduce. |
+| 3 build/check/review | **P until hosted verification.** C: 3.2, 3.4 — local behavior checks and attribution/links; hosted result recorded below. N/A: 3.1, 3.3, 3.5 — no PR, independent review/feedback or merge under authorized direct-main workflow. Numbered steps 2–5, 8 are self-verification; 1, 6–7, 9 N/A for this workflow; step 10 applies to default-branch/CI verification, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain product/release gates: clean foundation install tested but no capture journey, version/tag/notes/distribution/demo/release link. C: 4.8 issue reporting route retained. |
+| 5 discovery/adoption | **P.** C: 5.3 existing source/install links. P: 5.1–5.2, 5.4–5.8 — no profile pinning, product tutorial/outreach/invitation, real support reports or outside contribution/review evidence. |
+| 6 maintenance | **P overall.** C: 6.3 compatible pinned tooling/regressions (security refresh remains pending). P: 6.1 beyond task duplicate check. N/A: 6.2, 6.4–6.5 — no user report, recurring question or fix release. C: 6.6 existing dependency finding retained; 6.7–6.8 N/A — no new upstream diagnosis/discussion/fix required. |
+| 7 long-term review | **P.** C: 7.6 next useful prerequisite task identified, not started. P: 7.1–7.5, 7.7 — independent product outcomes, scans/category/deduction/freshness/comparison evidence and multi-year history absent. |
+
+Reusable PR checklist: problem/change/verification/tracking/self-review recorded;
+PR/independent review/merge fields N/A. No user, review, adoption, audience,
+upstream contribution, release or GHFind score gain is claimed.
+
+### Publication and handoff
+
+Implementation commit and hosted CI acceptance are pending at this record's
+initial publication. Completion must be finalized from the actual hosted run;
+D03.3 stays unchecked until then. If pushing/CI access fails, preserve the local
+commit and record the concrete blocker. No force push, history rewrite, remote,
+identity, visibility or branch-protection change is authorized or performed.
+
+Existing body-parser advisory remains in TOOLCHAIN.md; origin credential storage
+remains a local configuration finding. No unrelated fix/upgrade is bundled.
+**Next eligible task after completed D03.3: D04.1 — workspace and inbox schemas
+with timestamps and explicit validation**, requiring all D03 tasks. Until hosted
+acceptance is demonstrated, resume D03.3. Stop after this task.

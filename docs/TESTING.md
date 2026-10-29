@@ -6,7 +6,7 @@ Use pinned Node 24.22.0/npm 11.19.1 and `npm run bootstrap` from the root.
 The harness adds Vitest 5.0.5, its explicit Vite 8.3.5 peer, Supertest 7.3.1 and
 @types/supertest 7.2.1, all exact MIT-licensed dev dependencies. Application
 runtime pins, TypeScript 7 compiler, isolated TS6 lint parser and strict engine/
-peer policies are retained. No browser package or CI workflow is added.
+peer policies are retained. D03.2 added no browser package; D03.3 supplies the [CI workflow](CI.md).
 
 ## Run checks
 
@@ -97,8 +97,8 @@ nonzero exit, removed data directory and closed resources. A restored run must
 pass. An empty selection must also fail. No intentionally failing test is
 committed. See [progress](IMPLEMENTATION_PROGRESS.md) for recorded commands.
 
-Browser UI checks are not needed for this task; no UI behavior changed. Day 03's
-failure/pass demonstration **in CI** remains D03.3, not a completed criterion.
+Browser UI checks are not needed for the harness/CI tasks; no UI behavior changed.
+D03.3 automates Day 03's failure/correction demonstration; see [CI evidence](CI.md).
 No release, independent review, adoption or GHFind result is claimed. Dependency
 audits remain dated evidence; the pre-existing body-parser finding in
 [TOOLCHAIN.md](TOOLCHAIN.md#26-october-2026-audit-finding-d031) is unresolved.

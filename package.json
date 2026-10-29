@@ -50,7 +50,8 @@
     "check:contracts": "npm run build:contracts && vitest run tests/unit/contracts.test.ts tests/api/contracts.test.ts",
     "test": "npm run build:contracts && vitest run",
     "test:unit": "npm run build:contracts && vitest run --project unit",
-    "test:api": "npm run build:contracts && vitest run --project api"
+    "test:api": "npm run build:contracts && vitest run --project api",
+    "check:ci-contract-gate": "npm run build:contracts && node scripts/check-ci-contract-gate.mjs"
   },
   "devDependencies": {
     "@empiric-webhook-inbox/lint-config": "0.0.0",
