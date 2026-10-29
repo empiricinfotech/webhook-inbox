@@ -106,3 +106,13 @@ audits remain dated evidence; the pre-existing body-parser finding in
 References consulted: [Vitest projects](https://vitest.dev/guide/projects.html),
 [fixture lifecycle](https://vitest.dev/guide/test-context.html) and
 [Supertest](https://github.com/forwardemail/supertest).
+
+
+## D04.1 metadata checks
+
+The unit project now includes models.test.ts: disconnected, connection-owned
+schema validation without Mongo or global casting changes. The API project adds
+models.test.ts for real disposable persistence, both models' timestamps, failed
+writes, scoped index creation and strict validated updates. npm test discovers
+both automatically; no new test runner, dependency or CI bypass is needed.
+See [data models](DATA_MODELS.md) for field rules and the precise scope boundary.

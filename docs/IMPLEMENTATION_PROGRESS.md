@@ -1165,3 +1165,154 @@ remains a local configuration finding. No unrelated fix/upgrade is bundled.
 **Next eligible task: D04.1 — workspace and inbox schemas with timestamps and
 explicit validation.** D01–D03 prerequisites are complete. D04.1 is not started;
 stop after D03.3.
+
+
+## 2026-10-29 — D04.1: workspace and inbox metadata schemas
+
+**Implementation: completed. Publication: commit/push/CI handoff below.**
+D04.1 is the only selected task. D04.2/D04.3 are not started.
+
+### Inspection, selection and authorship
+
+Read the attached request, applicable instructions, project architecture/backlog,
+entire growth checklist, previous progress, README/contribution/local development
+and test/CI instructions. No ancestor/root AGENTS.md or TASK_BOARD.md exists;
+web's managed AGENTS.md is preserved and no web source changed. Started clean on
+main at af19472, tracking origin/main. Fresh fetch reports 0 ahead/behind;
+GitHub's main and last successful CI run confirm D03.3 is fully published. Fresh
+baseline npm test passes all 12 existing tests. Source inspection finds no domain
+models; D04.1 is the earliest unfinished task with D03 satisfied.
+
+Effective author/committer remain empiricinfotech <empiricinfotech@gmail.com>.
+GitHub maps af19472's author/committer to empiricinfotech. No identity, attribution
+or coauthor changes. Safely inspected origin/upstream destinations both match
+empiricinfotech/webhook-inbox. The embedded credential location remains
+.git/config remote.origin.url; values were never printed, copied to docs or
+changed. Credential-manager storage remains recommended. Main is unprotected;
+the user's authorized current-branch publication workflow remains applicable.
+
+D04.1 issue/PR searches found no equivalents. Reuse the ordered backlog and
+[v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No duplicate/activity issue, PR, release, milestone closure or external post.
+
+Acceptance: connection-owned typed schemas; required/bounded metadata and
+references; explicit defaults/enums; no unwanted primitive coercion/unknown
+fields; real persistence, timestamps and failed writes; stable scoped indexes;
+normal regression/type/lint/build checks and existing CI. Day 04's capture token
+and secret-free list acceptance still depends on D04.2/D04.3.
+
+### Work and decisions
+
+| Files | Work |
+|---|---|
+| apps/api/src/models/workspace.ts | Workspace name/ownerId/state, timestamps, strict validation and owner/date/ID list index; caller-owned connection model factory |
+| apps/api/src/models/inbox.ts | Workspace reference, name/description, enabled and 1/7/30-day retention; timestamps, strict types, immutable workspace reference and workspace/date/ID index |
+| tests/unit/models.test.ts | Five disconnected validation/default/boundary/connection-ownership tests, including operator-shaped input and premature secret fields |
+| tests/api/models.test.ts | Four real disposable-Mongo tests covering both models' persistence/timestamps, failed inserts/saves, actual indexes and validated strict updates |
+| docs/DATA_MODELS.md | Field rules, initial bound decisions, supported write behavior, connection/index lifecycle and future task boundaries |
+| README.md; CONTRIBUTING.md; docs/TESTING.md | Accurate schema capability/testing links with creation/capture still pending |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D04.1 task status/evidence and this preserved-history record |
+
+Initial bounds: trimmed names 1–100 UTF-16 units; description max 500, optional
+empty default, multiline allowed but unsafe ASCII controls rejected. Workspace
+state active/deleting; inbox enabled true and retention 7 by default. Native
+ObjectIds are required internally. These are schema constraints, not user/
+workspace existence checks, memberships or authorization. Display names are not
+unique. A scoped data query/index is not proof of tenant access control.
+
+Models never auto-connect or use the default Mongoose connection. Buffering,
+automatic collection creation and index building are disabled. Tests explicitly
+create indexes on owned fixtures only; normal startup/database/volumes unchanged.
+No destructive index synchronization. Document save/validate enforce the rules;
+query updates require runValidators:true and strict:"throw". Raw/replacement/
+pipeline/bypass writes are not a validated service interface. Future inputs must
+be allowlisted/validated separately; safe API error handling is unchanged.
+
+No token/hash/encrypted token or verification secret fields are accepted yet;
+they arrive with their actual D04.2/provider invariants. No crypto, token service,
+bootstrap, creation endpoint, signup, response serialization, tenant enforcement,
+retention cleanup or UI feature is introduced. An enabled metadata record cannot
+receive captures. Shared contracts, dependencies, lockfile and CI are unchanged.
+
+### Verification
+
+**Passed:** frozen clean bootstrap, exact runtime/dependency checks, lint, strict
+types, 10 unit tests and 11 API tests (21 total, including 9 new model tests),
+all six existing contracts, CI contract probe RED exit 1 then GREEN exit 0 with
+22 tests, foundation/startup, source Mongo lifecycle/outage, shared/Express/Next
+production builds, emitted API and routing regressions. No required local check
+remains failed. Used exact Node
+24.22.0/npm 11.19.1 and native MongoDB 8.0.32. Source-only verification copy under
+/tmp excludes local environment values and generated output. Fixtures allocate
+only their own temporary processes, random databases and data directories.
+
+Initial checks exposed deliberately invalid TypeScript literals in tests,
+deprecated validateSync calls, control-character regex lint errors and Mongoose's
+immutable query behavior without explicit strict options. Fixed the tests to
+exercise invalid runtime input with async validate, used explicit character-code
+checks and strict query options, and required timestamps to advance after a
+clock tick. No compiler/lint/test gate is suppressed. Focused 9 new tests and lint
+pass after correction; the clean frozen-install suite verifies the final code.
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:api
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+npm exec -- vitest run tests/unit/models.test.ts tests/api/models.test.ts
+git diff --check
+git diff --cached --check
+```
+
+Local Next production build bounds workers with CIRCLE_NODE_TOTAL=2; CI uses its
+normal hosted runner configuration. Documentation/status/link checks and full
+final diff/credential-pattern/generated-clutter review apply before commit.
+Browser UI and later capture/auth/replay/release journeys are not run: no UI
+change and those flows do not exist yet. No required check may remain failed.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These are per-run statuses, not permanent phase completion or score evidence.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — existing public scope/account, synthetic fixtures and inspected attribution preserved. P: 0.3, 0.6, 0.7 — standalone capture product and fresh six-category scan/status absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — README/setup/runtime/config/license/contribution/roadmap retained and schema rules documented. 1.5 C for working fixture/model example, P for product demo. P: 1.1 metadata unchanged; 1.10 independent unfamiliar-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing domain schemas, duplicate search, reused milestone/backlog, expected behavior, focused scope and acceptance. N/A: 2.5 — new schema step, no reported product bug. |
+| 3 build/check/review | **C for applicable local work, publication/CI handoff below.** C: 3.2, 3.4 — validation/persistence/failure behavior and attribution/links checked. N/A: 3.1, 3.3, 3.5 — no PR, independent feedback/review or merge under authorized direct-main workflow. Numbered steps 2–5, 8 apply as implementation/self-verification; 1, 6–7, 9 N/A; step 10 default-branch/CI verification is required during final handoff, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain product/release gates; a clean foundation install is not a capture journey/tag/notes/distribution/demo/release link. C: 4.8 — issue-reporting route retained. |
+| 5 discovery/adoption | **P.** C: 5.3 existing source/install links. P: 5.1–5.2, 5.4–5.8 — no pinning, product tutorial/outreach, invitations, real user reports or external contribution/review evidence. |
+| 6 maintenance | **P overall.** C: 6.3 unchanged compatible pins/passing regressions (security refresh still pending). P: 6.1 beyond this task's duplicate search. N/A: 6.2, 6.4–6.5 — no user bug/recurring question/fix release. C: 6.6 — existing dependency finding retained, not a fresh audit. 6.7–6.8 N/A — no new upstream diagnosis/discussion/fix required. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified without starting it. P: 7.1–7.5, 7.7 — no independent product trial, scan/category/deduction/freshness/comparison evidence or multi-year result. |
+
+Reusable PR checklist: problem/change/verification/tracking and honest self-review
+recorded; PR/independent review/merge fields N/A. No adoption, audience, review,
+upstream contribution, release, security-audit success or GHFind gain invented.
+
+### Publication, limitations and handoff
+
+One coherent D04.1 implementation/test/documentation commit on main is authorized
+for the existing origin/main. Commit, push, exact remote SHA, GitHub author/
+committer mapping and the existing hosted Foundation CI result are verified in
+the final run handoff. This entry records local implementation evidence; it does
+not pre-claim an unobserved hosted result. No force push, attribution rewrite,
+identity, remote, visibility or branch-protection change. If publication fails,
+preserve the local commit and report its safe concrete blocker separately.
+
+Existing body-parser advisory and local origin credential-storage findings remain
+recorded; no unrelated dependency/configuration fix is bundled. Schema references
+do not enforce ownership/foreign keys, and the normal API exposes no new route.
+**Next eligible task: D04.2 — random capture token generation,
+hashed lookup and encrypted owner retrieval.** D04.2/D04.3 and full Day 04
+acceptance remain pending; stop after D04.1.

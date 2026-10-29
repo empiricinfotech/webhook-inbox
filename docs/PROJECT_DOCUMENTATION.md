@@ -648,7 +648,7 @@ Prerequisite: D02. Modules: M01. Planned effort: 5 to 6 hours.
 
 Prerequisite: D03. Modules: M02. Planned effort: 5 to 6 hours.
 
-- [ ] **D04.1** Create workspace and inbox schemas with timestamps and explicit validation.
+- [x] **D04.1** Create workspace and inbox schemas with timestamps and explicit validation. [Metadata model and validation evidence](DATA_MODELS.md).
 
 - [ ] **D04.2** Implement random capture token generation, hashed lookup and encrypted owner retrieval.
 
