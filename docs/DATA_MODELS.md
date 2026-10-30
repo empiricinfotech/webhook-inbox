@@ -1,6 +1,6 @@
 # Workspace and inbox metadata models
 
-D04.1–D04.2 | Updated 30 October 2026
+D04.1–D04.3 | Updated 30 October 2026
 
 The Express backend now has typed Mongoose 9.11.2 schemas for workspace/inbox
 metadata. Imports do not connect to Mongo or register global models. Call
@@ -55,8 +55,8 @@ index building. They declare stable list indexes:
 - inboxes: tokenHash ascending, unique for string hashes (partial index).
 
 Index creation is explicit with Model.createIndexes() in disposable tests.
-Normal application startup is unchanged; the later bootstrap/service must
-initialize storage deliberately. No destructive syncIndexes/drop operation is
+Normal application startup is unchanged; [local bootstrap/creation](LOCAL_INBOX.md)
+initializes declared indexes deliberately before exposing its service. No destructive syncIndexes/drop operation is
 introduced. These nonunique indexes support future scoped listing, with an ID
 tiebreaker. They do not enforce ownership, foreign-key integrity or tenant
 isolation. Callers must include the verified workspace scope on every query.
@@ -93,14 +93,13 @@ Scoped-query examples demonstrate data shape; they do not claim authorization.
 D04.1 supplies metadata; [D04.2](CAPTURE_TOKENS.md) adds strict paired hash/encrypted
 credential fields, one-time provisioning, hashed lookup and owner-checked internal
 retrieval. Multiple older metadata-only records remain valid; new creation must
-provision credentials in D04.3. Verification-secret fields remain later work.
-There is no local bootstrap, inbox creation service, capture/management endpoint,
-signup, token rotation or session/membership flow. Retention metadata does not yet
+provision credentials atomically through [D04.3](LOCAL_INBOX.md). Verification-secret fields remain later work.
+Local bootstrap and owner-scoped creation/listing services now exist. There is
+no capture/management HTTP endpoint, signup, token rotation or session/membership flow. Retention metadata does not yet
 expire events. An enabled metadata record alone is not capture-capable.
 
-Day 04's full created-inbox and secret-free list acceptance still depends on
-D04.3. Normal-read secrecy is demonstrated at model/service level, not by a
-shipped list API. No public hosting, release, capture journey or tenant security
+Day 04's created-inbox and secret-free list acceptance is exercised by D04.3's
+services/operator command. There is no shipped HTTP list API. No public hosting, release, capture journey or tenant security
 is claimed here.
 
 Primary references: [Mongoose validation](https://mongoosejs.com/docs/validation.html),

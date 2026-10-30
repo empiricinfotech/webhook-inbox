@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Inbox creation, capture and releases remain future work.
+**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Local operator bootstrap and inbox creation/listing are implemented; capture and releases remain future work.
 
 ## Why this project exists
 
@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. Creation services and endpoints remain pending. There is no inbox/capture API behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. Management HTTP endpoints and capture remain pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -78,6 +78,22 @@ npm run build
 
 The build emits shared contracts, Express JavaScript and the Next.js production application in order. `npm run start:api` and `npm run start:web` start built services; production shared-origin routing requires the later reverse-proxy configuration.
 
+### Create a local inbox without signup
+
+With Mongo running, use the private operator configuration and backend command:
+
+```bash
+npm run local:inbox -- init
+npm run local:inbox -- bootstrap
+npm run local:inbox -- create "Synthetic integration" "Local test inbox"
+npm run local:inbox -- list
+```
+
+Run init once; it writes an ignored 0600 configuration file with random IDs/key
+and refuses overwrites. Preserve/back up that file. Creation/list output contains
+metadata only. See [local inbox setup](docs/LOCAL_INBOX.md) for configuration,
+failures, service contracts and remaining limits. This is not a capture endpoint.
+
 ## Architecture
 
 - **Frontend:** Next.js with React, TypeScript and App Router. Interactive forms, query providers and event subscriptions belong in Client Components.
@@ -86,7 +102,7 @@ The build emits shared contracts, Express JavaScript and the Next.js production 
 - **Data and worker:** MongoDB/Mongoose stores sanitized events and durable jobs; a separate Node worker will handle retention cleanup and controlled replay.
 - **Hosting:** a shared origin will route frontend pages to Next.js and API/capture/health paths to Express. UI route guards do not replace API permission checks.
 
-The frontend shell, Express startup, MongoDB connection and health checks are implemented; capture-token primitives and internal owner retrieval are implemented. Inbox creation, event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
+The frontend shell, Express startup, MongoDB connection and health checks are implemented; capture-token primitives and internal owner retrieval are implemented. Local operator inbox creation/listing is implemented; event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
 
 ## Repository layout
 
@@ -111,7 +127,7 @@ infra/            Local Mongo Compose; future app/reverse proxy
 .github/          CI workflow, task-label manifest and repository metadata
 ```
 
-Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while fixtures, full application containers, CI and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); only public placeholder application environment examples are committed.
+Workspace package manifests declare exact dependencies and shared-contract links. Root scripts verify bootstrap/toolchain compatibility and foundation behavior; a Mongo-only Compose service is available, while full application containers and later features remain future work. Local credentials, environment files, dependencies and generated outputs are excluded by [.gitignore](.gitignore); only public placeholder application environment examples are committed.
 
 ## Release roadmap
 
@@ -124,7 +140,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.2 are complete. D04.3 is next; bootstrap and inbox creation have not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 (inbox management UI) is next and has not been started.
 
 ## Data and scope boundaries
 
@@ -139,6 +155,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project brief](docs/PROJECT_BRIEF.md): users, first capture journey, scope and milestone criteria.
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
+- [Local workspace and inbox](docs/LOCAL_INBOX.md): private operator bootstrap, creation/list commands and service boundaries.
 - [Local MongoDB and health](docs/MONGODB_LOCAL.md): local service, connection lifecycle and safe health checks.
 - [Testing](docs/TESTING.md): Vitest unit/API projects, Supertest and owned disposable Mongo fixtures.
 - [API contracts](docs/API_CONTRACTS.md): shared identifiers, errors, pagination and request correlation.

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export interface Database {
+  readonly connection: mongoose.Connection;
   isReady(): Promise<boolean>;
   close(): Promise<void>;
 }
@@ -36,6 +37,7 @@ export async function connectDatabase(uri: string): Promise<Database> {
 
   let closing = false;
   return {
+    connection,
     async isReady() {
       if (closing || connection.readyState !== 1 || !connection.db) return false;
       try {

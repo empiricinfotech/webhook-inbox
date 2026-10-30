@@ -23,6 +23,10 @@
     "./pagination": {
       "types": "./dist/pagination.d.ts",
       "default": "./dist/pagination.js"
+    },
+    "./inboxes": {
+      "types": "./dist/inboxes.d.ts",
+      "default": "./dist/inboxes.js"
     }
   },
   "scripts": {

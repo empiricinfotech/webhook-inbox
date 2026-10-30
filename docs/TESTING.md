@@ -127,3 +127,16 @@ scoping, concurrent one-time provisioning and safe failures. Secrets/keys exist
 only in disposable runtime fixtures and comparisons avoid secret-bearing failure
 output. Full repository/CI checks discover these without new dependencies or
 runner changes. See [capture token security and scope](CAPTURE_TOKENS.md).
+
+
+## D04.3 local bootstrap and creation checks
+
+inboxes.test.ts in the unit/API projects and local-inbox.test.ts in the API project
+cover shared strict inputs/config, stable concurrent bootstrap, atomic credentialed
+creation, safe scoped DTO listing, real unique indexes/collisions, owner/validation/
+crypto/storage failure paths and actual operator processes. Operator tests create
+private temporary config and owned disposable Mongo only; no real environment
+files or development data are used. Normal npm test/CI discover all checks.
+See [local inbox setup](LOCAL_INBOX.md) for commands and scope. The emitted command
+is also exercised after build with TypeScript stripping disabled during task
+verification; normal CI operator tests exercise its source with the existing tsx.

@@ -1,11 +1,13 @@
 # Local development foundation
 
-D02.1–D03.2 | Updated 27 October 2026 | Linux x64
+D02.1–D04.3 | Updated 30 October 2026 | Linux x64
 
 Next.js serves the overview (`/`), setup (`/setup`) and missing-page shell.
 Express owns the MongoDB connection and health routes. Development management
 requests under `/api/v1` now reach Express through the frontend origin. Domain
 endpoints and the first capture journey remain future tasks.
+[Local inbox setup](LOCAL_INBOX.md) now provides a separate operator command for
+workspace bootstrap and safe inbox creation/listing, without signup or HTTP routes.
 
 ## Start from a clean checkout
 

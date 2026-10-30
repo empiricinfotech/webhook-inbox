@@ -1478,3 +1478,186 @@ recorded; no unrelated dependency/configuration repair is bundled.
 **Next eligible task: D04.3 — local workspace bootstrap and inbox creation service
 without public signup.** D04.1/D04.2 prerequisites are complete. D04.3 and the
 full Day 04 acceptance remain pending; stop after D04.2.
+
+
+## 2026-10-30 — D04.3: local workspace bootstrap and inbox creation without public signup
+
+**Implementation: completed. Publication: commit/push/CI verification follows this record.**
+Exactly D04.3 selected. D05.1 and later tasks have not been started.
+
+### Inspection, selection and authorship
+
+Read the applicable instructions, architecture/backlog, entire growth checklist,
+progress history, README/contribution/local-development/model/token/testing/CI
+guides. No ancestor/root AGENTS.md or TASK_BOARD.md exists. Scoped managed web
+AGENTS.md is preserved; there are no frontend changes. Started clean on main,
+tracking origin/main at efbb572. A fresh origin fetch and GitHub branch read-back
+match that commit. All 34 prerequisite tests pass. D04.1 models and D04.2 token
+primitives exist, but bootstrap/creation do not, making D04.3 the earliest eligible
+unfinished task. [D04.2's hosted CI](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41007634442)
+is successful on the exact prerequisite SHA, so no publication-only handoff remains.
+
+Effective author and committer remain empiricinfotech <empiricinfotech@gmail.com>;
+GitHub maps the prerequisite commit's author/committer to empiricinfotech.
+Repository ownership, push credentials and authorship were checked separately;
+no settings, coauthors or earlier attribution were changed. Origin and upstream
+fetch/push destinations were inspected with credentials removed before output
+and match the expected empiricinfotech/webhook-inbox. Embedded credential location
+remains .git/config remote.origin.url; no value was exposed, copied, rotated or
+removed. Credential-manager storage is recommended. Main is unprotected with no
+rulesets; authorized current-branch publication is suitable.
+
+D04.3 issue/PR searches returned no equivalent. Reuse the ordered backlog and
+[v0.1 issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1); all four
+release issues remain untouched and open. No issue/PR/release/tag/post was created
+for activity. The brief incorrectly called already-published D03.3 unstarted;
+its status/next-task reference is corrected using implementation/CI evidence.
+
+Acceptance: repeatable local workspace creation without signup; strict owner-
+scoped inbox creation; valid encrypted/hashed credentials present on every new
+inbox; explicit secret-free creation/list metadata; safe failures and normal
+repository checks. Day 04's created-inbox and secret-free list acceptance is now
+verified through backend services and the local operator command. It does not
+require Day 05's UI or imply working capture/HTTP management endpoints.
+
+### Work and files
+
+| Paths | Result |
+|---|---|
+| packages/contracts/src/inboxes.ts; packages/contracts/package.json | Shared strict creation/summary schemas, bounded names/descriptions, retention defaults and explicit metadata DTO/export |
+| apps/api/src/services/local-workspace.ts | Configured-ID bootstrap with real indexes, concurrent/repeat idempotency and no overwrite of stored owner/name/state/timestamps |
+| apps/api/src/services/inboxes.ts; storage-operation.ts | Awaited index initialization, stored-owner/scope checks, single-insert credentialed creation, projected deterministic safe listing and sanitized service errors |
+| apps/api/src/config/local-inbox.ts; apps/api/src/local-inbox.ts; apps/api/.env.inbox.example | Local-only explicit operator config and init/bootstrap/create/list commands; exclusive 0600 random-key/ID provisioning without key/token output |
+| apps/api/src/database.ts; apps/api/src/models/inbox.ts | Expose the existing caller-owned connection for composition; reuse shared bounds/default constants and preserve legacy optional credential compatibility |
+| package.json; apps/api/package.json | Root operator command builds contracts/API and forwards arguments to emitted JavaScript; no dependency or lockfile change |
+| tests/unit/inboxes.test.ts; tests/api/inboxes.test.ts; tests/api/local-inbox.test.ts; tests/helpers/local-inbox-command.ts | Four unit plus nine real-Mongo/service/operator checks using owned fixtures and no inherited app configuration |
+| docs/LOCAL_INBOX.md; README.md; CONTRIBUTING.md; docs/LOCAL_DEVELOPMENT.md; docs/DATA_MODELS.md; docs/CAPTURE_TOKENS.md; docs/TESTING.md; docs/PROJECT_BRIEF.md | Working commands, config/key preservation, service/DTO contracts, failure behavior, accurate current status and explicit scope limits |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D04.3 newly checked; this appended history-preserving evidence/checklist record |
+
+init alone explicitly generates private configuration; normal bootstrap/create
+never generate a missing key or overwrite a file. Missing/invalid key/IDs or
+production NODE_ENV fail closed. Only literal loopback Mongo with an explicit
+non-system database is accepted, with directConnection=true enforced even when
+omitted to prevent host discovery. Normal API Mongo config/startup is unchanged.
+The env-variable skill's local secret/config guidance was applied; no Vercel
+resources, real environment edits or new dependencies were needed.
+
+The configured local owner is a placeholder native ObjectId, not a user/session
+or membership record. Services require a trusted actor; IDs alone are not API
+authorization. Bootstrap uses the unique workspace _id, accepts duplicate-key
+races by rereading and never overwrites an existing record. Reuse requires the
+same stored owner and active state. Indexes use createIndexes, never sync/drop.
+Bootstrap may leave its workspace created if later inbox-index initialization
+fails; retry completes setup without overwriting it.
+
+Creation accepts only name/description/retentionDays. ID allocation, bound crypto
+and one validated insert keep metadata and the credential pair together. Failed
+crypto/validation/insert leaves no new partial inbox. Real unique hash collisions
+return safe CONFLICT. Creation/list output contains string IDs, UTC timestamps
+and allowlisted metadata only, never tokens/hashes/envelopes/keys/capture URLs.
+Lists recheck active stored ownership and sort newest first with an ID tiebreaker.
+Command errors/cleanup return static codes without private causes/argv/env/driver
+messages, and owned pools close on success/handled failure.
+
+### Verification results
+
+**Passed on pinned Node 24.22.0/npm 11.19.1 and MongoDB 8.0.32:**
+
+- Focused D04.3 tests: 13 passed, including actual subprocess init/bootstrap/create/
+  list, no-overwrite private configuration, repeated/concurrent bootstrap, valid
+  token owner retrieval/hash lookup, metadata-only outputs, scope/owner denial,
+  strict inputs, real index collisions, crypto/write/index failure and closed DB.
+- Source-only clean copy: frozen npm ci, exact toolchain/dependency checks, lint,
+  strict workspace/test types, 47 normal tests (20 unit + 27 API) and six retained
+  contract regressions. Deliberate contract probe RED exit 1, corrected GREEN exit
+  0 with 48 tests; no failing test/probe is committed.
+- Foundation, source Mongo lifecycle/outage/recovery/shutdown, shared/Express/Next
+  production builds, emitted API with TypeScript stripping disabled and real Next
+  forwarding all pass. Normal CI remains unchanged and covers the new tests.
+- Emitted operator flow: actual root npm init/bootstrap argument forwarding plus
+  plain-Node bootstrap/create/list with --no-experimental-strip-types against an
+  owned disposable Mongo. One workspace/inbox, valid owner token and hash lookup,
+  and no secret output. The private temporary configuration is removed afterward.
+- Full implementation byte-matches the passing clean-source copy. Lockfile hash
+  remains 1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+  Documentation links/fences/status/history, ignore rules, whitespace and full
+  staged diff/secret-pattern/generated-clutter review precede publication.
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+npm exec -- vitest run tests/unit/inboxes.test.ts tests/api/inboxes.test.ts tests/api/local-inbox.test.ts
+npm run local:inbox -- init
+npm run local:inbox -- bootstrap
+node --import tsx /tmp/webhook-d043-emitted.mts
+python3 /tmp/webhook-d043-doc-check.py
+git diff --check
+git diff --cached --check
+```
+
+The root operator commands above ran only inside the disposable source copy;
+the temporary emitted verification script drives the complete plain-Node flow
+and cleanup. Fixtures never use normal dev data/volumes or copy private env files.
+Runtime-only synthetic secrets are compared as booleans to avoid diagnostics
+printing them. Local Next builds use CIRCLE_NODE_TOTAL=2 to bound workers; CI uses
+normal runner defaults. Required final checks may not remain failed.
+
+**Not run:** browser/UI (no UI change); capture/HTTP creation/signup/session/
+membership/release journeys (not implemented); independent security review,
+operator backup/recovery drill, fresh dependency audit, external user trial or
+GHFind scan. No passing release/adoption/security-audit/score claim is made.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These statuses do not permanently complete any lifetime/release/adoption phase.
+
+| Phase | Per-run status and every checkpoint |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — public scope/account, synthetic/private-data boundary and checked attribution retained. P: 0.3, 0.6, 0.7 — full standalone capture product and fresh scan/category/freshness evidence absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — accurate README, executable operator/setup commands, pinned runtime, placeholder config, existing license/contribution/roadmap. 1.5 C for tested operator example, P for capture demo/screenshots. P: 1.1 metadata unchanged; 1.10 independent unfamiliar-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing local setup/creation need, duplicate search, reused backlog/milestone, expected result, observable acceptance and one task. N/A: 2.5 — feature increment, no reported product bug. |
+| 3 build/check/review | **C for applicable local work; final publication/CI follows.** C: 3.2, 3.4 — actual flow/failure/scoping checks, self-review, attribution and tracking links. N/A: 3.1, 3.3, 3.5 — no PR, independent feedback/review or PR merge under authorized direct-main workflow. Numbered steps 2–5, 8 apply to implementation/self-verification; 1, 6–7, 9 N/A; step 10 default-branch/CI verification applies to final handoff, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain full workflow/release gates: tested clean operator setup is not complete capture, a version/tag/notes/distributable/demo/release link. C: 4.8 retained issue-reporting route. |
+| 5 discovery/adoption | **P.** C: 5.3 real source/install links retained. P: 5.1–5.2, 5.4–5.8 — no pin/tutorial/outreach/invitations, real user support or outside contributor/review evidence. |
+| 6 maintenance | **P overall.** C: 6.3 compatible unchanged pins and passing regressions (security refresh pending). P: 6.1 beyond focused duplicate inspection. N/A: 6.2, 6.4–6.5 — no user bug/recurring question/fix release. C: 6.6 existing dependency finding retained, not a fresh audit. N/A: 6.7–6.8 — no new upstream diagnosis/discussion/fix needed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5, 7.7 — no full independent product trial, scan/category/deduction/freshness/comparison evidence or multi-year outcome. |
+
+Reusable PR checklist problem/change/verification/tracking/self-review fields are
+recorded; PR/independent review/merge fields N/A. No audience, users, external
+review, contribution, adoption, upstream fix, release or score gain invented.
+
+### Publication, limitations and next task
+
+One coherent D04.3 implementation/test/docs commit is authorized on unchanged
+origin/main. Its actual remote SHA, GitHub author/committer mapping and the existing
+hosted Foundation CI are checked after publication and reported in the final run
+handoff. This local evidence record does not pre-claim an unobserved hosted result.
+No force push, history rewrite, identity/remote/visibility/protection change. If
+publication fails, preserve the local commit and report the safe concrete blocker.
+
+Existing body-parser advisory and origin credential-storage findings are retained;
+no unrelated dependency/configuration repair is included. Local lists are arrays;
+API pagination and proposed quota/reservation policies are later work (D34.1 for
+atomic quotas), not claimed here. Create has no idempotency key: inspect list
+before retrying uncertain writes. The command currently composes one key version;
+secure backup, key migration and recovery remain operator/future work. Owner
+checks and writes are separate; later concurrent ownership/deletion policy and
+session/membership enforcement remain required. No public management/capture
+route, UI, rename/disable/rotation or user registration was added.
+
+**Task blockers: none after passing local acceptance. Publication/CI handoff is
+verified separately. Next eligible task: D05.1 — inbox list, create form, detail
+page and empty states**, with D04 prerequisites now complete. Stop after D04.3;
+D05.1 has not been started.

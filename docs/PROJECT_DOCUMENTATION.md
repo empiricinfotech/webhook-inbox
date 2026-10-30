@@ -652,7 +652,7 @@ Prerequisite: D03. Modules: M02. Planned effort: 5 to 6 hours.
 
 - [x] **D04.2** Implement random capture token generation, hashed lookup and encrypted owner retrieval. [Token security and verification evidence](CAPTURE_TOKENS.md).
 
-- [ ] **D04.3** Add local workspace bootstrap and inbox creation service without public signup.
+- [x] **D04.3** Add local workspace bootstrap and inbox creation service without public signup. [Local operator flow and service evidence](LOCAL_INBOX.md).
 
 **Acceptance:** A created inbox has a valid token and list responses omit secret values.
 

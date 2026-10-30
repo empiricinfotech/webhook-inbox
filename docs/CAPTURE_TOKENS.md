@@ -1,11 +1,12 @@
 # Capture token primitives and owner retrieval
 
-D04.2 | 30 October 2026
+D04.2–D04.3 | 30 October 2026
 
 The backend now provisions credentials for an existing inbox metadata record,
 looks up an inbox by a capture token's hash and recovers the token only after a
-stored-owner check. No capture/management route, inbox creation, bootstrap,
-login or token rotation is added. The existing health-only startup stays unchanged.
+stored-owner check. [D04.3](LOCAL_INBOX.md) composes these primitives for local
+bootstrap and atomic inbox creation. No capture/management route, login or token
+rotation is added. The existing health-only startup stays unchanged.
 
 ## Token and encrypted format
 
@@ -43,9 +44,10 @@ into private Node KeyObjects; subsequent caller buffer mutations cannot change
 the imported keys. The returned API exposes no key material and performs no I/O.
 
 Keys must come from operator-managed runtime secrets outside Mongo/source, with
-separate secure backups. There is no environment-file reading, key generation
-fallback or key persistence in this task. The later bootstrap/service integration
-must supply them deliberately; missing/bad configuration fails at factory creation.
+separate secure backups. The crypto factory does not read environment files or persist keys. D04.3
+supplies one explicitly provisioned key from private local operator configuration;
+there is no automatic generation fallback on bootstrap/create or server startup.
+Missing/bad configuration fails closed.
 Tests create their own ephemeral random keys, which are not production defaults.
 
 New envelopes use currentVersion. Retaining old versions permits recovery of old
@@ -71,7 +73,7 @@ workspace and inbox lookups are scoped; missing, nonowned and mismatched objects
 share NOT_FOUND. A metadata-only inbox also has no retrievable credential.
 Issue uses one compare-and-set update for both fields; concurrent/repeated issue
 attempts produce one success and CONFLICT, without replacing an existing token.
-The service only provisions existing records; inbox creation remains D04.3.
+The service only provisions existing records; D04.3 separately creates credentialed inboxes in a single insert.
 
 The actor ID must come from a trusted local caller now and verified session/
 membership context when authentication is introduced. Supplying an ID to this
@@ -97,8 +99,7 @@ its capture-path redaction regressions continue to run unchanged.
 A real unique partial index on tokenHash applies to string hashes, preserving
 multiple older metadata-only inboxes. Document validation permits neither field
 for D04.1 compatibility but rejects a partial pair, nulls or malformed envelopes.
-The token service always sets a validated pair together. D04.3 creation must
-require credential provisioning before treating a new inbox as usable.
+The token service always sets a validated pair together. D04.3 creation inserts the validated pair atomically before reporting success.
 
 Selecting hidden fields, lean results with explicit secret projections, raw driver
 access, transform:false or bypass writes remain trusted backend operations;
@@ -132,10 +133,10 @@ and changed-owner denial, one-time concurrent issue and safe database failures.
 Tests compare secrets as booleans so assertion diagnostics do not print them;
 there are no committed keys or raw token fixtures. See [testing](TESTING.md).
 
-Bootstrap/creation, environment composition, capture endpoints, HTTP token
-retrieval, rotation, membership/session authorization and release journeys remain
-later work. Day 04's full created-inbox/list acceptance still requires D04.3;
-normal-read secrecy here is model/service evidence, not a shipped list endpoint.
+D04.3 adds local bootstrap/creation and explicit environment composition. Capture
+endpoints, HTTP token retrieval, rotation, membership/session authorization and
+release journeys remain later work. Day 04's created-inbox/list acceptance is now
+verified through services and the operator command, not a shipped HTTP endpoint.
 
 Primary references: [Node crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html),
 [OWASP cryptographic storage](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html).

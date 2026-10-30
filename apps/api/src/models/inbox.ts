@@ -1,10 +1,8 @@
 import { Schema, type Connection, type InferSchemaType } from "mongoose";
 import { KEY_VERSION_PATTERN, TOKEN_HASH_PATTERN } from "../security/capture-token.js";
 
-export const INBOX_NAME_MAX_LENGTH = 100;
-export const INBOX_DESCRIPTION_MAX_LENGTH = 500;
-export const RETENTION_DAYS = [1, 7, 30] as const;
-export const DEFAULT_RETENTION_DAYS = 7;
+import { INBOX_NAME_MAX_LENGTH, INBOX_DESCRIPTION_MAX_LENGTH, RETENTION_DAYS, DEFAULT_RETENTION_DAYS } from "@empiric-webhook-inbox/contracts/inboxes";
+export { INBOX_NAME_MAX_LENGTH, INBOX_DESCRIPTION_MAX_LENGTH, RETENTION_DAYS, DEFAULT_RETENTION_DAYS };
 
 const encryptedTokenSchema = new Schema({
   formatVersion: { type: Number, required: true, cast: false, enum: [1] },
@@ -42,7 +40,7 @@ export const inboxSchema = new Schema({
   bufferCommands: false, autoCreate: false, autoIndex: false,
 });
 inboxSchema.index({ workspaceId: 1, createdAt: -1, _id: -1 });
-// Metadata-only records remain valid until bootstrap/creation is implemented.
+// Preserve legacy metadata-only records; the creation service always inserts a credential pair.
 inboxSchema.index({ tokenHash: 1 }, { unique: true, partialFilterExpression: { tokenHash: { $type: "string" } } });
 inboxSchema.pre("validate", function () {
   const hash = this.tokenHash;
