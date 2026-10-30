@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Local operator bootstrap and inbox creation/listing are implemented; capture and releases remain future work.
+**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Local bootstrap and inbox creation/list/detail UI are implemented; capture and releases remain future work.
 
 ## Why this project exists
 
@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. Management HTTP endpoints and capture remain pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. The [local inbox UI](docs/INBOX_UI.md) now connects to an explicitly enabled local-only management API; capture remains pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -93,6 +93,13 @@ Run init once; it writes an ignored 0600 configuration file with random IDs/key
 and refuses overwrites. Preserve/back up that file. Creation/list output contains
 metadata only. See [local inbox setup](docs/LOCAL_INBOX.md) for configuration,
 failures, service contracts and remaining limits. This is not a capture endpoint.
+
+### Use the inbox interface
+
+After the operator init/bootstrap above, run npm run local:dashboard instead of
+dev:api, keep dev:web running, and open [/inboxes](http://127.0.0.1:3000/inboxes).
+See [local inbox UI setup](docs/INBOX_UI.md) for port/origin matching and limits.
+This unauthenticated entry point is loopback-only and must not be publicly proxied.
 
 ## Architecture
 
@@ -140,7 +147,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 (inbox management UI) is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 (rename, disable and token rotation) is next and has not been started.
 
 ## Data and scope boundaries
 

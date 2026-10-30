@@ -4,7 +4,7 @@ import { errorHandler, notFound } from "./errors.js";
 
 export type ReadinessProbe = () => Promise<boolean>;
 
-export function createApp(isDatabaseReady: ReadinessProbe, logger?: RequestLogger) {
+export function createApp(isDatabaseReady: ReadinessProbe, logger?: RequestLogger, management?: express.Router) {
   const app = express();
   app.disable("x-powered-by");
   app.use(requestContext(logger));
@@ -24,6 +24,8 @@ export function createApp(isDatabaseReady: ReadinessProbe, logger?: RequestLogge
       data: { status: ready ? "ready" : "not_ready" },
     });
   });
+
+  if (management) app.use("/api/v1", management);
 
   // Capture will need bounded original bytes; do not install a global body parser.
   app.use(notFound);

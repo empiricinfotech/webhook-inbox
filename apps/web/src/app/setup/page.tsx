@@ -20,17 +20,20 @@ cp apps/web/.env.example apps/web/.env.local`}</code></pre>
             <p>Keep these local files private. Match API_ORIGIN to the API port if you change it.</p></li>
           <li><h3>Start MongoDB</h3><pre><code>docker compose -f infra/compose.mongo.yaml up -d --wait mongo</code></pre>
             <p>The local database listens on 127.0.0.1:27017.</p></li>
-          <li><h3>Terminal one · API</h3><pre><code>npm run dev:api</code></pre>
+          <li><h3>Bootstrap the local workspace once</h3><pre><code>{`npm run local:inbox -- init
+npm run local:inbox -- bootstrap`}</code></pre>
+            <p>Run init once. It preserves private local configuration by refusing overwrites.</p></li>
+          <li><h3>Terminal one · Local inbox API</h3><pre><code>npm run local:dashboard</code></pre>
             <p>Check /health/live and /health/ready at 127.0.0.1:4000.</p></li>
           <li><h3>Terminal two · Frontend</h3><pre><code>npm run dev:web</code></pre>
-            <p>Open http://127.0.0.1:3000 to explore the local shell.</p></li>
+            <p>Open http://127.0.0.1:3000/inboxes to create and view inboxes.</p></li>
         </ol>
         <p className="notice">
           Development requests under /api/v1 now reach Express through the
-          frontend. Inbox creation and capture are still being built. Use synthetic data during development.
+          frontend. Create and view inboxes from this preview. Capture is still being built. Use synthetic data during development.
         </p>
       </section>
-      <Link className="text-link" href="/">← Back to overview</Link>
+      <Link className="button" href="/inboxes">Open inboxes</Link>
     </div>
   );
 }

@@ -1661,3 +1661,204 @@ route, UI, rename/disable/rotation or user registration was added.
 verified separately. Next eligible task: D05.1 — inbox list, create form, detail
 page and empty states**, with D04 prerequisites now complete. Stop after D04.3;
 D05.1 has not been started.
+
+
+## 2026-10-30 — D05.1: inbox list, create form, detail page and empty states
+
+**Implementation: completed. Publication: commit/push/CI verification follows this record.**
+Only D05.1 selected. D05.2/D05.3 remain unfinished; full Day 05 disable/rotation/
+old-token acceptance requires those tasks and is not claimed here.
+
+### Inspection, task selection and attribution
+
+Read applicable AGENTS instructions, the architecture/backlog, entire growth
+checklist, progress history and README/contribution/local-development/operator/
+model/token/test/CI guides. No root/ancestor AGENTS.md or TASK_BOARD.md exists.
+Read the managed web AGENTS.md and relevant installed Next 16.4.2 guides before
+editing pages. The existing Next App Router + Express + Mongo + TanStack Query
+architecture is retained. React quality, full-flow verification and private-env
+skill guidance informed this work; no Vercel service or new dependency was added.
+
+Started clean on main at 292f088, tracking origin/main. Fresh fetch is 0 ahead/
+behind; GitHub main matches. [D04.3 CI](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41014528114)
+is successful on that exact SHA. Fresh baseline passes 47 tests. Bootstrap and
+credentialed creation/list services exist, but frontend inbox screens and their
+HTTP transport do not. D05.1 is therefore the earliest eligible unfinished task;
+no publication-only handoff remains from D04.3.
+
+Author/committer remain empiricinfotech <empiricinfotech@gmail.com>. GitHub maps
+the prerequisite commit's author/committer to empiricinfotech. Repository owner,
+push destination and commit attribution were considered separately; no identity,
+coauthor or attribution rewrite. Safely inspected origin/upstream fetch/push URLs
+match empiricinfotech/webhook-inbox. Embedded credential location is still
+.git/config remote.origin.url; no value was printed, changed, rotated or removed.
+Credential-manager storage remains recommended. Current main is suitable under
+the authorized direct-branch workflow; normal protection/rules are respected.
+
+D05.1 issue/PR searches found no equivalent. Reuse the backlog and existing
+[v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+Milestone issues are preserved, with no new issue/PR/release/tag/post manufactured.
+
+### Scope and files
+
+Acceptance: real empty/list/create/detail flow with persisted reload; shared
+validation, pending/error/missing states; safe scoped HTTP glue; no secrets in
+metadata responses; keyboard/narrow-screen verification; normal repository/CI
+checks. The minimum local HTTP bridge is necessary to make the UI functional,
+not a separate authentication/signup feature or later task.
+
+| Paths | Work |
+|---|---|
+| apps/web/src/app/inboxes/{page,loading,error}.tsx; inboxes/new/page.tsx; inboxes/[id]/page.tsx | Server page composition, metadata, dynamic ID boundary and safe route loading/error UI |
+| apps/web/src/features/inboxes/{api,shared,inbox-list,inbox-create,inbox-detail} | Zod-checked same-origin requests, workspace-scoped Query state, bounded page loading, explicit form validation/pending/error handling and persisted settings detail |
+| apps/web/src/app/{globals.css,layout.tsx,page.tsx,setup/page.tsx} | Responsive shell-consistent styles, inbox navigation and accurate executable local setup |
+| apps/api/src/routes/local-inboxes.ts; config/local-dashboard.ts; local-dashboard.ts | Explicit local-only entry point, configured actor/workspace, Host/Origin/fetch-site guards, bounded route-local JSON and safe context/list/create/detail routes |
+| apps/api/src/services/inboxes.ts; app.ts; server.ts | Owner-scoped detail and bounded timestamp/ID cursor page; optional router composition while ordinary API stays health-only |
+| package.json; apps/api/package.json; apps/api/.env.inbox.example | Built local:dashboard command and placeholder optional port/origin settings; real files, pins and lock unchanged |
+| tests/api/inbox-routes.test.ts; tests/unit/inbox-client.test.ts | Six owned-Mongo HTTP and four client/config regressions, automatically covered by normal test/CI discovery |
+| docs/INBOX_UI.md; README.md; CONTRIBUTING.md; docs/{LOCAL_INBOX,LOCAL_DEVELOPMENT,CAPTURE_TOKENS,PROJECT_BRIEF,TESTING}.md | Working UI instructions, local trust/security boundaries, honest current capability and remaining scope |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D05.1 newly checked and this history-preserving evidence/checklist entry |
+
+Local mode reads existing private operator config; it never overwrites real env
+files, creates users or trusts browser-supplied actor IDs. It refuses production
+NODE_ENV/nonlocal Mongo, binds only 127.0.0.1 and accepts only the exact configured
+literal-loopback browser origin. Host/fetch-site/Origin checks run before parsing;
+POST requires that Origin and no CORS permission is granted. It must not be
+publicly proxied. Normal dev:api/start:api do not enable these management routes.
+
+Creation uses the existing one-insert encrypted/hash credential service. Context,
+list/detail and all queries recheck active stored ownership/scope; unknown objects
+share 404. Pagination defaults to 25/max 100, validates its canonical base64url
+workspace/date/ID tuple and uses the compound index/tiebreaker with limit+1.
+Only safe DTOs leave the backend; token retrieval remains internal, and the UI
+never receives a capture URL/key/hash/envelope. Request IDs and errors are safe.
+
+The JSON parser is mounted only on the create route, with 4 KiB limit and
+inflate:false. Invalid/malformed/oversized/unsupported/compressed input maps to
+safe 400/413/415 responses with no raw parser cause. The pre-existing body-parser
+advisory is retained; the new route follows its documented compression-rejection
+workaround, verified with a rejected encoded body followed by a healthy request.
+This is not a dependency upgrade or an all-clear security audit.
+
+Client Components fetch through /api/v1 with no-store, bounded timeouts and safe
+response validation; private data is not server-fetched into shared page caches.
+Queries have explicit loading/error/empty states. Create is never automatically
+retried, protects duplicate clicks, preserves drafts after mutation/background
+refresh errors and warns to inspect the list before uncertain retries. Successful
+creation invalidates list state, seeds detail metadata and navigates to the saved
+inbox. Retry revalidates both workspace and inbox queries after an outage.
+
+### Verification and evidence
+
+**Passed with Node 24.22.0/npm 11.19.1/MongoDB 8.0.32:**
+
+- Frozen clean-source npm ci; exact runtime, dependency tree/import checks; lint;
+  strict workspace/test types; 57 normal tests (24 unit + 33 API, 10 new);
+  six retained contract regressions. CI contract gate deliberately exits 1 on
+  its intended assertion, then exits 0 with all 58 corrected-probe tests passed.
+- Foundation, source Mongo startup/outage/recovery/shutdown, shared/Express/Next
+  production builds, emitted ordinary API lifecycle with TypeScript stripping
+  disabled and real Next development forwarding. Normal API opt-in behavior,
+  metadata secrecy, host/origin/scope denial and body failures have regressions.
+- Final UI recovery/form/setup changes pass lint, strict types and a fresh web
+  production build. Final implementation byte-matches the verified source copy;
+  lockfile hash remains 1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+- Actual emitted local-dashboard entry point runs with
+  --no-experimental-strip-types; a production-mode launch exits 1 safely before
+  connecting. The final browser flow uses this compiled backend and owned Mongo.
+
+Browser evidence (self-verification, not independent review): empty/list loading;
+blank validation focuses the name field; keyboard Tab/Enter creation; pending
+submit state; one persisted inbox; saved detail and direct reload; updated list;
+missing-inbox error with request ID; failed create keeps both draft fields;
+unavailable-service state; one retry after API restart restores the populated
+list with no error banner. 375px mobile and 1280px desktop checks show no
+horizontal overflow. Screenshot artifacts are local verification output, not
+committed product/demo assets. The final browser console has no application
+errors; fixture logs have no compilation/driver errors. Intentional outage tests
+are separate from successful-flow evidence.
+
+Initial strict checks found optional-field typing issues; corrected without
+weakening settings. One API outage test initially constructed multiple Supertest
+requests before execution, racing its auto-closed ephemeral server; changed to
+sequential request construction. The passing suite retains all failure checks.
+Browser recovery exposed stale inbox error state after workspace-only retry;
+fixed invalidation and verified the final one-click recovery. Verification
+processes were interrupted before the first build completed; that build is not
+counted as a pass. Outstanding checks were restarted sequentially and all passed.
+Normal development data/config and unrelated processes were not used or altered.
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+npm run build:web
+npm exec -- vitest run tests/api/inbox-routes.test.ts tests/unit/inbox-client.test.ts
+node --import tsx /tmp/webhook-d051-browser.mts
+python3 /tmp/webhook-d051-doc-check.py
+git diff --check
+git diff --cached --check
+```
+
+Checks run in source-only copies excluding private env/generated output; fixtures
+own their native Mongo data/processes and runtime-only synthetic keys. Local Next
+builds bound workers with CIRCLE_NODE_TOTAL=2. Browser scripts are temporary test
+orchestration, not a new committed dependency or fabricated application test.
+Owned live browser resources are stopped/cleaned after verification. Final diff,
+links/fences/status/history, ignore/secret-pattern and generated-clutter checks
+precede commit. No required acceptance check remains failed.
+
+**Not run:** disable/rotation/old-token and capture flows (later tasks), hosted
+signup/session/membership/tenant journeys, public deployment/release, independent
+security review, fresh dependency audit, unfamiliar-user trial or GHFind scan.
+No full Day 05/release/adoption/security-audit/score result is claimed.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+Per-run results do not permanently complete lifetime/release/adoption phases.
+
+| Phase | Status and every checkpoint |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — public scope/account, synthetic/private-data boundary and inspected attribution preserved. P: 0.3, 0.6, 0.7 — full useful capture product and fresh scan/categories/freshness absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — current README, real setup commands, unchanged pinned toolchain, sample config, existing license/contribution/roadmap. 1.5 C for verified local UI/synthetic example, P for release demo. P: 1.1 metadata unchanged; 1.10 independent unfamiliar-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing maintainer inbox UI, duplicate search, reused milestone/backlog, expected flow, observable checks and one task. N/A: 2.5 — feature increment, not a reported product bug. |
+| 3 build/check/review | **C for applicable local work; final publication/CI follows.** C: 3.2, 3.4 — real browser/API/data/failure checks, self-review, attribution/tracking. N/A: 3.1, 3.3, 3.5 — no PR, independent feedback/review or PR merge under authorized direct-main workflow. Numbered steps 2–5, 8 apply; 1, 6–7, 9 N/A; step 10 default-branch/CI verification is required at final handoff, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain full product/release gates: clean inbox UI is not complete capture, tag/version/notes/distribution/demo/release link. C: 4.8 retained safe reporting route. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 — no pin/tutorial/outreach/invitations, real user support or outside contribution/review evidence. |
+| 6 maintenance | **P overall.** C: 6.3 compatible unchanged pins/passing regressions (security update still pending). P: 6.1 beyond task duplicate inspection. N/A: 6.2, 6.4–6.5 — no user bug/recurring question/fix release. C: 6.6 advisory inspected, applicable workaround tested. N/A: 6.7–6.8 — no upstream discussion/fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5, 7.7 — no full independent product trial, scan/category/deduction/freshness/comparison evidence or multi-year outcome. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are recorded;
+PR/independent review/merge fields N/A. No users/stars/reviews/adoption/upstream
+contribution, release or GHFind improvement invented.
+
+### Publication, limitations and handoff
+
+One coherent D05.1 implementation/test/docs commit on unchanged origin/main is
+authorized. The final handoff verifies actual remote SHA, GitHub author/committer
+mapping and hosted Foundation CI on the new SHA after publication; this record
+does not pre-claim an unobserved hosted outcome. If pushing fails, preserve the
+local commit and report the safe concrete blocker. No force push, history rewrite,
+remote/identity/visibility/protection change or unrelated upgrade.
+
+Existing origin credential-storage and body-parser dependency findings remain
+recorded. The UI/API is deliberately local, without sessions/membership; no
+public-hosted authorization claim. Metadata-only detail shows capture as future
+work, not a fake URL/event count. Creation has no idempotency key and quotas/
+key migration/concurrent transfer policy remain later work. No rename, disable,
+rotation, capture/token reveal, event data or worker is implemented here.
+
+**Task blockers: none after passing local acceptance. Next eligible task: D05.2 —
+rename, disable and capture-token rotation services**, with D05.1 complete and
+D04 prerequisites satisfied. D05.2 has not been started. Stop after D05.1.

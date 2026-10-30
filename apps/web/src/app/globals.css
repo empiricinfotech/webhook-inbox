@@ -38,3 +38,54 @@ footer { max-width: 1120px; margin: auto; padding: 24px 32px; border-top: 1px so
   .journey { grid-template-columns: 1fr; gap: 16px; }
   footer { padding: 20px; }
 }
+
+/* Inbox management follows the shell's light palette and typography. */
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: wait; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.button { border: 1px solid var(--ink); line-height: 1.5; }
+.button.secondary { color: var(--ink); background: transparent; }
+.inbox-page h1 { font-size: clamp(2.4rem, 4.5vw, 3.5rem); }
+.inbox-toolbar, .inbox-actions, .inbox-card-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.inbox-toolbar { margin: 32px 0 24px; }
+.inbox-toolbar p { margin: 0; }
+.inbox-actions { justify-content: flex-start; }
+.muted { color: var(--muted); }
+.small { font-size: 0.8rem; }
+.inbox-state { text-align: center; padding: 40px 24px; }
+.inbox-state .inbox-actions { justify-content: center; }
+.empty-icon { display: block; font-size: 2.5rem; color: var(--accent); margin-bottom: 12px; }
+.inbox-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 0; margin: 0 0 32px; list-style: none; }
+.inbox-card { display: flex; flex-direction: column; height: 100%; background: white; padding: 28px; border: 1px solid #d8dfd8; border-radius: 10px; text-decoration: none; }
+.inbox-card:hover { border-color: var(--ink); }
+.inbox-card h2 { margin: 20px 0 12px; overflow-wrap: anywhere; font-size: 1.5rem; }
+.inbox-description { white-space: pre-wrap; overflow-wrap: anywhere; }
+.inbox-card .inbox-description { flex: 1; color: var(--muted); }
+.status-pill { display: inline-block; border-radius: 20px; background: #e6f1e5; color: #254c2d; font-size: 0.75rem; padding: 3px 12px; }
+.status-pill.disabled { background: #efefed; color: #535b59; }
+.back-link { display: inline-block; margin-bottom: 28px; font-size: 0.9rem; }
+.inbox-form-panel { max-width: 720px; margin-top: 28px; }
+.form-field { margin: 24px 0; }
+.form-field label { display: block; font-weight: 700; margin-bottom: 8px; }
+.form-field label span { font-weight: 400; font-size: 0.85rem; }
+.form-field input, .form-field textarea { display: block; width: 100%; padding: 12px; color: var(--ink); background: #fff; border: 1px solid #7f9290; border-radius: 5px; }
+.form-field textarea { resize: vertical; }
+.form-field [aria-invalid="true"] { border: 2px solid #a02c1c; }
+.field-hint, .field-error { font-size: 0.8rem; margin-top: 8px; }
+.field-hint { color: var(--muted); }
+.field-error { color: #9b2d20; }
+.form-error { border-left: 3px solid #9b2d20; padding: 12px; margin-top: 20px; background: #fcf3ef; }
+.form-actions { margin-top: 28px; }
+.inbox-detail { margin-top: 24px; }
+.inbox-detail h2 { margin: 20px 0 16px; overflow-wrap: anywhere; }
+.inbox-metadata { display: grid; gap: 20px; grid-template-columns: 1fr 2fr; margin-top: 32px; }
+.inbox-metadata dt { color: var(--muted); font-size: 0.8rem; }
+.inbox-metadata dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+.text-button { border: none; background: none; padding: 0; text-decoration: underline; }
+@media (max-width: 640px) {
+  .site-header { flex-wrap: wrap; }
+  .inbox-grid, .inbox-metadata { grid-template-columns: 1fr; }
+  .inbox-toolbar { align-items: flex-start; }
+  .inbox-card { padding: 24px; }
+}

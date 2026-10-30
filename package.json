@@ -52,7 +52,8 @@
     "test:unit": "npm run build:contracts && vitest run --project unit",
     "test:api": "npm run build:contracts && vitest run --project api",
     "check:ci-contract-gate": "npm run build:contracts && node scripts/check-ci-contract-gate.mjs",
-    "local:inbox": "npm run build:api && npm run local:inbox --workspace=@empiric-webhook-inbox/api --"
+    "local:inbox": "npm run build:api && npm run local:inbox --workspace=@empiric-webhook-inbox/api --",
+    "local:dashboard": "npm run build:api && npm run local:dashboard --workspace=@empiric-webhook-inbox/api"
   },
   "devDependencies": {
     "@empiric-webhook-inbox/lint-config": "0.0.0",

@@ -660,7 +660,7 @@ Prerequisite: D03. Modules: M02. Planned effort: 5 to 6 hours.
 
 Prerequisite: D04. Modules: M02. Planned effort: 5 to 6 hours.
 
-- [ ] **D05.1** Build inbox list, create form, detail page and empty states.
+- [x] **D05.1** Build inbox list, create form, detail page and empty states. [Local interface and verification](INBOX_UI.md).
 
 - [ ] **D05.2** Implement rename, disable and capture-token rotation services.
 

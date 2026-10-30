@@ -8,6 +8,10 @@ stored-owner check. [D04.3](LOCAL_INBOX.md) composes these primitives for local
 bootstrap and atomic inbox creation. No capture/management route, login or token
 rotation is added. The existing health-only startup stays unchanged.
 
+[D05.1](INBOX_UI.md) now adds local metadata list/create/detail HTTP routes.
+Token retrieval is still internal; no capture URL or credential is exposed by
+that transport.
+
 ## Token and encrypted format
 
 - Generation uses Node crypto.randomBytes(32): 256 random bits, encoded as a

@@ -9,7 +9,7 @@ export default function OverviewPage() {
         Find out what arrived, inspect the details, and debug your integrations
         from one place.
       </p>
-      <Link className="button" href="/setup">Open local setup <span aria-hidden="true">↗</span></Link>
+      <Link className="button" href="/inboxes">Open inboxes <span aria-hidden="true">↗</span></Link>
       <section className="panel" aria-labelledby="preview-heading">
         <p className="eyebrow">The first release</p>
         <h2 id="preview-heading">From request to understanding.</h2>
@@ -20,7 +20,7 @@ export default function OverviewPage() {
         </ol>
         <p className="notice">
           Capture and inspection are coming in the first release.
-          This preview currently provides local setup and navigation.
+          You can now create and view inboxes in the local workspace.
         </p>
       </section>
     </div>

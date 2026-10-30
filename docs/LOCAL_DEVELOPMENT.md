@@ -1,13 +1,14 @@
 # Local development foundation
 
-D02.1–D04.3 | Updated 30 October 2026 | Linux x64
+D02.1–D05.1 | Updated 30 October 2026 | Linux x64
 
 Next.js serves the overview (`/`), setup (`/setup`) and missing-page shell.
 Express owns the MongoDB connection and health routes. Development management
-requests under `/api/v1` now reach Express through the frontend origin. Domain
-endpoints and the first capture journey remain future tasks.
+requests under `/api/v1` reach Express through the frontend origin. The first
+capture journey remains future work.
 [Local inbox setup](LOCAL_INBOX.md) now provides a separate operator command for
-workspace bootstrap and safe inbox creation/listing, without signup or HTTP routes.
+workspace bootstrap and safe inbox creation/listing, without signup. [Inbox UI](INBOX_UI.md) adds a separate local-only API entry point
+for list/create/detail; ordinary dev:api stays health-only.
 
 ## Start from a clean checkout
 
@@ -73,7 +74,8 @@ curl -i http://127.0.0.1:3000/api/v1/inboxes
 
 Readiness returns 200/ready after a bounded Mongo ping, or 503/not_ready during
 an outage; liveness is `/health/live`. The second request currently returns
-Express's JSON `NOT_FOUND` error because management features are unimplemented.
+Express's JSON `NOT_FOUND` error because ordinary dev:api does not enable local
+management. Use local:dashboard for the [inbox UI flow](INBOX_UI.md).
 The response header `X-Request-Id` matches `error.requestId`; IDs are generated
 by Express and incoming client IDs are ignored. See [API contracts](API_CONTRACTS.md)
 for schemas, safe errors and request log correlation.

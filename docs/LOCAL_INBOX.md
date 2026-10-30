@@ -1,11 +1,12 @@
 # Local workspace bootstrap and inbox creation
 
-D04.3 | 30 October 2026
+D04.3–D05.1 | 30 October 2026
 
 A local operator can now create a workspace, create credentialed inboxes and list
-safe metadata using the Express backend's services. This is a command-line flow,
-not a dashboard, HTTP management API, user account or public signup flow.
-The Next.js shell and health-only Express server are unchanged.
+safe metadata using the Express backend's services. This document describes the
+command-line flow. [D05.1](INBOX_UI.md) adds a separate local dashboard/API using
+these services, without user accounts or public signup.
+Normal API startup remains health-only; the local dashboard is an explicit opt-in.
 
 ## Try the local flow
 
@@ -120,10 +121,11 @@ through booleans to avoid secret-bearing assertion diagnostics.
 
 Day 04's created-inbox/secret-free list criterion is exercised through backend
 services and the operator command. It does not require Day 05's UI or infer a
-shipped HTTP list endpoint. Listing is an internal local array; API pagination
-and inbox quotas remain future policy work. No signup, password/session/membership,
-rename/disable/rotation, capture route, event storage, frontend, hosted deployment
-or release is added. D05.1 is next and has not been started.
+shipped HTTP list endpoint. The CLI retains an internal array; D05.1 supplies
+HTTP pagination. Inbox quotas remain future policy work. No signup, password/session/membership,
+rename/disable/rotation, capture route, event storage, hosted deployment
+or release is added by this operator flow. D05.1 now supplies the separate
+[frontend and local transport](INBOX_UI.md); D05.2 is next.
 
 Primary references: [Mongoose Model.create/createIndexes](https://mongoosejs.com/docs/api/model.html),
 [Node file creation flags](https://nodejs.org/docs/latest-v24.x/api/fs.html#file-system-flags)

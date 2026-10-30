@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Link className="brand" href="/">Webhook Inbox<span>by Empiric</span></Link>
           <nav aria-label="Main navigation">
             <Link href="/">Overview</Link>
+            <Link href="/inboxes">Inboxes</Link>
             <Link href="/setup">Local setup</Link>
           </nav>
         </header>

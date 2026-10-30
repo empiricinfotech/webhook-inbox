@@ -19,6 +19,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "build": "tsc -p tsconfig.build.json",
     "start": "node --env-file-if-exists=.env.local dist/index.js",
-    "local:inbox": "node --env-file-if-exists=.env.inbox.local dist/local-inbox.js"
+    "local:inbox": "node --env-file-if-exists=.env.inbox.local dist/local-inbox.js",
+    "local:dashboard": "node --env-file-if-exists=.env.inbox.local dist/local-dashboard.js"
   }
 }

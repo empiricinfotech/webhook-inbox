@@ -140,3 +140,14 @@ files or development data are used. Normal npm test/CI discover all checks.
 See [local inbox setup](LOCAL_INBOX.md) for commands and scope. The emitted command
 is also exercised after build with TypeScript stripping disabled during task
 verification; normal CI operator tests exercise its source with the existing tsx.
+
+
+## D05.1 local interface checks
+
+inbox-routes.test.ts adds six owned-Mongo API regressions for context/create/detail/
+page contracts, cursor boundaries, scope/owner changes, opt-in/Host/Origin guards,
+bounded parsing and outages. inbox-client.test.ts adds four request/response/error/
+config tests with no DOM dependency. Normal npm test/CI discovers all ten. Browser
+checks additionally cover the actual Next → Express → Mongo flow, keyboard form
+handling, reload, empty/loading/missing/error states and responsive layout using
+synthetic disposable data. See [inbox UI](INBOX_UI.md) and progress for scope/results.
