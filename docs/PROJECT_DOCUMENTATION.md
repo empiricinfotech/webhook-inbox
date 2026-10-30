@@ -650,7 +650,7 @@ Prerequisite: D03. Modules: M02. Planned effort: 5 to 6 hours.
 
 - [x] **D04.1** Create workspace and inbox schemas with timestamps and explicit validation. [Metadata model and validation evidence](DATA_MODELS.md).
 
-- [ ] **D04.2** Implement random capture token generation, hashed lookup and encrypted owner retrieval.
+- [x] **D04.2** Implement random capture token generation, hashed lookup and encrypted owner retrieval. [Token security and verification evidence](CAPTURE_TOKENS.md).
 
 - [ ] **D04.3** Add local workspace bootstrap and inbox creation service without public signup.
 

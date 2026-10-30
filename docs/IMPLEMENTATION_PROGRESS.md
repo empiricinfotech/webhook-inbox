@@ -1316,3 +1316,165 @@ do not enforce ownership/foreign keys, and the normal API exposes no new route.
 **Next eligible task: D04.2 — random capture token generation,
 hashed lookup and encrypted owner retrieval.** D04.2/D04.3 and full Day 04
 acceptance remain pending; stop after D04.1.
+
+
+## 2026-10-30 — D04.2: capture token generation, hashed lookup and encrypted owner retrieval
+
+**Implementation: completed. Publication: commit/push/CI handoff below.**
+Only D04.2 selected; D04.3 and later features are not started.
+
+### Inspection, task selection and attribution
+
+Read applicable instructions, project architecture/backlog, the entire growth
+checklist, prior progress, README/contribution/local-development/model/test/CI
+instructions. No ancestor/root AGENTS.md or TASK_BOARD.md exists; managed web
+AGENTS.md is preserved, with no web source changes. Started clean on main at
+f03e9f1, tracking origin/main. Fresh fetch is 0 ahead/behind; GitHub main and
+[the prior successful CI run](https://github.com/empiricinfotech/webhook-inbox/actions/runs/40833162542)
+verify D04.1 is published. Fresh baseline passes all 21 tests. Metadata schemas
+exist; token fields/crypto/lookup/retrieval do not, making D04.2 the earliest
+unfinished eligible task. No publication-only handoff remains from D04.1.
+
+Author/committer remain empiricinfotech <empiricinfotech@gmail.com>; GitHub maps
+f03e9f1's author/committer to empiricinfotech. No identity, attribution rewrite or
+invented coauthor. Safely inspected origin/upstream fetch/push destinations match
+empiricinfotech/webhook-inbox. Origin's embedded credential location remains
+.git/config remote.origin.url; values were never printed, committed or changed.
+Credential-manager storage remains recommended. Main is unprotected with no
+rulesets; the user's current-branch publication workflow is suitable.
+
+D04.2 issue/PR searches found no equivalent. Reuse the ordered backlog and
+[v0.1 tracking #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No count-building issue/PR, milestone closure, release or external post created.
+README still named D03.3 as next despite published implementation; corrected
+that task-status reference using verified backlog/implementation evidence.
+
+Acceptance: 256-bit random canonical tokens; unique hash-based lookup; versioned
+authenticated encryption with fresh nonces and inbox/workspace binding; stored-
+owner/scoped retrieval; hidden ordinary reads; safe failures; real Mongo and
+normal repository/CI checks. Day 04's complete creation/list acceptance still
+requires D04.3; no list/capture endpoint is inferred from internal service checks.
+
+### Work and decisions
+
+| Files | Work |
+|---|---|
+| apps/api/src/security/capture-token.ts | Random canonical tokens, SHA-256, strict envelope/key validation, private copied KeyObjects, AES-256-GCM, authenticated ID/version context and checked decryption |
+| apps/api/src/services/capture-tokens.ts | One-time compare-and-set provisioning of an existing inbox, exact hash lookup DTO, current stored-owner checks, scoped retrieval and static ApiError mapping |
+| apps/api/src/models/inbox.ts | Paired hidden tokenHash/encryptedToken fields, strict nested schema, unique partial hash index and ordinary document serialization redaction |
+| tests/unit/capture-token.test.ts; tests/api/capture-tokens.test.ts | 6 unit and 7 disposable-Mongo tests for crypto/key/context/canonical boundaries, hidden storage, real uniqueness, owner/scoping changes, concurrent issue and safe failures |
+| tests/unit/models.test.ts | New declared credential fields replace only their previous unknown-field assertions; raw token/unknown/verification fields remain rejected and new strict-pair tests cover credentials |
+| docs/CAPTURE_TOKENS.md; docs/DATA_MODELS.md | Format, operator key/caller trust boundaries, index/storage lifecycle, examples and scope limits |
+| README.md; CONTRIBUTING.md; docs/TESTING.md | Accurate internal capability/testing and next-task references |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D04.2 marked complete; this history-preserving evidence/growth record |
+
+The core uses built-in Node crypto and existing Zod/Mongoose only. No dependency,
+lockfile, engine, shared contract, frontend, real environment file or CI change.
+No default/generated production encryption key: a trusted caller supplies a
+validated current key version and Map of 32-byte operator keys. Old retained
+versions can decrypt their envelopes; missing/wrong keys fail closed. Keys stay
+outside Mongo/source, with separate secure operator backups required later.
+No environment composition or automatic key migration/rotation is implemented.
+
+The service checks native ObjectId inputs, active workspace owner and inbox scope.
+Actor identity must be supplied by trusted local composition now and verified
+session/membership context later; this does not implement authentication/roles.
+Provisioning updates both fields atomically only when absent, returns no raw
+token and never silently rotates. Hash lookup returns explicit metadata, with
+disabled state preserved for the later 410 handler and inactive workspaces hidden.
+
+Default selects omit credentials; normal toObject/toJSON also redact fresh or
+explicitly selected documents. Only owner retrieval releases plaintext. Crypto
+checks tag/context/version and the stored hash before returning it; errors retain
+no input/driver/crypto cause. Existing raw-URL/header log-omission tests remain.
+Direct projections, transform:false and raw/bypass writes are trusted backend
+operations, not a public interface. Metadata-only legacy records remain valid;
+D04.3 must initialize indexes and provision credentials during actual creation.
+
+No bootstrap, creation service, public route, signup/session/membership flow,
+provider verification, capture processing, token rotation or UI work. No normal
+Mongo database, volume or stored user data is migrated or touched.
+
+### Verification
+
+**Passed with Node 24.22.0/npm 11.19.1 and MongoDB 8.0.32:** source-only clean npm
+ci; runtime/dependency tree/import checks; lint; strict types; 16 unit plus 18 API
+tests (34 total, 13 new); six retained contract regressions; contract gate RED
+exit 1 then GREEN exit 0 with 35 tests; foundation/startup, source Mongo lifecycle/
+outage, shared/Express/Next production builds, emitted API and routing checks.
+
+Focused token tests passed. Initial lint/types caught optional stored-fixture
+narrowing and a test error-helper issue; corrected without suppressing rules.
+Final explicit terminal-newline regression cases reject malformed token/hash/
+envelope/key/context input. Re-ran the affected unit project, lint and types;
+byte comparison confirms all application/API-test code matches the full passing
+source-copy verification. No required check remains failed or skipped.
+
+```text
+npm run bootstrap
+npm run check:toolchain
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:api
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+npm exec -- vitest run tests/unit/capture-token.test.ts tests/api/capture-tokens.test.ts
+git diff --check
+git diff --cached --check
+```
+
+The official pinned Node archive was checksum verified in /tmp. Source-only
+verification copies exclude private environment files and generated output;
+all Mongo fixtures/processes/data are owned and disposable. Keys/tokens are
+runtime-generated synthetic values, never printed/committed as fixtures; test
+comparisons avoid secret-bearing failure output. Local Next build uses
+CIRCLE_NODE_TOTAL=2 to bound workers; hosted CI uses its normal runner defaults.
+Documentation links/fences/status/history, unchanged lockfile, source-copy
+matching and final secret-pattern/generated-clutter/diff review precede commit.
+
+Not run: browser/UI (no UI change), capture/creation/release journeys (unimplemented),
+production key provisioning/backup drill, independent security review or fresh
+dependency audit. Internal owner predicates are not a complete tenant/session
+security result. No release/adoption/audit/score success is claimed.
+
+### Growth checklist — every checkpoint evaluated
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These per-run results do not permanently complete lifetime phases.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — public scope/account, synthetic/private-data boundary and checked attribution retained. P: 0.3, 0.6, 0.7 — usable capture product and fresh scan/categories/status absent; no scan requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — README/setup/runtime/config/license/contribution/roadmap retained and token boundary documented. 1.5 C for working internal fixture/service example, P for product demo. P: 1.1 metadata unchanged; 1.10 unfamiliar independent tester absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — real token/security need, duplicate search, reused milestone/backlog, expected result, one scope and acceptance. N/A: 2.5 — new feature, no reported product defect. |
+| 3 build/check/review | **C for applicable local work; final publication/CI below.** C: 3.2, 3.4 — actual crypto/persistence/denial/failure checks, links and attribution. N/A: 3.1, 3.3, 3.5 — no PR, independent review/feedback or merge under direct-main workflow. Numbered steps 2–5, 8 apply as implementation/self-review; 1, 6–7, 9 N/A; step 10 default-branch/CI verification applies to final handoff, milestone closure N/A. |
+| 4 release | **P.** 4.1–4.7 remain product/release gates: a clean foundation is not the capture journey, version/tag/notes/distribution/demo/link. C: 4.8 retained issue-reporting route. |
+| 5 discovery/adoption | **P.** C: 5.3 retained source/install links. P: 5.1–5.2, 5.4–5.8 — no pinning, product tutorial/outreach/invitation, actual support reports or outside contribution/review evidence. |
+| 6 maintenance | **P overall.** C: 6.3 compatible unchanged pins/passing regressions (security refresh pending). P: 6.1 beyond duplicate search. N/A: 6.2, 6.4–6.5 — no user bug/recurring question/fix release. C: 6.6 existing dependency finding retained, not a fresh audit. 6.7–6.8 N/A — no new upstream diagnosis/discussion/fix needed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5, 7.7 — no independent product trial, scan/category/deduction/freshness/comparison evidence or multi-year outcome. |
+
+Reusable PR checklist problem/change/verification/tracking/self-review recorded;
+PR, independent review and merge fields N/A. No stars/users/reviews/adoption,
+upstream contribution, release or GHFind improvement invented.
+
+### Publication, limitations and handoff
+
+One coherent D04.2 commit on main is authorized for unchanged origin/main. The
+final handoff verifies the actual remote commit, GitHub author/committer mapping
+and existing Foundation CI run on that SHA; this local record does not pre-claim
+an unobserved hosted result. No force push, history/attribution rewrite, identity,
+remote, visibility or branch-protection change. If publication fails, preserve
+the local commit and report the safe concrete blocker.
+
+Existing body-parser advisory and local origin credential-storage findings remain
+recorded; no unrelated dependency/configuration repair is bundled.
+**Next eligible task: D04.3 — local workspace bootstrap and inbox creation service
+without public signup.** D04.1/D04.2 prerequisites are complete. D04.3 and the
+full Day 04 acceptance remain pending; stop after D04.2.

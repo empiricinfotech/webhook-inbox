@@ -72,7 +72,7 @@ test("inbox rejects invalid references, scalar coercion, lengths, controls and r
 
 test("strict schemas reject unexpected fields and premature secret fields", () => {
   expect(() => new Workspace({ ownerId, name: "Synthetic", extra: true })).toThrow(mongoose.Error.StrictModeError);
-  for (const field of ["extra", "token", "tokenHash", "encryptedToken", "verificationConfig"]) {
+  for (const field of ["extra", "token", "verificationConfig"]) {
     expect(() => new Inbox({ workspaceId, name: "Synthetic", [field]: "synthetic" }))
       .toThrow(mongoose.Error.StrictModeError);
   }

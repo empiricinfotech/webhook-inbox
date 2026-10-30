@@ -116,3 +116,14 @@ models.test.ts for real disposable persistence, both models' timestamps, failed
 writes, scoped index creation and strict validated updates. npm test discovers
 both automatically; no new test runner, dependency or CI bypass is needed.
 See [data models](DATA_MODELS.md) for field rules and the precise scope boundary.
+
+
+## D04.2 capture token checks
+
+The unit/API projects include capture-token.test.ts and capture-tokens.test.ts
+for random token encoding, authenticated encryption, key/version/context/hash
+failure paths, hidden paired storage, real unique lookup indexes, stored-owner
+scoping, concurrent one-time provisioning and safe failures. Secrets/keys exist
+only in disposable runtime fixtures and comparisons avoid secret-bearing failure
+output. Full repository/CI checks discover these without new dependencies or
+runner changes. See [capture token security and scope](CAPTURE_TOKENS.md).

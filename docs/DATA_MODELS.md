@@ -1,6 +1,6 @@
 # Workspace and inbox metadata models
 
-D04.1 | 29 October 2026
+D04.1–D04.2 | Updated 30 October 2026
 
 The Express backend now has typed Mongoose 9.11.2 schemas for workspace/inbox
 metadata. Imports do not connect to Mongo or register global models. Call
@@ -20,6 +20,7 @@ the model. No server startup, health contract or frontend behavior changes.
 | inboxes.description | Optional text with empty-string default; trimmed, max 500 UTF-16 code units; tab/newline/CR permitted, other ASCII controls/DEL rejected; explicit null rejected |
 | inboxes.enabled | Required boolean, default true |
 | inboxes.retentionDays | Required number, exactly 1, 7 (default), or 30 |
+| inboxes.tokenHash / encryptedToken | Optional paired capture credential, hidden by default; strict format and unique partial hash index; see [token security](CAPTURE_TOKENS.md) |
 | Both: _id | Mongoose-generated native ObjectId |
 | Both: createdAt / updatedAt | Mongoose-managed UTC Date values added on save; later saves retain createdAt and advance updatedAt |
 
@@ -39,7 +40,7 @@ opt-in and cannot replace future input allowlists. Explicit strict query options
 also reject attempted immutable-field changes rather than silently stripping
 them. Replacement, update-pipeline, bulk/raw-driver writes and options that
 bypass validation/immutability/timestamps are not a validated application write
-interface. No service exposes any write operation in this task. Future services
+interface. D04.2 adds only one-time credential provisioning with a validated atomic pair. Future services
 must validate/allowlist input, enforce workspace access and use these rules.
 Do not serialize/log Mongoose validation errors or documents from untrusted input;
 existing safe API errors remain the external error boundary.
@@ -51,6 +52,7 @@ index building. They declare stable list indexes:
 
 - workspaces: ownerId ascending, createdAt descending, _id descending.
 - inboxes: workspaceId ascending, createdAt descending, _id descending.
+- inboxes: tokenHash ascending, unique for string hashes (partial index).
 
 Index creation is explicit with Model.createIndexes() in disposable tests.
 Normal application startup is unchanged; the later bootstrap/service must
@@ -88,19 +90,18 @@ Scoped-query examples demonstrate data shape; they do not claim authorization.
 
 ## Scope and next requirements
 
-D04.1 completes the metadata schema step only. Token/hash/encrypted-token and
-verification configuration fields are not yet accepted or stored. They will be
-added with their actual invariants in D04.2/provider-verification work rather
-than allowing opaque or plaintext placeholders into the current schema.
-There is no token generation, encryption, hashed lookup, owner retrieval, token
-rotation, local bootstrap, creation service, endpoint or signup flow. Retention
-metadata does not yet expire events. An enabled metadata record alone is not a
-capture-capable inbox; the capture route does not exist yet.
+D04.1 supplies metadata; [D04.2](CAPTURE_TOKENS.md) adds strict paired hash/encrypted
+credential fields, one-time provisioning, hashed lookup and owner-checked internal
+retrieval. Multiple older metadata-only records remain valid; new creation must
+provision credentials in D04.3. Verification-secret fields remain later work.
+There is no local bootstrap, inbox creation service, capture/management endpoint,
+signup, token rotation or session/membership flow. Retention metadata does not yet
+expire events. An enabled metadata record alone is not capture-capable.
 
-Day 04's valid capture token and secret-free list acceptance remains dependent
-on D04.2 and D04.3. Foreign-key/ownership checks and safe response serialization
-belong in later services, not in the metadata persistence layer. No public
-hosting, release, capture journey or tenant security is claimed here.
+Day 04's full created-inbox and secret-free list acceptance still depends on
+D04.3. Normal-read secrecy is demonstrated at model/service level, not by a
+shipped list API. No public hosting, release, capture journey or tenant security
+is claimed here.
 
 Primary references: [Mongoose validation](https://mongoosejs.com/docs/validation.html),
 [timestamps](https://mongoosejs.com/docs/timestamps.html),

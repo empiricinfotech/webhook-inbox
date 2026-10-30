@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; creation services, capture tokens and endpoints remain pending. There is no inbox/capture API behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. Creation services and endpoints remain pending. There is no inbox/capture API behavior yet. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -86,7 +86,7 @@ The build emits shared contracts, Express JavaScript and the Next.js production 
 - **Data and worker:** MongoDB/Mongoose stores sanitized events and durable jobs; a separate Node worker will handle retention cleanup and controlled replay.
 - **Hosting:** a shared origin will route frontend pages to Next.js and API/capture/health paths to Express. UI route guards do not replace API permission checks.
 
-The frontend shell, Express startup, MongoDB connection and health checks are implemented; domain services, event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
+The frontend shell, Express startup, MongoDB connection and health checks are implemented; capture-token primitives and internal owner retrieval are implemented. Inbox creation, event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
 
 ## Repository layout
 
@@ -124,7 +124,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D03.2 are complete. D03.3 is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.2 are complete. D04.3 is next; bootstrap and inbox creation have not been started.
 
 ## Data and scope boundaries
 
