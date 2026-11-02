@@ -1862,3 +1862,196 @@ rotation, capture/token reveal, event data or worker is implemented here.
 **Task blockers: none after passing local acceptance. Next eligible task: D05.2 —
 rename, disable and capture-token rotation services**, with D05.1 complete and
 D04 prerequisites satisfied. D05.2 has not been started. Stop after D05.1.
+
+
+## 2026-11-02 — D05.2: rename, disable and capture-token rotation services
+
+**Implementation status: completed.** All individual acceptance and required local checks pass.
+Exactly D05.2 selected. No D05.3 or later task is marked complete.
+Publication status is recorded separately below. No TASK_BOARD.md exists.
+
+### Selection, repository safety and attribution
+
+The initial tree/index was clean on main tracking origin/main at
+f9c2f2a4e2cf3b74af1e7612c170121eb9df4fe4 (D05.1), preceded by verified D04.3,
+D04.2 and D04.1 implementations. Fresh fetch showed 0 ahead/0 behind. Inspected
+source, contracts, fixtures, scripts and CI; the unmodified baseline passed all
+57 tests. GitHub main matched that SHA and [D05.1 Foundation CI run 41057526735](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41057526735)
+was completed/success. Its authorized publication has no outstanding handoff.
+Rename/disable/rotation methods were absent, making D05.2 the earliest eligible
+unfinished task after D05.1 and the D04 prerequisites.
+
+Read applicable instructions, the complete project plan and growth checklist,
+progress history, README, contribution, toolchain, development, model, token,
+local operator/UI, testing and CI guidance. No ancestor/root AGENTS.md applies;
+apps/web/AGENTS.md is scoped to unchanged frontend code. The backend skill's
+existing-framework guidance was used; no Vercel service or dependency was added.
+
+Origin fetch/push destinations were inspected programmatically and confirmed as
+https://github.com/empiricinfotech/webhook-inbox; upstream also targets that
+repository. No remote or identity setting changed. Embedded credential location:
+.git/config remote.origin.url. Only its location was reported; secure credential-
+manager storage is recommended. No value was printed, copied, removed or rotated.
+Effective author and committer remain empiricinfotech <empiricinfotech@gmail.com>;
+GitHub maps both fields of the prerequisite commit to empiricinfotech. Ownership,
+push authentication and commit attribution were checked separately; this does not
+claim independent personal authorship/review or GHFind credit for the agent work.
+
+D05.2 issue/PR searches found no equivalent; inspected the four existing open
+release issues. Reuse the backlog and [v0.1 milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No new issue, PR, release or public post was needed. Main is unprotected and
+repository rulesets are empty; the authorized existing direct-main workflow is
+suitable. Preserve all four milestone issues and their pending release criteria.
+
+### Result and affected files
+
+| Files | Work |
+|---|---|
+| packages/contracts/src/inboxes.ts | Strict renameInboxSchema reusing existing bounded normalized name rules |
+| apps/api/src/services/inboxes.ts | Active-owner/scoped rename and repeat-safe disable returning only InboxSummary; shared scoped-ID guard |
+| apps/api/src/services/capture-tokens.ts | Explicit owner-authorized atomic compare-and-set rotation; common safe storage error mapping |
+| tests/unit/inboxes.test.ts; tests/api/inbox-management.test.ts | One rename contract check and eight real-Mongo management checks; no new runner/dependency |
+| docs/INBOX_MANAGEMENT.md | Working internal usage, safe DTOs, ownership, rotation/failure/concurrency contracts and assumptions |
+| docs/CAPTURE_TOKENS.md; docs/LOCAL_INBOX.md; docs/INBOX_UI.md; docs/DATA_MODELS.md; docs/TESTING.md | Consistent current service/transport boundaries and verification guidance |
+| README.md; CONTRIBUTING.md; docs/PROJECT_BRIEF.md | Current capabilities, service documentation links and next task |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D05.2 newly checked after verification; this appended evidence record, preserving all previous history |
+
+Rename accepts only name, trims it, bounds it to 1–100 UTF-16 code units and rejects
+controls/DEL or unknown/privileged fields. It changes only name/updatedAt.
+Disable sets enabled:false without deleting data or changing credentials/settings;
+a repeated disable leaves timestamps unchanged. No implicit re-enable is exposed.
+All mutations require native ObjectIds, an active stored owner and matching inbox
+workspace; inaccessible/missing objects share NOT_FOUND. Ordinary return values
+use the existing explicit metadata allowlist and contain no credentials.
+
+Rotation generates/encrypts first, then replaces hash plus envelope together in
+one validated single-document update matching the old hash. A real unique index
+rejects collisions; a same-hash candidate or concurrent generation loss is
+CONFLICT. Rotation returns void; existing explicit owner retrieval is separate.
+Old-token lookup becomes null, and disabled state remains false. Rotation uses
+the configured current key without decrypting the old envelope. It is an explicit
+single-inbox action, not automatic key migration/recovery. Legacy unprovisioned
+records need existing one-time provisioning and return CONFLICT on rotation.
+
+The tests demonstrate creation → rename → disable → rotate at the internal
+service boundary, including old-token invalidation and denied other-workspace
+mutations. D05.3 remains the next focused validation/old-token/disabled-response
+verification task. Do not require D06's capture transport to complete these
+services, or infer a shipped capture 410/acknowledgement from enabled:false.
+No new UI/HTTP mutation route, CLI command, capture feature, authentication,
+membership, audit feature, event data, worker or release is implemented.
+
+### Acceptance and verification
+
+Pinned Node 24.22.0/npm 11.19.1 were restored only in a task-owned /tmp toolchain;
+the official archive SHA-256 cc2f601cee82d9a5a233302fe307abc600727035fd7d2c3a3571755989e95008
+was verified against the published SHASUMS256.txt. No global version-manager
+settings changed. Native MongoDB 8.0.32 was used. No package or lockfile change;
+package-lock.json SHA-256 remains
+1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+
+Commands from the repository root or a disposable snapshot with the same final
+source, using PATH set to the pinned toolchain:
+
+```bash
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+NEXT_TELEMETRY_DISABLED=1 CIRCLE_NODE_TOTAL=2 npm run build
+npm run check:compiled-api
+npm run check:routing
+npm audit --json
+git diff --check
+git diff --cached --check
+```
+
+- Initial baseline: 57 tests passed. First implementation run: 65 passed, lint and
+  strict types passed. Final clean frozen install, dependency smoke/compatibility,
+  lint, strict types and all **66 tests passed** (25 unit + 41 API, 14 files).
+- New checks cover safe current metadata, normalized/invalid inputs, repeat
+  disable/timestamps, unchanged settings/credential pair, native IDs, missing and
+  cross-workspace scope, changed stored owner, deleting workspace, old/new token
+  lookup, preserved disabled state, crypto/validation/duplicate/write failures,
+  recovery, deterministic two-read CAS race, legacy records, closed storage and
+  explicit rotation with an unavailable old key/new current key.
+- Shared contracts: **6 passed**. Deliberate CI contract gate: RED exits 1 for
+  exactly the intended assertion, then GREEN exits 0 with **67 passed**, including
+  the corrected probe. The owned probe is removed; no failing test is committed.
+- Foundation **5 passed**, source Mongo lifecycle **6 passed**, emitted API Mongo
+  lifecycle **6 passed**, and actual Next development routing **3 passed**.
+  Shared-contract/API/Next production builds pass. Compiled API checks use plain
+  JavaScript with Node TypeScript stripping disabled.
+- The final source/config matches the clean verification snapshot. All declared
+  snapshot files remain byte-identical after checks; probe cleanup and source
+  integrity checks pass. Final doc-only status/cross-reference updates are checked
+  in the working repository after the same implementation passes.
+- Reviewed the complete code/tests/docs diff; relative links, fenced blocks,
+  status references, secret-pattern scans and whitespace checks pass. No real
+  credentials, operator environment, capture data or generated artifacts are
+  staged. Assertions compare secrets as booleans, avoiding secret-bearing diffs.
+  Source/lockfile integrity after clean install/tests passes.
+- Fresh npm audit returns exit 1: **12 advisories, 11 moderate and 1 high** on the
+  unchanged lockfile. Affected package chains include ESLint/minimatch tooling
+  and body-parser. This is a recorded maintenance finding, not an audit pass or
+  an upgrade performed here. The known body-parser local-parser inflate:false
+  mitigation/regression remains; dependency remediation and the full Next lint
+  preset peer constraints remain pending separate maintenance.
+
+All Mongo processes, ports, databases, keys and temporary config belong to the
+test fixtures. No normal local Mongo data, private environment file or running
+application was used, replaced or stopped. Local Next build sets CIRCLE_NODE_TOTAL=2 for
+resource limits; CI retains its existing configuration. No checks were weakened.
+
+**Not run:** browser interaction checks (no UI change); capture HTTP 410 or actual
+capture flow (no receiver yet); hosted/session/membership/replay/release journeys;
+independent security review, unfamiliar-user trial or GHFind scan. No release,
+adoption, score gain or complete M02/session authorization claim.
+
+### Growth checklist — every checkpoint evaluated for this run
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These results do not permanently complete lifetime or release/adoption phases.
+
+| Phase | Per-run status and every checkpoint |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — existing public project/account/synthetic scope and inspected attribution retained. P: 0.3, 0.6, 0.7 — complete useful capture product and fresh scan/categories/freshness evidence absent; scan not requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — README, real commands, exact supported runtime, placeholder config, retained MIT license/contribution/roadmap and updated service docs. 1.5 C for tested synthetic service example, P for full release demo. P: 1.1 metadata unchanged; 1.10 independent unfamiliar-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — owner configuration/credential replacement need, duplicate search, reused backlog/milestone, expected behavior, observable checks and one coherent task. N/A: 2.5 — feature increment, no reported bug reproduction. |
+| 3 build/check/review | **C for local implementation/self-verification after checks; publication follows below.** C: 3.2, 3.4 — important real-Mongo success/failure/race behavior, safe authorship/tracking. N/A: 3.1, 3.3 — no PR or independent feedback under authorized direct-main workflow. 3.5 P until actual remote/default-branch CI read-back. Numbered steps 2–5 and 8 apply; 1, 6–7, 9 N/A for direct-main/no PR/review feedback; step 10 verification follows publication, milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 remain product/release gates: clean service install is not full capture, version/tag/notes/distribution/demo/release link. C: 4.8 retained safe problem-reporting instructions. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 — profile pin/tutorial/outreach/invitations, real user support and outside contribution/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C for scoped issue/PR inspection, P for continuing broader triage. C: 6.3 unchanged compatible pins/passing regressions; advisory remediation remains P. N/A: 6.2, 6.4 — no user bug/recurring question. P: 6.5 fix release not due/ready. C: 6.6 fresh dependency advisory result inspected/recorded. N/A: 6.7–6.8 — no upstream discussion/fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5, 7.7 — complete product trial, scan/category/deduction/freshness/comparison evidence and multi-year outcomes absent. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are recorded;
+PR/independent review/merge fields N/A. No artificial issue/PR/release/post,
+user/star/review/adoption/upstream contribution or GHFind improvement is claimed.
+
+### Publication, limitations and handoff
+
+**Publication status at record preparation: pending task commit/push.** The local
+checks above precede publication. One coherent D05.2 commit on unchanged origin/main
+is authorized; final handoff must read back the actual remote SHA, GitHub author/
+committer mapping and hosted Foundation CI on that SHA. This entry does not
+pre-claim a later push/CI result. Preserve the local commit if publication fails
+and report the exact safe reason; no force push, rewrite, remote/identity change,
+visibility/protection change or unrelated upgrade.
+
+Important limits: internal trusted-actor methods do not implement sessions or
+membership. Owner checks and writes are separate; transfer/deletion concurrency
+policy is later work. Rotation has no idempotency key, does not cancel captures
+already resolved before it, and an uncertain storage acknowledgement may follow
+a complete atomic update. Inspect current owner-authorized state before retrying.
+No automatic re-enable, crypto key migration/recovery, audit trail or token
+transport was added. Credential-storage and dependency findings remain recorded.
+
+**Task blockers: none. Next eligible task: D05.3 — test validation, old-token invalidation and disabled-inbox
+responses.** D05.3 is not started or marked complete by these implementation
+checks. Stop after D05.2 and its verification/publication.

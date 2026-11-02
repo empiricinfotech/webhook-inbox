@@ -105,12 +105,14 @@ only synthetic keys and data; normal developer databases/files stay untouched.
 The progress record contains exact checks and observed browser results.
 
 The detail view shows saved settings and an honest placeholder for future capture.
-It does not display a fake event count or an active capture URL. Rename, disable
-and token rotation are D05.2; their validation/old-token/disabled-response checks
-are D05.3. Thus Day 05's complete acceptance remains pending those tasks.
-No session/signup/membership, capture processing, event list, token reveal or
-rotation endpoint, worker, release or deployment is added. D05.2 is next and is
-not started in this run.
+It does not display a fake event count or an active capture URL.
+[D05.2](INBOX_MANAGEMENT.md) now implements internal rename, disable and token
+rotation services. This UI/HTTP transport still offers only list/create/detail;
+it has no rename/disable/rotation controls or token reveal/rotation endpoint. D05.3 remains the
+next validation/old-token/disabled-response verification task. Service checks
+do not claim a capture HTTP 410 response; the capture route belongs to D06.
+No session/signup/membership, capture processing, event list, worker, release
+or deployment is added by the interface task.
 
 See [local operator setup](LOCAL_INBOX.md), [testing](TESTING.md) and
 [implementation progress](IMPLEMENTATION_PROGRESS.md). Relevant installed Next

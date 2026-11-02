@@ -95,11 +95,14 @@ credential fields, one-time provisioning, hashed lookup and owner-checked intern
 retrieval. Multiple older metadata-only records remain valid; new creation must
 provision credentials atomically through [D04.3](LOCAL_INBOX.md). Verification-secret fields remain later work.
 Local bootstrap and owner-scoped creation/listing services now exist. There is
-no capture/management HTTP endpoint, signup, token rotation or session/membership flow. Retention metadata does not yet
-expire events. An enabled metadata record alone is not capture-capable.
+no capture endpoint, signup or session/membership flow. D05.1 now supplies
+[local metadata HTTP routes](INBOX_UI.md); D05.2 adds
+[internal rename/disable/rotation services](INBOX_MANAGEMENT.md). Retention metadata
+does not yet expire events. An enabled metadata record alone is not capture-capable.
 
 Day 04's created-inbox and secret-free list acceptance is exercised by D04.3's
-services/operator command. There is no shipped HTTP list API. No public hosting, release, capture journey or tenant security
+services/operator command; D05.1 separately adds an opt-in local HTTP list API.
+No public hosting, release, capture journey or tenant security
 is claimed here.
 
 Primary references: [Mongoose validation](https://mongoosejs.com/docs/validation.html),

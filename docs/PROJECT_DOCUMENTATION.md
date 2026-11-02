@@ -662,7 +662,7 @@ Prerequisite: D04. Modules: M02. Planned effort: 5 to 6 hours.
 
 - [x] **D05.1** Build inbox list, create form, detail page and empty states. [Local interface and verification](INBOX_UI.md).
 
-- [ ] **D05.2** Implement rename, disable and capture-token rotation services.
+- [x] **D05.2** Implement rename, disable and capture-token rotation services. [Service contracts and verification](INBOX_MANAGEMENT.md).
 
 - [ ] **D05.3** Test validation, old-token invalidation and disabled-inbox responses.
 

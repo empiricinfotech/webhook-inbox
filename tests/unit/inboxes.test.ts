@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { test, expect } from "vitest";
-import { createInboxSchema, inboxSummarySchema } from "@empiric-webhook-inbox/contracts/inboxes";
+import { createInboxSchema, renameInboxSchema, inboxSummarySchema } from "@empiric-webhook-inbox/contracts/inboxes";
 import { EnvironmentConfigurationError } from "@empiric-webhook-inbox/contracts/environment";
 import { readLocalInboxEnvironment } from "../../apps/api/src/config/local-inbox.js";
 
@@ -59,4 +59,14 @@ test("operator config fails closed without required IDs/keys and reports field n
       expect(Object.hasOwn(error as object, "cause")).toBe(false);
     }
   }
+});
+
+test("rename accepts only a bounded normalized name, without changes to other settings", () => {
+  expect(renameInboxSchema.parse({ name: " Synthetic rename " })).toEqual({ name: "Synthetic rename" });
+  expect(renameInboxSchema.safeParse({ name: "x".repeat(100) }).success).toBe(true);
+  for (const input of [null, [], {}, { name: " " }, { name: null }, { name: 1 },
+    { name: "x".repeat(101) }, { name: "bad\nname" }, { name: "bad\u007fname" }, { name: { $ne: null } },
+    ...["workspaceId", "ownerId", "description", "retentionDays", "enabled", "tokenHash", "encryptedToken", "$set"]
+      .map((key) => ({ name: "x", [key]: true })),
+  ]) expect(renameInboxSchema.safeParse(input).success).toBe(false);
 });

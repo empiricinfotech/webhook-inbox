@@ -17,6 +17,7 @@ export const createInboxSchema = z.strictObject({
     })).default(""),
   retentionDays: z.union([z.literal(1), z.literal(7), z.literal(30)]).default(DEFAULT_RETENTION_DAYS),
 });
+export const renameInboxSchema = z.strictObject({ name: inboxNameSchema });
 // Explicit DTO: adding a database field never adds it to a management response.
 export const inboxSummarySchema = z.strictObject({
   id: identifierSchema, workspaceId: identifierSchema,

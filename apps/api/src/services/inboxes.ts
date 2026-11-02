@@ -2,7 +2,7 @@ import { z } from "zod";
 import { paginationQuerySchema } from "@empiric-webhook-inbox/contracts/pagination";
 import { identifierSchema } from "@empiric-webhook-inbox/contracts/identifiers";
 import { Types, type Connection } from "mongoose";
-import { createInboxSchema, inboxSummarySchema, type InboxSummary } from "@empiric-webhook-inbox/contracts/inboxes";
+import { createInboxSchema, renameInboxSchema, inboxSummarySchema, type InboxSummary } from "@empiric-webhook-inbox/contracts/inboxes";
 import { ApiError } from "../errors.js";
 import { getInboxModel, type Inbox as InboxRecord } from "../models/inbox.js";
 import { getWorkspaceModel } from "../models/workspace.js";
@@ -32,13 +32,41 @@ export function createInboxService(connection: Connection, crypto: CaptureTokenC
         throw new ApiError("NOT_FOUND");
       }
     }
+    async function ownedInboxFilter(request: OwnerInboxRequest, inboxId: Types.ObjectId) {
+      await requireOwner(request);
+      if (!(inboxId instanceof Types.ObjectId)) throw new ApiError("INVALID_REQUEST");
+      return { _id: inboxId, workspaceId: request.workspaceId };
+    }
     const cursorSchema = z.tuple([identifierSchema, z.iso.datetime(), identifierSchema]);
     return Object.freeze({
       getForOwner(request: OwnerInboxRequest, inboxId: Types.ObjectId): Promise<InboxSummary> {
         return safeStorageOperation(async () => {
-          await requireOwner(request);
-          if (!(inboxId instanceof Types.ObjectId)) throw new ApiError("INVALID_REQUEST");
-          const inbox = await Inbox.findOne({ _id: inboxId, workspaceId: request.workspaceId }).lean().exec();
+          const filter = await ownedInboxFilter(request, inboxId);
+          const inbox = await Inbox.findOne(filter).lean().exec();
+          if (!inbox) throw new ApiError("NOT_FOUND");
+          return summary(inbox);
+        });
+      },
+      renameForOwner(request: OwnerInboxRequest, inboxId: Types.ObjectId, input: unknown): Promise<InboxSummary> {
+        return safeStorageOperation(async () => {
+          const filter = await ownedInboxFilter(request, inboxId);
+          const parsed = renameInboxSchema.safeParse(input);
+          if (!parsed.success) throw new ApiError("INVALID_REQUEST");
+          const inbox = await Inbox.findOneAndUpdate(filter, { $set: { name: parsed.data.name } }, {
+            returnDocument: "after", runValidators: true, strict: "throw",
+          }).lean().exec();
+          if (!inbox) throw new ApiError("NOT_FOUND");
+          return summary(inbox);
+        });
+      },
+      disableForOwner(request: OwnerInboxRequest, inboxId: Types.ObjectId): Promise<InboxSummary> {
+        return safeStorageOperation(async () => {
+          const filter = await ownedInboxFilter(request, inboxId);
+          // Repeated disable is a no-op, including timestamps. Never delete or re-enable.
+          const changed = await Inbox.findOneAndUpdate({ ...filter, enabled: true }, { $set: { enabled: false } }, {
+            returnDocument: "after", runValidators: true, strict: "throw",
+          }).lean().exec();
+          const inbox = changed ?? await Inbox.findOne(filter).lean().exec();
           if (!inbox) throw new ApiError("NOT_FOUND");
           return summary(inbox);
         });

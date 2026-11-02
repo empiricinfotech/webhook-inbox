@@ -1,12 +1,13 @@
 # Capture token primitives and owner retrieval
 
-D04.2–D04.3 | 30 October 2026
+D04.2–D05.2 | Updated 2 November 2026
 
 The backend now provisions credentials for an existing inbox metadata record,
 looks up an inbox by a capture token's hash and recovers the token only after a
 stored-owner check. [D04.3](LOCAL_INBOX.md) composes these primitives for local
-bootstrap and atomic inbox creation. No capture/management route, login or token
-rotation is added. The existing health-only startup stays unchanged.
+bootstrap and atomic inbox creation. [D05.2](INBOX_MANAGEMENT.md) adds explicit
+owner-authorized token rotation. No capture route or login is added. The existing
+health-only startup stays unchanged.
 
 [D05.1](INBOX_UI.md) now adds local metadata list/create/detail HTTP routes.
 Token retrieval is still internal; no capture URL or credential is exposed by
@@ -57,9 +58,9 @@ Tests create their own ephemeral random keys, which are not production defaults.
 New envelopes use currentVersion. Retaining old versions permits recovery of old
 envelopes; dropping/wrongly replacing an old key fails closed until the correct
 key is restored. Hash lookup does not need decryption and remains independent
-of encryption-key availability. Automatic key migration/re-encryption and capture
-token rotation are not implemented. This versioned read/write capability does
-not claim an operator rotation or backup drill has occurred.
+of encryption-key availability. Explicit capture-token rotation is implemented;
+automatic key migration/re-encryption remains unimplemented. This versioned
+read/write capability does not claim an operator rotation or backup drill has occurred.
 
 ## Internal service contract
 
@@ -69,6 +70,7 @@ The caller must initialize declared indexes explicitly before normal use.
 | Method | Result and boundaries |
 |---|---|
 | issueForInbox({ actorId, workspaceId, inboxId }) | Checks the active workspace's stored owner and an existing scoped inbox; atomically sets the credential pair only if both are absent; returns no token |
+| rotateForOwner({ actorId, workspaceId, inboxId }) | Checks active stored ownership and inbox scope; replaces both credential fields in one compare-and-set update; returns no token; see [rotation boundaries](INBOX_MANAGEMENT.md) |
 | retrieveForOwner({ actorId, workspaceId, inboxId }) | Checks the current stored owner, selects credentials only internally and returns the authenticated plaintext token |
 | findByCaptureToken(unknown) | Malformed/unknown token or deleting/missing workspace returns null; a match returns only inboxId, workspaceId, enabled and retentionDays |
 
@@ -77,12 +79,13 @@ workspace and inbox lookups are scoped; missing, nonowned and mismatched objects
 share NOT_FOUND. A metadata-only inbox also has no retrievable credential.
 Issue uses one compare-and-set update for both fields; concurrent/repeated issue
 attempts produce one success and CONFLICT, without replacing an existing token.
-The service only provisions existing records; D04.3 separately creates credentialed inboxes in a single insert.
+One-time provisioning applies only to existing records; D04.3 separately creates
+credentialed inboxes in a single insert. Explicit rotation replaces an existing pair.
 
 The actor ID must come from a trusted local caller now and verified session/
 membership context when authentication is introduced. Supplying an ID to this
 internal API is not authentication. No request header/body becomes a trusted
-actor here, and no HTTP endpoint exposes the service. This owner predicate does
+actor here, and no HTTP endpoint exposes these credential methods. This owner predicate does
 not complete the later session, membership/role or revocation tasks.
 
 A disabled inbox remains discoverable with enabled:false so the later capture
@@ -138,7 +141,7 @@ Tests compare secrets as booleans so assertion diagnostics do not print them;
 there are no committed keys or raw token fixtures. See [testing](TESTING.md).
 
 D04.3 adds local bootstrap/creation and explicit environment composition. Capture
-endpoints, HTTP token retrieval, rotation, membership/session authorization and
+endpoints, HTTP token retrieval/rotation, membership/session authorization and
 release journeys remain later work. Day 04's created-inbox/list acceptance is now
 verified through services and the operator command, not a shipped HTTP endpoint.
 

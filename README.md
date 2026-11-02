@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives and owner retrieval](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. The [local inbox UI](docs/INBOX_UI.md) now connects to an explicitly enabled local-only management API; capture remains pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives, owner retrieval and rotation](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. The [local inbox UI](docs/INBOX_UI.md) now connects to an explicitly enabled local-only management API; capture remains pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -147,7 +147,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 (rename, disable and token rotation) is next and has not been started.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 adds [owner-scoped rename, disable and token-rotation services](docs/INBOX_MANAGEMENT.md). D05.3 validation and disabled-response verification is next.
 
 ## Data and scope boundaries
 
@@ -162,6 +162,7 @@ Billing, AI summaries, mobile apps, Kubernetes, unlimited retention, anonymous s
 - [Project brief](docs/PROJECT_BRIEF.md): users, first capture journey, scope and milestone criteria.
 - [Project documentation](docs/PROJECT_DOCUMENTATION.md): architecture, modules and 120-task backlog.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): actual work, verification and remaining tasks.
+- [Inbox management services](docs/INBOX_MANAGEMENT.md): owner-scoped rename, disable, atomic token rotation and failure boundaries.
 - [Local workspace and inbox](docs/LOCAL_INBOX.md): private operator bootstrap, creation/list commands and service boundaries.
 - [Local MongoDB and health](docs/MONGODB_LOCAL.md): local service, connection lifecycle and safe health checks.
 - [Testing](docs/TESTING.md): Vitest unit/API projects, Supertest and owned disposable Mongo fixtures.

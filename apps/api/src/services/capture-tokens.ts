@@ -2,7 +2,8 @@ import { Types, type Connection } from "mongoose";
 import { ApiError } from "../errors.js";
 import { getInboxModel } from "../models/inbox.js";
 import { getWorkspaceModel } from "../models/workspace.js";
-import { CaptureTokenError, hashCaptureToken, type CaptureTokenCrypto } from "../security/capture-token.js";
+import { hashCaptureToken, type CaptureTokenCrypto } from "../security/capture-token.js";
+import { safeStorageOperation } from "./storage-operation.js";
 
 export interface OwnerCaptureTokenRequest {
   actorId: Types.ObjectId;
@@ -21,17 +22,10 @@ export function createCaptureTokenService(connection: Connection, crypto: Captur
     const owner = await Workspace.exists({ _id: request.workspaceId, ownerId: request.actorId, state: "active" });
     if (!owner) throw new ApiError("NOT_FOUND");
   }
-  async function safe<T>(operation: () => Promise<T>): Promise<T> {
-    try { return await operation(); }
-    catch (error) {
-      if (error instanceof ApiError) throw error;
-      throw new ApiError(error instanceof CaptureTokenError ? "INTERNAL_ERROR" : "STORAGE_UNAVAILABLE");
-    }
-  }
   return Object.freeze({
-    // Provision an existing metadata record once. No creation or rotation here.
+    // Provision an existing metadata record once; never replace existing credentials.
     issueForInbox(request: OwnerCaptureTokenRequest): Promise<void> {
-      return safe(async () => {
+      return safeStorageOperation(async () => {
         await requireOwner(request);
         if (!await Inbox.exists({ _id: request.inboxId, workspaceId: request.workspaceId })) {
           throw new ApiError("NOT_FOUND");
@@ -44,8 +38,25 @@ export function createCaptureTokenService(connection: Connection, crypto: Captur
         if (result.modifiedCount !== 1) throw new ApiError("CONFLICT");
       });
     },
+    rotateForOwner(request: OwnerCaptureTokenRequest): Promise<void> {
+      return safeStorageOperation(async () => {
+        await requireOwner(request);
+        const filter = { _id: request.inboxId, workspaceId: request.workspaceId };
+        const inbox = await Inbox.findOne(filter).select("+tokenHash +encryptedToken").lean().exec();
+        if (!inbox) throw new ApiError("NOT_FOUND");
+        // Legacy metadata-only records need explicit provisioning, not implicit rotation.
+        if (!inbox.tokenHash || !inbox.encryptedToken) throw new ApiError("CONFLICT");
+        const credential = crypto.issue({ workspaceId: request.workspaceId.toHexString(), inboxId: request.inboxId.toHexString() });
+        if (credential.tokenHash === inbox.tokenHash) throw new ApiError("CONFLICT");
+        // One atomic pair replacement. A concurrent rotation of this generation wins once.
+        const result = await Inbox.updateOne({ ...filter, tokenHash: inbox.tokenHash }, { $set: credential }, {
+          runValidators: true, strict: "throw",
+        });
+        if (result.modifiedCount !== 1) throw new ApiError("CONFLICT");
+      });
+    },
     findByCaptureToken(token: unknown) {
-      return safe(async () => {
+      return safeStorageOperation(async () => {
         const tokenHash = hashCaptureToken(token);
         if (!tokenHash) return null;
         const inbox = await Inbox.findOne({ tokenHash }).select("_id workspaceId enabled retentionDays").lean().exec();
@@ -55,7 +66,7 @@ export function createCaptureTokenService(connection: Connection, crypto: Captur
       });
     },
     retrieveForOwner(request: OwnerCaptureTokenRequest): Promise<string> {
-      return safe(async () => {
+      return safeStorageOperation(async () => {
         await requireOwner(request);
         const inbox = await Inbox.findOne({ _id: request.inboxId, workspaceId: request.workspaceId })
           .select("+tokenHash +encryptedToken").lean().exec();

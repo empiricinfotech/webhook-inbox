@@ -151,3 +151,17 @@ config tests with no DOM dependency. Normal npm test/CI discovers all ten. Brows
 checks additionally cover the actual Next → Express → Mongo flow, keyboard form
 handling, reload, empty/loading/missing/error states and responsive layout using
 synthetic disposable data. See [inbox UI](INBOX_UI.md) and progress for scope/results.
+
+
+## D05.2 management service checks
+
+The strict rename contract is covered in tests/unit/inboxes.test.ts;
+tests/api/inbox-management.test.ts exercises real Mongo rename, repeat disable,
+owner/scope/validation denial, atomic token rotation, old-token invalidation,
+disabled-state preservation, collision/crypto/write failures and recovery, a
+deterministic concurrent-rotation race, legacy records, closed storage and
+explicit rotation with a new current key. Existing npm test/CI discovers these
+without new dependencies. Fixtures use synthetic owned data and boolean secret
+comparisons. No UI/HTTP transport changes: browser checks are not applicable.
+See [management service contracts and limits](INBOX_MANAGEMENT.md). D05.3 remains
+the next focused validation/disabled-response verification task.

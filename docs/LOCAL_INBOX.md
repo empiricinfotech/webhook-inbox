@@ -1,6 +1,6 @@
 # Local workspace bootstrap and inbox creation
 
-D04.3–D05.1 | 30 October 2026
+D04.3–D05.2 | Updated 2 November 2026
 
 A local operator can now create a workspace, create credentialed inboxes and list
 safe metadata using the Express backend's services. This document describes the
@@ -123,9 +123,10 @@ Day 04's created-inbox/secret-free list criterion is exercised through backend
 services and the operator command. It does not require Day 05's UI or infer a
 shipped HTTP list endpoint. The CLI retains an internal array; D05.1 supplies
 HTTP pagination. Inbox quotas remain future policy work. No signup, password/session/membership,
-rename/disable/rotation, capture route, event storage, hosted deployment
-or release is added by this operator flow. D05.1 now supplies the separate
-[frontend and local transport](INBOX_UI.md); D05.2 is next.
+capture route, event storage, hosted deployment or release is added by this
+operator flow. D05.1 supplies the separate [frontend and local transport](INBOX_UI.md).
+D05.2 adds [internal rename/disable/rotation services](INBOX_MANAGEMENT.md); the
+operator command still exposes only init/bootstrap/create/list. D05.3 is next.
 
 Primary references: [Mongoose Model.create/createIndexes](https://mongoosejs.com/docs/api/model.html),
 [Node file creation flags](https://nodejs.org/docs/latest-v24.x/api/fs.html#file-system-flags)
