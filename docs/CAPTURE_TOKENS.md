@@ -1,6 +1,6 @@
 # Capture token primitives and owner retrieval
 
-D04.2–D05.2 | Updated 2 November 2026
+D04.2–D05.3 | Updated 3 November 2026
 
 The backend now provisions credentials for an existing inbox metadata record,
 looks up an inbox by a capture token's hash and recovers the token only after a
@@ -73,6 +73,7 @@ The caller must initialize declared indexes explicitly before normal use.
 | rotateForOwner({ actorId, workspaceId, inboxId }) | Checks active stored ownership and inbox scope; replaces both credential fields in one compare-and-set update; returns no token; see [rotation boundaries](INBOX_MANAGEMENT.md) |
 | retrieveForOwner({ actorId, workspaceId, inboxId }) | Checks the current stored owner, selects credentials only internally and returns the authenticated plaintext token |
 | findByCaptureToken(unknown) | Malformed/unknown token or deleting/missing workspace returns null; a match returns only inboxId, workspaceId, enabled and retentionDays |
+| requireEnabledForCapture(unknown) | Reuses safe hash lookup; missing/invalid/old token or inactive workspace throws NOT_FOUND, current disabled token throws ENDPOINT_DISABLED, available enabled token returns the same safe target metadata; no event is accepted or stored |
 
 All request IDs must be native ObjectIds, not strings/operator objects. Owner,
 workspace and inbox lookups are scoped; missing, nonowned and mismatched objects
@@ -89,8 +90,11 @@ actor here, and no HTTP endpoint exposes these credential methods. This owner pr
 not complete the later session, membership/role or revocation tasks.
 
 A disabled inbox remains discoverable with enabled:false so the later capture
-handler can return its documented 410. Lookup does not acknowledge capture,
-persist events or decide HTTP status. Corrupted/undecryptable storage maps to
+handler can return its documented 410. D05.3 adds a separate eligibility guard
+that throws the shared NOT_FOUND or ENDPOINT_DISABLED ApiError. The existing
+error handler maps these to 404/410; a test-only adapter verifies the composition.
+Neither lookup nor the guard acknowledges or persists capture; no production
+capture route is installed. Corrupted/undecryptable storage maps to
 INTERNAL_ERROR; driver failures map to STORAGE_UNAVAILABLE. Service errors use
 existing static ApiError messages and never retain a private crypto/driver cause.
 

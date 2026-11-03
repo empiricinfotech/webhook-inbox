@@ -147,7 +147,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 adds [owner-scoped rename, disable and token-rotation services](docs/INBOX_MANAGEMENT.md). D05.3 validation and disabled-response verification is next.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 adds [owner-scoped rename, disable and token-rotation services](docs/INBOX_MANAGEMENT.md). D05.3 verifies validation, old-token invalidation and disabled responses at the service/shared-error and local metadata HTTP boundaries. D06.1 (supported capture methods and bounded raw bytes) is next; the capture receiver remains unimplemented.
 
 ## Data and scope boundaries
 

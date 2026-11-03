@@ -1,6 +1,6 @@
 # Inbox rename, disable and token rotation services
 
-D05.2 | 2 November 2026
+D05.2–D05.3 | Updated 3 November 2026
 
 An owner can rename or disable an inbox and replace its capture credential
 through the existing Express backend services. These are internal methods for
@@ -78,9 +78,19 @@ one-time provisioning method instead. Missing/inaccessible inboxes return NOT_FO
 
 Errors retain no private cause or input. Narrow updates preserve settings under
 concurrent rename/disable/rotation; none of these methods re-enables an inbox.
-A disabled inbox still resolves its current token to enabled:false so the future
-capture transport can apply ENDPOINT_DISABLED/410. It does not accept a capture
-or emit that HTTP response today. Ownership checks and writes remain separate;
+A disabled inbox still resolves its current token to enabled:false. D05.3 adds
+requireEnabledForCapture(unknown): it reuses sanitized lookup, throws NOT_FOUND
+for malformed/unknown/old tokens or missing/inactive workspaces and throws
+ENDPOINT_DISABLED unless the stored enabled flag is exactly true. A valid enabled
+token returns only inboxId, workspaceId, enabled and retentionDays. Storage
+failures retain STORAGE_UNAVAILABLE. Syntax rejection occurs before database
+access. The guard does not decrypt/reveal a credential or require a management
+actor: the capture token is its bearer credential, separate from owner methods.
+It neither accepts bytes nor persists/acknowledges an event.
+
+The shared Express error handler already maps these codes to 404/410/503. D05.3
+verifies that real guard/handler composition with a test-only HTTP adapter;
+there is still no installed capture receiver. Ownership checks and writes remain separate;
 later owner-transfer/deletion workflows need their own concurrency policy.
 No session authentication, membership revocation or audit trail is claimed.
 
@@ -95,11 +105,33 @@ concurrent rotation, legacy records, unavailable storage and current-key replace
 Secret comparisons use booleans so assertion diffs do not print credentials.
 Normal developer databases, configuration and running services are untouched.
 
-These are D05.2's necessary implementation checks. D05.3 remains a separate
-validation/old-token/disabled-response verification task; it is not marked done.
-The Day 05 create/disable/old-token expectations are demonstrated at the service
-boundary. A real capture HTTP 410 belongs to the later capture transport and is
-not required to implement these services. No release gate is claimed complete.
+D05.3 adds five focused tests in tests/api/inbox-management-responses.test.ts:
+
+- Real local POST validation rejects malformed shapes, control characters,
+  privileged fields and over-limit strings with safe correlated 400 errors; a
+  normalized 100-UTF-16-unit Unicode name/500-unit description is accepted.
+- Invalid rename and rejected driver writes preserve the saved metadata and
+  credential pair; subsequent rename/disable succeeds and HTTP reads remain safe.
+- Local detail/list/HEAD responses stay secret-free and show enabled:false after
+  rename/disable/rotation and fresh router composition. A disabled inbox remains
+  manageable (200 with disabled metadata); capture eligibility is a separate rule.
+- Multiple old token generations fail across fresh connections while the current
+  token and an unrelated inbox remain valid.
+- The production eligibility guard plus real shared response handler return
+  404 for missing/malformed/old tokens, 410 for a current disabled inbox and 503
+  for unavailable storage, with no-store, fresh request IDs and no secret logs.
+  Inactive workspaces return 404; malformed input rejects even during an outage.
+
+The HTTP eligibility adapter exists only in tests and contains no duplicated
+policy decisions. Its 200 response exposes target metadata to the test, not a
+product capture acknowledgement; an events count check confirms no capture was
+stored. These tests do not claim a product /capture endpoint exists.
+
+Day 05's create/disable/old-token acceptance is demonstrated through the existing
+services, local metadata HTTP and shared error response contract. D05.3 is complete
+at those implemented boundaries. D06.1 is next: supported capture methods and
+bounded raw-byte collection, followed by the remaining D06–D07 capture pipeline.
+No Day 06, first successful capture or release gate is marked complete.
 
 Primary references: [Mongoose atomic updates](https://mongoosejs.com/docs/tutorials/findoneandupdate.html#atomic-updates),
 [update validation](https://mongoosejs.com/docs/validation.html#update-validators)

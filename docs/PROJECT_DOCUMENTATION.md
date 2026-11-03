@@ -664,7 +664,7 @@ Prerequisite: D04. Modules: M02. Planned effort: 5 to 6 hours.
 
 - [x] **D05.2** Implement rename, disable and capture-token rotation services. [Service contracts and verification](INBOX_MANAGEMENT.md).
 
-- [ ] **D05.3** Test validation, old-token invalidation and disabled-inbox responses.
+- [x] **D05.3** Test validation, old-token invalidation and disabled-inbox responses. [Response and persistence verification](INBOX_MANAGEMENT.md#verification-and-next-task).
 
 **Acceptance:** A maintainer creates and disables an inbox; the old token fails after rotation.
 

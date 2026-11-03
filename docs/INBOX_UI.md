@@ -108,9 +108,11 @@ The detail view shows saved settings and an honest placeholder for future captur
 It does not display a fake event count or an active capture URL.
 [D05.2](INBOX_MANAGEMENT.md) now implements internal rename, disable and token
 rotation services. This UI/HTTP transport still offers only list/create/detail;
-it has no rename/disable/rotation controls or token reveal/rotation endpoint. D05.3 remains the
-next validation/old-token/disabled-response verification task. Service checks
-do not claim a capture HTTP 410 response; the capture route belongs to D06.
+it has no rename/disable/rotation controls or token reveal/rotation endpoint.
+D05.3 now verifies saved disabled metadata through detail/list/HEAD/reloaded
+routers, invalid-input responses and old-token invalidation. A production service
+guard plus the real shared error handler produce 404/410/503 in a test-only HTTP
+adapter. This is not an installed capture route; that receiver belongs to D06.
 No session/signup/membership, capture processing, event list, worker, release
 or deployment is added by the interface task.
 

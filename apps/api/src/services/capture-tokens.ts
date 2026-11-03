@@ -11,8 +11,8 @@ export interface OwnerCaptureTokenRequest {
   inboxId: Types.ObjectId;
 }
 
-// Internal service only. The eventual transport must supply a trusted actor;
-// accepting an actor ID here does not implement session authentication.
+// Internal service only. Owner methods require a trusted actor; accepting an
+// actor ID here does not implement session authentication.
 export function createCaptureTokenService(connection: Connection, crypto: CaptureTokenCrypto) {
   const Inbox = getInboxModel(connection);
   const Workspace = getWorkspaceModel(connection);
@@ -21,6 +21,16 @@ export function createCaptureTokenService(connection: Connection, crypto: Captur
       .every((id) => id instanceof Types.ObjectId)) throw new ApiError("INVALID_REQUEST");
     const owner = await Workspace.exists({ _id: request.workspaceId, ownerId: request.actorId, state: "active" });
     if (!owner) throw new ApiError("NOT_FOUND");
+  }
+  function findByCaptureToken(token: unknown) {
+    return safeStorageOperation(async () => {
+      const tokenHash = hashCaptureToken(token);
+      if (!tokenHash) return null;
+      const inbox = await Inbox.findOne({ tokenHash }).select("_id workspaceId enabled retentionDays").lean().exec();
+      if (!inbox || !await Workspace.exists({ _id: inbox.workspaceId, state: "active" })) return null;
+      // Disabled remains observable to the later capture route for its 410 response.
+      return { inboxId: inbox._id, workspaceId: inbox.workspaceId, enabled: inbox.enabled, retentionDays: inbox.retentionDays };
+    });
   }
   return Object.freeze({
     // Provision an existing metadata record once; never replace existing credentials.
@@ -55,15 +65,13 @@ export function createCaptureTokenService(connection: Connection, crypto: Captur
         if (result.modifiedCount !== 1) throw new ApiError("CONFLICT");
       });
     },
-    findByCaptureToken(token: unknown) {
-      return safeStorageOperation(async () => {
-        const tokenHash = hashCaptureToken(token);
-        if (!tokenHash) return null;
-        const inbox = await Inbox.findOne({ tokenHash }).select("_id workspaceId enabled retentionDays").lean().exec();
-        if (!inbox || !await Workspace.exists({ _id: inbox.workspaceId, state: "active" })) return null;
-        // Disabled remains observable to the later capture route for its 410 response.
-        return { inboxId: inbox._id, workspaceId: inbox.workspaceId, enabled: inbox.enabled, retentionDays: inbox.retentionDays };
-      });
+    findByCaptureToken,
+    async requireEnabledForCapture(token: unknown) {
+      // Reuse sanitized lookup; this guard neither accepts bytes nor persists a capture.
+      const inbox = await findByCaptureToken(token);
+      if (!inbox) throw new ApiError("NOT_FOUND");
+      if (inbox.enabled !== true) throw new ApiError("ENDPOINT_DISABLED");
+      return inbox;
     },
     retrieveForOwner(request: OwnerCaptureTokenRequest): Promise<string> {
       return safeStorageOperation(async () => {
