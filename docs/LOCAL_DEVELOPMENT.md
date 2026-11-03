@@ -183,3 +183,14 @@ ESLint and TypeScript before editing. Also see the official
 [rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites),
 [environment](https://nextjs.org/docs/app/guides/environment-variables) and
 [TypeScript](https://nextjs.org/docs/app/api-reference/config/typescript) guides.
+
+
+## D06.1 optional capture transport
+
+The backend now has a [capture method/byte boundary](CAPTURE_TRANSPORT.md) that
+requires an explicit downstream handler. Normal dev:api/local:dashboard startup
+does not supply one and remains unchanged; no sample capture acknowledgement is
+available. createApiServer supplies Node CONNECT rejection and controlled
+100-continue handling, and startServer composes it. Next's API rewrite still
+excludes capture. D06.2/D06.3 and D07 must supply parsing/media policy, redaction
+and durable storage before the product receiver is enabled.

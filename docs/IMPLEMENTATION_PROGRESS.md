@@ -2264,3 +2264,218 @@ not an installed /capture endpoint. Existing credential/advisory findings remain
 **Task blockers: none. Next eligible task: D06.1 — explicitly supported HTTP methods and bounded raw-byte
 collection**, requiring completed Day 05. D06.1 has not been started. Stop after
 D05.3 verification/publication.
+
+
+## 2026-11-03 — D06.1: explicit HTTP methods and bounded raw-byte collection
+
+**Implementation status: completed.**
+Only D06.1 selected. Publication status is separate below. No TASK_BOARD.md exists.
+
+### Selection, repository and attribution
+
+Started with a clean tree/index on main tracking origin/main at
+a7197ecf9fd2a7c4211cde56e3b9e63374ef0036 (D05.3). Fresh fetch showed 0 ahead/0
+behind. Inspected current implementation, tests, scripts/CI and recent D05/D04
+commits. GitHub main matched that SHA and [D05.3 CI run 41580889995](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41580889995)
+was completed/success. The previous publication is therefore verified with no
+unfinished handoff. The unchanged baseline passed **71 tests** this run.
+
+Read the project architecture/backlog, entire growth checklist, progress history,
+README/contribution/development/contract/token/transport-test instructions and CI.
+No ancestor/root AGENTS.md applies; the full search found only apps/web/AGENTS.md,
+scoped to unchanged frontend code. Backend skill guidance retained the existing
+Express framework; no Vercel resource, new application or dependency was added.
+D05 primitives/eligibility exist, but no method/byte router/collector existed.
+D06.1 is the earliest eligible unfinished task after completed Day 05; parsing,
+media policy, redaction and event storage are not missing prerequisites for it.
+
+Origin fetch/push destinations were inspected programmatically with userinfo and
+sensitive parameters withheld and matched the expected public repository:
+https://github.com/empiricinfotech/webhook-inbox. Upstream targets that same repo.
+Embedded credential location: .git/config remote.origin.url. Only the location
+was reported; secure credential-manager storage is recommended. No credential
+was printed, copied, changed, removed or rotated. Existing author/committer remain
+empiricinfotech <empiricinfotech@gmail.com>; GitHub maps both fields of D05.3 to
+empiricinfotech. Repository ownership, push authentication and attribution were
+checked separately; no independent review, personal authorship or score credit
+is inferred from agent work or repository ownership.
+
+D06.1 issue/PR searches found no equivalent. Reuse the ordered backlog and
+[v0.1 milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1).
+No duplicate issue, PR, release or public post was needed. Main is unprotected
+and rulesets are empty; the existing authorized direct-main workflow is suitable.
+Milestone issues remain untouched and their release criteria are not completed.
+
+### Result, affected files and acceptance boundary
+
+| Files | Work |
+|---|---|
+| apps/api/src/capture/raw-body.ts | 256 KiB original-byte bound, declared/streamed counts, metadata discard, total body deadline and safe lifecycle cleanup |
+| apps/api/src/routes/capture.ts | Explicit six-method router, event-free OPTIONS, TRACE denial, existing token eligibility, required downstream handler and route-local errors |
+| apps/api/src/app.ts; server.ts | Optional capture composition; Node CONNECT denial and controlled 100-continue with ordinary management behavior preserved |
+| packages/contracts/src/errors.ts | Static METHOD_NOT_ALLOWED/405 and REQUEST_TIMEOUT/408 catalog entries |
+| tests/unit/capture-body.test.ts; tests/api/capture-transport.test.ts | Five stream/composition unit plus seven real-Mongo/Node HTTP acceptance checks |
+| docs/CAPTURE_TRANSPORT.md | Working focused verification command, composition contract, exact methods/byte/deadline/errors and remaining pipeline requirements |
+| README.md; CONTRIBUTING.md; docs/PROJECT_BRIEF.md; docs/INBOX_MANAGEMENT.md; docs/CAPTURE_TOKENS.md; docs/LOCAL_DEVELOPMENT.md; docs/API_CONTRACTS.md; docs/TESTING.md | Accurate current capabilities, new codes/transport semantics and next task |
+| docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md | Only D06.1 newly checked after verification; appended history-preserving evidence and checkpoint evaluation |
+
+The factory requires a token service and downstream handler. No default capture
+success, parser, event model, raw vault or persistence implementation is supplied.
+Ordinary API/local-dashboard startup does not mount it. The loopback test probe
+observes delivery and returns 204 only in tests, without eventId/captured:true;
+its real-Mongo event count stays zero. This is functioning transport evidence,
+not a product storage acknowledgement or a first successful capture journey.
+
+GET/HEAD enforce byte bounds but deliver an empty body for metadata processing;
+POST/PUT/PATCH/DELETE deliver the complete unmodified Buffer exactly once. OPTIONS
+returns 204 plus Allow without lookup/collection/consumer call or CORS grant.
+TRACE and Node CONNECT return the shared 405 error contract before lookup. The
+router is case-sensitive and has no trailing-slash alias; /api/v1 and lookalikes
+are outside it. No global parser or frontend/rewrite change was introduced.
+
+The limit is 262144 raw bytes: declared excess rejects before lookup/100 Continue;
+actual bytes are counted even for unknown-length chunked uploads and metadata-only
+methods. The first byte over the bound yields 413 without downstream delivery.
+No decoding, inflation, parsing or normalization occurs. Retained chunks are
+released on completion/error; concatenation can briefly hold both chunks and
+result, so no constant-memory/concurrency capacity result is claimed.
+
+The default 10-second total body-read deadline is an initial documented decision,
+not a measured guarantee. Trusted composition may choose 1–30000 ms; request fields
+cannot set it. Incomplete, decoded, errored, aborted and timed-out streams never
+reach the handler with partial bytes. Active read listeners/timers are cleaned;
+late stream errors are shielded until close. Rejected uploads close their
+connection. Broken sockets/native HTTP framing errors can terminate before a JSON
+response is possible. Eligibility time and an explicit future consumer's work
+are separate from the body deadline.
+
+Node checkContinue suppresses automatic upload permission for capture until size/
+eligibility pass; other requests keep ordinary continue behavior. CONNECT is a
+separate Node event with shared static error/UUID/no-store headers, bounded socket
+cleanup and private-input-free logs; no undocumented socket-attachment API is used.
+
+D06.2 normalization/parsing, D06.3 full binary/compressed-media rejection policy
+and D07 sanitization/durable persistence remain unfinished. Necessary D06.1 size
+rejection does not mark D06.3 complete. Raw byte probe vectors are not claims of
+supported product media. Full Day 06 sample capture/storage acceptance is pending
+those later increments; do not require that whole-day result for this task.
+
+### Verification and observed corrections
+
+Reused and checked the temporary pinned Node **24.22.0/npm 11.19.1** toolchain;
+no global version-manager settings changed. Native MongoDB 8.0.32 is used by owned
+fixtures. No dependency/package/lockfile/policy change; package-lock.json SHA-256
+remains 1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+Official Node HTTP/Express references and pinned types informed CONNECT,
+100-continue and stream completion behavior; no runtime upgrade was inferred
+from current online docs.
+
+Commands run using the pinned toolchain PATH in the working repository or an
+owned clean snapshot with the same final code and no private .env/Git files:
+
+```bash
+npm run check:toolchain
+npm test
+npm test -- tests/unit/capture-body.test.ts tests/api/capture-transport.test.ts
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+NEXT_TELEMETRY_DISABLED=1 CIRCLE_NODE_TOTAL=2 npm run build
+npm run check:compiled-api
+npm run check:routing
+git diff --check
+git diff --cached --check
+```
+
+- Baseline **71 passed**. Initial strict types caught setTimeout on the generic
+  CONNECT Duplex; replaced it with a bounded timer/close cleanup. No cast/private
+  Node API was used to bypass the type check.
+- Initial focused run passed 11/12; one test incorrectly expected 404 for a local
+  management request rejected by its existing Host guard with 403. Corrected the
+  assertion and preserved that guard. Focused acceptance then **12 passed**;
+  lint and strict types passed.
+- The final clean snapshot passed **83 normal tests in 17 files**, including all
+  12 new focused checks, plus **6 contract checks**. The CI gate deliberately
+  failed its isolated incorrect assertion, then passed **84 tests** with the
+  corrected probe; the temporary probe was removed.
+- All 13 clean-snapshot commands exited 0: exact toolchain, frozen installation,
+  dependency tree/imports, lint, strict types, full tests, contracts, contract
+  gate, foundation (**5**), Mongo lifecycle (**6**), production build, compiled
+  API (**6**) and Next development routing (**3**). No required check was weakened.
+- Rechecked native MongoDB **8.0.32**, no MONGOD_BINARY override. Snapshot input
+  hashes were unchanged after checks and all working code matched the tested
+  snapshot. Final documentation-only status updates do not alter that code.
+- Acceptance covers split original bytes, exact declared/chunked limits and one-
+  byte overflow, metadata-only GET/HEAD, zero-event OPTIONS, TRACE/CONNECT errors,
+  eligibility/storage errors and privacy, route boundaries, safe consumer failure/
+  missing response, incomplete/error/deadline cleanup, abort/recovery and capture/
+  normal-management 100-continue ordering. CONNECT error headers/body use the same
+  correlated request-ID/no-store/Allow contract.
+- Final diff, relative links/fences/status references, credential-pattern and
+  generated-clutter/staged-scope checks precede commit. Previous progress remains
+  byte-identical before this appended entry; no failing test is committed.
+- The clean frozen install reports **12 vulnerabilities (11 moderate, 1 high)**
+  on the unchanged lockfile. The dated D05.2 audit identified ESLint/minimatch
+  tooling and body-parser chains. Remediation remains separate maintenance; no
+  new full audit, upgrade or security-audit pass is claimed.
+
+HTTP servers, Mongo processes/data/ports, stream sockets, keys and test consumers
+are fixture-owned; cleanup precedes database teardown. No normal developer data,
+configuration or running application was read/reset/stopped. Tests use synthetic
+inputs and boolean secret/Buffer comparisons, keeping bearer values and raw
+private data out of assertion diagnostics. Logs are checked for token/body/header/
+query/consumer-error privacy. Existing tests/CI remain mandatory and unweakened.
+
+**Not run:** browser interaction (no UI change), real capture-to-store/provider
+journey (downstream pipeline unfinished), unsupported-media acceptance matrix
+(D06.3), signature verification, sessions/memberships, worker/replay/deployment/
+release journeys, independent security review, unfamiliar-user trial or GHFind
+scan. No release, adoption, score gain, measured latency/throughput or complete
+hosted-security result is claimed.
+
+### Growth checklist — every checkpoint evaluated for this run
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+Results do not permanently complete lifetime/release/adoption phases.
+
+| Phase | Per-run status and every checkpoint |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — existing public scope/account, synthetic/private-data boundary and attribution inspection retained. P: 0.3, 0.6, 0.7 — full useful capture product and fresh categories/deductions/scan freshness absent; scan not requested. |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — current README/setup/test commands, exact runtime, placeholder config and retained MIT license/contribution/roadmap. 1.5 C for tested synthetic transport example, P for product demo. P: 1.1 metadata unchanged; 1.10 independent unfamiliar-developer trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — missing bounded transport need, duplicate search, reused backlog/milestone, expected methods/bytes, observable acceptance and one task. N/A: 2.5 — feature increment, no reported production bug reproduction. |
+| 3 build/check/review | **C for applicable local work; publication follows.** C: 3.2, 3.4 — real stream/Mongo/HTTP/protocol/failure evidence and inspected authorship/tracking. N/A: 3.1, 3.3 — no PR/independent feedback in authorized direct-main workflow. 3.5 P until actual remote/default-branch CI read-back. Numbered steps 2–5, 8 apply; 1, 6–7, 9 N/A; step 10 read-back follows publication, milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 remain full product/release gates: clean boundary install is not capture/store workflow, version/tag/notes/distribution/demo/release link. C: 4.8 retained safe problem-reporting instructions. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 — profile pin/tutorial/outreach/invitations, real user support and outside contribution/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C for scoped duplicate inspection, P for ongoing broader triage. C: 6.3 pinned compatibility/passing regressions; advisory remediation remains P. N/A: 6.2, 6.4 — no incoming user bug/recurring question. P: 6.5 fix releases when ready. 6.6 C for identifying the internal missing transport and retaining actual dependency findings, P for remediation. N/A: 6.7–6.8 — no upstream discussion/fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5, 7.7 — full product trial, fresh scan/category/deduction/status/comparison evidence and multi-year outcomes absent. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are recorded;
+PR/independent review/PR-merge fields N/A. No activity-only issue/PR/release/post,
+user/star/adoption/review/upstream contribution or score gain is claimed.
+
+### Publication, limitations and handoff
+
+**Publication status at record preparation: pending D06.1 commit/push.** Local
+verification precedes publication. One coherent task commit on unchanged
+origin/main is authorized; final handoff must verify the actual remote SHA,
+GitHub author/committer mapping and Foundation CI on that SHA. This entry does
+not pre-claim that later outcome. Preserve the local commit if pushing fails and
+report the safe concrete blocker. No force-push, history rewrite, identity/remote/
+visibility/protection change or unrelated upgrade.
+
+The consumer must be implemented and composed before enabling product capture;
+it must not emit capture success before sanitized durable storage. Raw headers/
+bytes are ephemeral private input; parsing/media/redaction/storage are not shipped
+here. Eligibility precedes collection; already-authorized in-flight reads are not
+canceled by rotation/disable. No quotas/concurrency guarantees or public hosting
+are added. Existing credential/advisory findings remain recorded.
+
+**Implementation blockers: none. Publication verification remains pending at
+record preparation. Next eligible task: D06.2 — normalize safe metadata and parse JSON, form and text without
+executing content.** D06.2 has not been started. Stop after D06.1 verification/
+publication; D06.3 and D07 remain unchecked.

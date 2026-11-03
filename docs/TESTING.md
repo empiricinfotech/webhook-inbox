@@ -183,9 +183,25 @@ continued validity. The production requireEnabledForCapture service guard is
 composed with the real shared Express error handler in a test-only adapter to
 verify 404/410/503, request correlation, no-store responses and private logs.
 The adapter does not implement a product endpoint or persist an event. The
-application's capture receiver, bounded methods/bytes and persistence remain
-D06–D07 work. See [management acceptance and limits](INBOX_MANAGEMENT.md).
+application's capture-to-store receiver and persistence remain later work.
+D06.1 now adds the optional bounded method/byte transport described below. See [management acceptance and limits](INBOX_MANAGEMENT.md).
 
 Normal npm test and the unchanged CI workflow discover all five automatically;
 there is no new dependency, special test runner or normal database access.
 Browser checks are not applicable to this backend/test-only change.
+
+
+## D06.1 raw capture transport checks
+
+```bash
+npm test -- tests/unit/capture-body.test.ts tests/api/capture-transport.test.ts
+```
+
+Five unit and seven real-Mongo/Node HTTP checks verify exact original bytes,
+metadata-only GET/HEAD, body byte/deadline bounds, explicit composition, event-free
+OPTIONS, TRACE/CONNECT denial, eligibility errors, safe consumer errors, aborted
+request recovery, local routing and 100-continue ordering. The fixture binds
+owned loopback HTTP/Mongo resources; its 204 consumer is a test probe, not a
+product capture or event-store acknowledgement. Normal test/CI discovers all
+checks with unchanged dependencies. Browser checks are not applicable. See
+[capture transport](CAPTURE_TRANSPORT.md) for current scope and pending pipeline.

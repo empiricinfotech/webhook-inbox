@@ -49,6 +49,8 @@ rejects unknown properties at both envelope levels.
 | UNAUTHENTICATED | 401 |
 | FORBIDDEN | 403 |
 | NOT_FOUND | 404 |
+| METHOD_NOT_ALLOWED | 405 |
+| REQUEST_TIMEOUT | 408 |
 | CONFLICT | 409 |
 | ENDPOINT_DISABLED | 410 |
 | PAYLOAD_TOO_LARGE | 413 |
@@ -66,8 +68,11 @@ default handler using a replacement generic error, never the original exception.
 Error responses use Cache-Control: no-store. HEAD keeps status/headers with no body.
 
 A missing management route currently returns NOT_FOUND; it is not evidence of
-implemented inbox behavior. Capture remains unimplemented and returns the same
-safe missing-route envelope. Existing health response bodies remain special
+implemented inbox behavior. Normal startup still returns that missing-route
+envelope for capture. D06.1 adds an [optional capture transport](CAPTURE_TRANSPORT.md)
+with explicit methods/byte bounds, requiring a downstream handler. Its 405/408
+codes use this same catalog; CONNECT uses the Node server event and the same
+static error/UUID/no-store envelope, without an Express request context. Existing health response bodies remain special
 operational snapshots: `{ "data": { "status": "live" | "ready" | "not_ready" } }`.
 Readiness 503 is not a domain error and does not change shape.
 

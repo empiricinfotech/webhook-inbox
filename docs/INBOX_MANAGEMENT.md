@@ -129,8 +129,9 @@ stored. These tests do not claim a product /capture endpoint exists.
 
 Day 05's create/disable/old-token acceptance is demonstrated through the existing
 services, local metadata HTTP and shared error response contract. D05.3 is complete
-at those implemented boundaries. D06.1 is next: supported capture methods and
-bounded raw-byte collection, followed by the remaining D06–D07 capture pipeline.
+at those implemented boundaries. D06.1 now adds an [optional method/byte router](CAPTURE_TRANSPORT.md)
+using the eligibility guard; normal startup still has no capture-to-store handler.
+D06.2 safe metadata/parsing is next, followed by the remaining D06–D07 pipeline.
 No Day 06, first successful capture or release gate is marked complete.
 
 Primary references: [Mongoose atomic updates](https://mongoosejs.com/docs/tutorials/findoneandupdate.html#atomic-updates),

@@ -152,3 +152,9 @@ verified through services and the operator command, not a shipped HTTP endpoint.
 Primary references: [Node crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html),
 [OWASP cryptographic storage](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html).
 Behavior is verified on the pinned Node 24.22.0, Mongoose 9.11.2 and MongoDB 8.0.32.
+
+
+D06.1 now composes requireEnabledForCapture inside an [optional method/byte
+transport router](CAPTURE_TRANSPORT.md). It is exercised with a test probe, not
+installed by normal startup; no raw-data persistence or capture acknowledgement
+is added. Existing owner-only retrieval and token rotation remain unchanged.

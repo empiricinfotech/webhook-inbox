@@ -3,7 +3,7 @@ import { requestIdSchema, type RequestId } from "./identifiers.js";
 
 export const apiErrorCodeSchema = z.enum([
   "INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "CONFLICT",
-  "ENDPOINT_DISABLED", "PAYLOAD_TOO_LARGE", "UNSUPPORTED_MEDIA_TYPE",
+  "ENDPOINT_DISABLED", "METHOD_NOT_ALLOWED", "REQUEST_TIMEOUT", "PAYLOAD_TOO_LARGE", "UNSUPPORTED_MEDIA_TYPE",
   "RATE_LIMITED", "STORAGE_UNAVAILABLE", "INTERNAL_ERROR",
 ]);
 export type ApiErrorCode = z.output<typeof apiErrorCodeSchema>;
@@ -15,6 +15,8 @@ export const API_ERRORS = {
   FORBIDDEN: { status: 403, message: "This action is not permitted" },
   NOT_FOUND: { status: 404, message: "Resource not found" },
   CONFLICT: { status: 409, message: "The request conflicts with the current state" },
+  METHOD_NOT_ALLOWED: { status: 405, message: "This HTTP method is not supported" },
+  REQUEST_TIMEOUT: { status: 408, message: "Request body did not complete in time" },
   ENDPOINT_DISABLED: { status: 410, message: "This endpoint is disabled" },
   PAYLOAD_TOO_LARGE: { status: 413, message: "Request body exceeds the configured limit" },
   UNSUPPORTED_MEDIA_TYPE: { status: 415, message: "Request content type is not supported" },
