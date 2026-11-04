@@ -145,3 +145,8 @@ remains pending until that automation exists.
 References consulted: [Zod schemas](https://zod.dev/api),
 [Express error handling](https://expressjs.com/en/guide/error-handling/), and
 [Node asynchronous context](https://nodejs.org/api/async_context.html).
+
+
+D06.2 [capture preparation](CAPTURE_PARSING.md) is an internal Node/Express type,
+not a shared browser response or sanitized event contract. Parse failures use
+static internal flags; no new HTTP error or capture success contract is added.

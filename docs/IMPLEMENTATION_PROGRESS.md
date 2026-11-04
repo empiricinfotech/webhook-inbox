@@ -2479,3 +2479,187 @@ are added. Existing credential/advisory findings remain recorded.
 record preparation. Next eligible task: D06.2 — normalize safe metadata and parse JSON, form and text without
 executing content.** D06.2 has not been started. Stop after D06.1 verification/
 publication; D06.3 and D07 remain unchecked.
+
+## 2026-11-04 — D06.2: safe metadata and inert JSON/form/text preparation
+
+**Implementation status: completed.** Only
+D06.2 selected. Publication is recorded separately below; no TASK_BOARD.md exists.
+
+### Selection, repository and honest attribution
+
+Started clean on main tracking origin/main at
+4b07099b3528055b824c4bee8df5569f91e50a4c (D06.1). Inspected branch, upstream,
+recent commits and sanitized fetch/push destinations. A fresh fetch showed 0
+ahead/0 behind; origin and upstream target the expected
+https://github.com/empiricinfotech/webhook-inbox. No remote, identity, visibility,
+protection or history change was made. Embedded credential location remains
+.git/config remote.origin.url; only its location was reported, with a secure
+credential-manager recommendation. No credential was disclosed, copied or changed.
+
+GitHub main matched D06.1, mapped its author and committer to empiricinfotech and
+showed [Foundation CI 41595001290](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41595001290)
+completed/success. The older progress entry's pre-commit publication note is
+historical: that handoff is now freshly verified, with no unfinished publication.
+Effective author/committer remain empiricinfotech <empiricinfotech@gmail.com>.
+Repository ownership, authentication and attribution were inspected separately;
+no personal authorship, independent review or score credit is inferred from agent
+work or repository ownership.
+
+Read applicable ancestor instructions (none found), project architecture/backlog,
+the entire growth checklist, progress/task status, README/contribution/local-dev,
+transport/contracts/testing/toolchain instructions, scripts and CI. The only
+repository AGENTS.md is scoped to unchanged apps/web code. Backend skill guidance
+retains the separate Express API; Next.js, worker and deployment are unchanged.
+Actual bounded-method/byte/token behavior exists; the unchanged baseline passed
+83 tests. No metadata preparation or JSON/form/text capture parser existed.
+D06.2 is therefore the earliest eligible unfinished task; D06.3 and D07 are later
+increments, not missing prerequisites for this private preparation component.
+
+D06.2 issue and PR searches found no equivalents. Reuse the ordered backlog and
+[v0.1 issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1); no activity-only
+issue/PR/release/post was created. Main is unprotected with empty rulesets, so
+the existing authorized direct-main workflow applies. No milestone is closed.
+
+### Work, files and individual acceptance
+
+- apps/api/src/capture/prepare.ts: internal PreparedCapture/body types, normalized
+  private metadata and conservative content-type-only header projection; inert
+  JSON, ordered URL-encoded form and text parsing, static failure flags and bounds.
+- apps/api/src/routes/capture.ts: server-generated receivedAt at route entry,
+  before eligibility/collection; original bytes and optional handler contract kept.
+- tests/unit/capture-prepare.test.ts: ten unit checks for normalized metadata,
+  private headers, UTF-8/BOM, nested/primitive JSON, inert script/prototype data,
+  invalid data, exact depth/form/body limits and the trusted input contract.
+- tests/api/capture-transport.test.ts: four new composed real-Mongo/HTTP checks
+  for formats, arrival time, unchanged bytes, method/eligibility boundaries,
+  failed parsing/recovery, private logs and zero stored events.
+- docs/CAPTURE_PARSING.md: runnable focused test command, internal contract,
+  exact choices/failure flags, limits and pending endpoint/storage requirements.
+- README.md; CONTRIBUTING.md; docs/PROJECT_BRIEF.md; docs/INBOX_MANAGEMENT.md;
+  docs/LOCAL_DEVELOPMENT.md; docs/API_CONTRACTS.md; docs/CAPTURE_TRANSPORT.md;
+  docs/TESTING.md: consistent current capabilities and next task.
+- docs/PROJECT_DOCUMENTATION.md and this file: only D06.2 will be newly checked
+  after verification; earlier progress history is preserved byte-for-byte.
+
+The parser operates only on validated, bounded raw input. Date/forwarding/query/
+credential fields never control receipt time or enter the metadata projection.
+MIME essence is normalized with the Node API; parameters are not copied. The
+512-character header, 64 JSON-container depth and 1000 form-field bounds are
+initial defensive choices, not measured capacity. GET/HEAD retain actual byte
+count but stay metadata-only. UTF-8 is strict; JSON may ignore one initial BOM,
+while text/form preserve it. JSON uses no executable callbacks or object merge;
+forms preserve ordered repeated/literal names and reject malformed percent UTF-8.
+
+Failed preparation returns unparsed/parseFailed:true/value:null plus a static
+reason, without a partial body, fallback text or parser exception. This is not
+an HTTP acceptance decision. Unsupported/encoded/charset inputs remain unparsed;
+D06.3 must supply the complete documented endpoint rejection policy. Successful
+JSON/form/text is still unsanitized private input. D07.1 redaction and D07.2
+storage-before-acknowledgement remain pending. Normal startup does not mount a
+product receiver. The explicit HTTP test probe replies 204 solely for observation;
+no eventId/captured:true, event insertion, raw vault, forwarding or first-capture
+success is added. Full Day 06 sample/product and release acceptance remain pending.
+
+### Verification, corrections and limitations
+
+Pinned Node 24.22.0/npm 11.19.1 was absent from PATH and the previous /tmp tools
+were gone, so the first launch could not start. Downloaded the official archive
+to a new /tmp tool directory and verified its published SHA-256; exact versions
+then passed. No global/version-manager settings changed. A checksum-verified CI
+Ubuntu 24.04 Mongo binary could not run on this host's older glibc; used the
+existing working native /usr/bin/mongod 8.0.32 explicitly for owned test fixtures.
+No system package/library or developer database was changed. These were tool
+setup limitations, not passing application checks or application regressions.
+
+All tests use synthetic inputs and isolated HTTP/Mongo resources. A clean tracked-
+file baseline snapshot, without .git/private environment files, passed **83 tests**.
+The first strict check caught a readonly-header assignment in the new unit fixture;
+replaced its header snapshot, preserving the readonly contract. Then strict types,
+lint and focused **21 tests** passed (14 new and seven existing transport checks).
+
+Commands use the verified pinned toolchain PATH and native Mongo fixture binary,
+in the working repository or an owned clean snapshot with the same final code:
+
+```bash
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm test -- tests/unit/capture-prepare.test.ts tests/api/capture-transport.test.ts
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+NEXT_TELEMETRY_DISABLED=1 CIRCLE_NODE_TOTAL=2 npm run build
+npm run check:compiled-api
+npm run check:routing
+git diff --check
+git diff --cached --check
+```
+
+Final clean-snapshot results: **97 normal tests in 18 files**, including all 14
+new acceptance checks, and **6 contract checks** passed. The isolated CI gate
+proved failure of its intended bad assertion, then passed **98 tests** with the
+corrected probe and removed it. All 13 required snapshot commands exited 0:
+toolchain, frozen install, dependency tree/imports, lint, strict types, full tests,
+contracts, contract gate, foundation (5), Mongo lifecycle (6), production build,
+compiled API (6) and Next development routing (3). No required check failed in
+the final run. Snapshot input hashes remained unchanged; working code matched
+the tested snapshot. Only documentation status/evidence was finalized afterward.
+The package-lock.json SHA-256 remains
+1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+
+The unchanged frozen installation reports **12 vulnerabilities (11 moderate,
+1 high)**. This is an observed install summary, not a new full audit or security
+pass. Previously documented dependency-advisory remediation remains maintenance
+work; no dependency/package/lockfile/CI policy changes were required here.
+
+Review covers the complete diff, staged task scope, relative links/fences, secret
+patterns, generated clutter, unchanged snapshot input hashes/lockfile and retained
+prior progress. No check is weakened. Failure comparisons keep token/body/header
+values out of diagnostics, and logs/responses are checked for private input.
+
+**Not run:** UI/browser interaction (no UI change), real provider capture-to-store
+journey (later pipeline missing), full D06.3 media/status matrix, D07 redaction/
+storage and D20 signature acceptance, releases/deployment/replay/session flows,
+independent review, unfamiliar-user trial or GHFind scan. No usage, latency,
+capacity, adoption, review or score result is claimed. JSON uses normal JavaScript
+number precision/duplicate-key semantics; the decisions are documented.
+
+### Growth checklist — every checkpoint evaluated for this run
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+These are per-run results, not permanent completion of lifetime phases.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 scope/baseline | **P overall.** C: 0.1, 0.2, 0.4, 0.5 — retained public scope/account, private synthetic-data boundary and inspected attribution. P: 0.3 full useful capture product; 0.6–0.7 fresh six-category/deduction/scan-freshness evidence (scan not requested). |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 — accurate guides/commands/runtime, placeholder-only configuration and existing license/contribution/roadmap retained. 1.5 C for executable synthetic preparation example, P for full product demo. P: 1.1 metadata unchanged; 1.10 independent clean-setup trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 — actual parsing gap, duplicate search/reused tracking, described result, explicit acceptance and one scope. N/A: 2.5 no incoming production bug to reproduce. |
+| 3 build/check/review | **C for applicable local work.** C: 3.2, 3.4 — acceptance/privacy/failure verification and inspected authorship/tracking. N/A: 3.1, 3.3 — no PR/independent feedback in authorized direct-main workflow. 3.5 P until actual remote/default-branch CI read-back. Numbered steps 2–5 and 8 apply; 1, 6–7, 9 N/A; step 10 read-back follows publication, milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 remain full workflow/release/example/version/tag/notes/distribution/demo/link gates. Clean component install is not release acceptance. C: 4.8 retained problem-reporting instructions. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 profile/tutorial/outreach/invitations, actual user support and outside-contributor/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C for scoped issue/PR inspection, P for ongoing broader triage. C: 6.3 pinned compatibility/passing regressions; advisory remediation P. N/A: 6.2, 6.4 no incoming user report/recurring question. P: 6.5 fix releases when ready. 6.6 C for locating the internal parser gap and retaining dependency findings, P for remediation. N/A: 6.7–6.8 no upstream discussion/fix needed or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful eligible task identified, not started. P: 7.1–7.5 and 7.7 full product trial, fresh scan/categories/deductions/status/comparison evidence and multi-year outcomes absent. |
+
+PR problem/change/verification/tracking/self-review fields are recorded here;
+PR/independent review/merge fields N/A. No activity-only public artifact or
+invented user/star/review/adoption/contribution/score gain is claimed.
+
+### Publication and handoff
+
+**Publication status at record preparation: pending D06.2 commit/push.** Final
+local checks precede the authorized single coherent commit on unchanged main.
+The run's final handoff must report the actual pushed SHA, remote read-back,
+GitHub author/committer mapping and Foundation CI result on that SHA; this
+pre-commit record does not pre-claim publication. Preserve the local commit if
+pushing fails. No force push, rewrite, remote/identity/visibility change or
+unrelated upgrade is authorized by this task.
+
+**Implementation blockers: none. Publication verification is pending at record
+preparation.** Next eligible task: **D06.3 — reject oversized, binary and compressed bodies with
+documented status codes.** It has not been started. Its remaining endpoint policy
+must precede the later D07 redaction/durable capture integration. Stop after this
+one task and its verification/publication.

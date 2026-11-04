@@ -205,3 +205,19 @@ owned loopback HTTP/Mongo resources; its 204 consumer is a test probe, not a
 product capture or event-store acknowledgement. Normal test/CI discovers all
 checks with unchanged dependencies. Browser checks are not applicable. See
 [capture transport](CAPTURE_TRANSPORT.md) for current scope and pending pipeline.
+
+
+## D06.2 metadata and payload preparation
+
+```bash
+npm test -- tests/unit/capture-prepare.test.ts tests/api/capture-transport.test.ts
+```
+
+Ten new unit checks and four additions to the existing raw-transport API file
+verify normalized private metadata, server-generated time, UTF-8/BOM, inert JSON/
+form/text, repeated/literal field names, invalid input flags, exact complexity
+bounds and HTTP composition with eligibility, raw bytes, private logs, recovery
+and no persisted event. The API probe replies 204 only for observation; neither
+parsed nor unparsed data is a product acknowledgement. These checks use the same
+owned Mongo/HTTP lifecycle and normal test discovery. See [preparation decisions
+and limits](CAPTURE_PARSING.md). No UI/browser behavior changed.

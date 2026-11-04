@@ -10,6 +10,7 @@ export type CaptureMethod = typeof CAPTURE_METHODS[number];
 type Tokens = Pick<ReturnType<typeof createCaptureTokenService>, "requireEnabledForCapture">;
 export interface RawCaptureInput {
   method: CaptureMethod;
+  receivedAt: Date;
   inbox: Awaited<ReturnType<Tokens["requireEnabledForCapture"]>>;
   headers: Readonly<IncomingHttpHeaders>;
   rawBody: Buffer;
@@ -30,6 +31,7 @@ export function createCaptureRouter(options: CaptureRouterOptions) {
   if (!Number.isInteger(deadline) || deadline < 1 || deadline > 30_000) throw new TypeError("Invalid capture body deadline");
   const router = express.Router({ caseSensitive: true, strict: true });
   router.all("/capture/:token", async (req, res) => {
+    const receivedAt = new Date();
     res.set("Cache-Control", "no-store");
     // Cover disconnects during asynchronous eligibility checks as well as body reads.
     const ignoreReadError = () => {};
@@ -51,7 +53,7 @@ export function createCaptureRouter(options: CaptureRouterOptions) {
     const pending = collectCaptureBody(req, method !== "GET" && method !== "HEAD", deadline);
     if (req.headers.expect?.toLowerCase() === "100-continue") res.writeContinue();
     const body = await pending;
-    await options.handle({ method, inbox, headers: { ...req.headers }, rawBody: body.bytes, receivedBytes: body.receivedBytes }, res);
+    await options.handle({ method, receivedAt, inbox, headers: { ...req.headers }, rawBody: body.bytes, receivedBytes: body.receivedBytes }, res);
     if (!res.writableEnded) throw new ApiError("INTERNAL_ERROR");
   });
   router.use(((error, _req, res, next) => {

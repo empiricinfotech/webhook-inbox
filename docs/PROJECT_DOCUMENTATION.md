@@ -674,7 +674,7 @@ Prerequisite: D05. Modules: M03. Planned effort: 5 to 6 hours.
 
 - [x] **D06.1** Implement explicitly supported HTTP methods and bounded raw-byte collection. [Transport boundary and verification](CAPTURE_TRANSPORT.md).
 
-- [ ] **D06.2** Normalize safe metadata and parse JSON, form and text payloads without executing content.
+- [x] **D06.2** Normalize safe metadata and parse JSON, form and text payloads without executing content. [Preparation contract and verification](CAPTURE_PARSING.md).
 
 - [ ] **D06.3** Reject oversized, binary and compressed bodies with documented status codes.
 

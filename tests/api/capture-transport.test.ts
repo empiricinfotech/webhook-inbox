@@ -8,6 +8,7 @@ import { expect, vi } from "vitest";
 import { apiErrorResponseSchema, createErrorResponse, type ApiErrorCode } from "@empiric-webhook-inbox/contracts/errors";
 import { inboxSummarySchema } from "@empiric-webhook-inbox/contracts/inboxes";
 import { test } from "../helpers/api-fixture.js";
+import { prepareCapture, MAX_FORM_FIELDS, MAX_JSON_DEPTH, type PreparedCapture } from "../../apps/api/src/capture/prepare.js";
 import { MAX_CAPTURE_BYTES } from "../../apps/api/src/capture/raw-body.js";
 import { createApiServer } from "../../apps/api/src/server.js";
 import { createCaptureRouter, CAPTURE_ALLOW, CAPTURE_METHODS, type RawCaptureInput } from "../../apps/api/src/routes/capture.js";
@@ -193,4 +194,80 @@ captureTest("100-continue is sent only after capture eligibility/size checks and
   }, "continue");
   expect(ordinary.status).toBe(201); expect(ordinary.continues).toBe(1);
   expect(inboxSummarySchema.parse(JSON.parse(ordinary.text).data).name).toBe("Synthetic management continue");
+});
+
+
+captureTest("D06.2 prepares JSON, text and form from real original-byte HTTP transport with private metadata", async ({ capture, mongo }) => {
+  const observed: PreparedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => {
+    const before = Buffer.from(input.rawBody); observed.push(prepareCapture(input));
+    expect(input.rawBody.equals(before)).toBe(true); response.status(204).end();
+  });
+  const start = Date.now();
+  for (const [type, text, format] of [["Application/JSON; Charset=UTF-8", '{"emoji":"😀"}', "json"],
+    ["text/html", "<script>globalThis.syntheticCaptureExecuted=true</script>", "text"],
+    ["application/x-www-form-urlencoded", "a=1&a=2&x=%F0%9F%98%80", "form"]]) {
+    const bytes = Buffer.from(text!);
+    const response = await capture.exchange(capture.path + "?private=synthetic-private-query", "POST", [bytes.subarray(0, 2), bytes.subarray(2)], {
+      "Content-Type": type!, "Content-Length": String(bytes.length), Authorization: "synthetic-private-header", Cookie: "synthetic-private-cookie", Date: "synthetic-private-time",
+    });
+    expect(response.status).toBe(204); expect(response.text).toBe("");
+    const result = observed.at(-1)!; expect(result.body.format).toBe(format);
+    expect(result.metadata.receivedBytes).toBe(bytes.length);
+    expect(Date.parse(result.metadata.receivedAt)).toBeGreaterThanOrEqual(start);
+    expect(Date.parse(result.metadata.receivedAt)).toBeLessThanOrEqual(Date.now());
+    expect(JSON.stringify(result.metadata).includes("synthetic-private")).toBe(false);
+  }
+  expect(Object.hasOwn(globalThis, "syntheticCaptureExecuted")).toBe(false);
+  expect([capture.token, "synthetic-private-query", "synthetic-private-header", "synthetic-private-cookie", "syntheticCaptureExecuted"].some(value => capture.logs().includes(value))).toBe(false);
+  expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+});
+
+captureTest("D06.2 respects metadata-only methods, OPTIONS and existing eligibility before preparation", async ({ capture }) => {
+  const observed: PreparedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => { observed.push(prepareCapture(input)); response.status(204).end(); });
+  for (const method of ["GET", "HEAD"]) {
+    expect((await capture.exchange(capture.path, method, [Buffer.from([255])], { "Content-Type": "application/json", "Content-Length": "1" })).status).toBe(204);
+    expect(observed.at(-1)!.body).toEqual({ format: "metadata", parseFailed: false, value: null });
+    expect(observed.at(-1)!.metadata.receivedBytes).toBe(1);
+  }
+  expect((await capture.exchange(capture.path, "OPTIONS")).status).toBe(204);
+  await capture.inboxes.disableForOwner(capture.owner, capture.request.inboxId);
+  error(await capture.exchange(capture.path, "POST"), 410, "ENDPOINT_DISABLED");
+  expect(observed.length).toBe(2);
+});
+
+captureTest("D06.2 parsing failures are static private results with no partial content, and the next valid body recovers", async ({ capture, mongo }) => {
+  const observed: PreparedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => { observed.push(prepareCapture(input)); response.status(204).end(); });
+  for (const [type, bytes, extra, reason] of [
+    ["application/json", Buffer.from('{"synthetic-private-body":'), {}, "invalid_json"],
+    ["application/x-www-form-urlencoded", Buffer.from("synthetic-private-body=%FF"), {}, "invalid_form"],
+    ["text/plain", Buffer.from([255]), {}, "invalid_utf8"],
+    ["application/octet-stream", Buffer.from("synthetic-private-body"), {}, "unsupported_media"],
+    ["text/plain", Buffer.from("synthetic-private-body"), { "Content-Encoding": "gzip" }, "encoded_body"],
+  ] as const) {
+    const response = await capture.exchange(capture.path, "POST", [bytes], { "Content-Type": type, "Content-Length": String(bytes.length), ...extra });
+    expect(response.status).toBe(204); // A test-only probe, never a capture acknowledgement.
+    expect(observed.at(-1)!.body).toEqual({ format: "unparsed", parseFailed: true, value: null, reason });
+    expect(JSON.stringify(observed.at(-1)).includes("synthetic-private-body")).toBe(false);
+  }
+  expect((await capture.exchange(capture.path, "POST", [Buffer.from("{}")], { "Content-Type": "application/json", "Content-Length": "2" })).status).toBe(204);
+  expect(observed.at(-1)!.body.parseFailed).toBe(false);
+  expect(capture.logs().includes("synthetic-private-body")).toBe(false);
+  expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+});
+
+captureTest("D06.2 enforces parser complexity bounds after transport and never prepares oversized uploads", async ({ capture }) => {
+  const observed: PreparedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => { observed.push(prepareCapture(input)); response.status(204).end(); });
+  const send = (text: string, type: string) => capture.exchange(capture.path, "POST", [Buffer.from(text)], { "Content-Type": type, "Content-Length": String(Buffer.byteLength(text)) });
+  expect((await send("[".repeat(MAX_JSON_DEPTH + 1) + "0" + "]".repeat(MAX_JSON_DEPTH + 1), "application/json")).status).toBe(204);
+  expect(observed.at(-1)!.body.parseFailed && observed.at(-1)!.body.format === "unparsed").toBe(true);
+  expect((await send(Array(MAX_FORM_FIELDS + 1).fill("a=1").join("&"), "application/x-www-form-urlencoded")).status).toBe(204);
+  expect(observed.at(-1)!.body.parseFailed).toBe(true);
+  expect((await send("a".repeat(MAX_CAPTURE_BYTES), "text/plain")).status).toBe(204);
+  expect(observed.at(-1)!.body.parseFailed).toBe(false);
+  error(await send("a".repeat(MAX_CAPTURE_BYTES + 1), "text/plain"), 413, "PAYLOAD_TOO_LARGE");
+  expect(observed.length).toBe(3);
 });

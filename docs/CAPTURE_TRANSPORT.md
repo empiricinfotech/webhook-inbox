@@ -5,8 +5,9 @@ D06.1 | 3 November 2026
 The separate Express backend now provides an optional capture router and a bounded
 original-byte collector. A caller must supply the existing token-eligibility
 service and an explicit downstream handler. Ordinary API and local-dashboard
-startup do not mount this router: parsing, media policy, redaction and durable
-storage are later D06–D07 tasks. No default handler returns a fake capture success.
+startup do not mount this router. D06.2 adds [private preparation](CAPTURE_PARSING.md)
+for explicit composition; media policy, redaction and durable storage are still
+later tasks. No default handler returns a fake capture success.
 
 ## Exercise the boundary
 
@@ -43,10 +44,11 @@ use the existing safe error boundary. Only the later durable-storage path may
 return 201 with eventId/captured:true, after storage actually succeeds.
 
 RawCaptureInput contains method, safe internal inbox target, unnormalized raw
-headers, rawBody Buffer and receivedBytes. Headers and raw bytes are untrusted,
+headers, server-generated receivedAt Date, rawBody Buffer and receivedBytes. Headers and raw bytes are untrusted,
 private, ephemeral input: never log, persist, export or queue them before the
 later sanitization policy. No original URL/capture token is added to the input.
-There is no raw vault, forwarding, parser, signature verification or event model.
+The raw router has no parser; D06.2 preparation can be explicitly composed.
+There is no raw vault, forwarding, signature verification or event model.
 
 ## Methods and raw-byte behavior
 
@@ -113,7 +115,7 @@ the [existing eligibility guard](INBOX_MANAGEMENT.md). Eligibility is checked
 before collection; rotation/disable does not cancel a read already authorized
 under the documented in-flight policy. No final-generation reservation is added.
 
-D06.2 still owns safe metadata and JSON/form/text parsing. D06.3 still owns the
+D06.2 now provides [safe metadata and private JSON/form/text preparation](CAPTURE_PARSING.md). D06.3 still owns the
 complete unsupported-binary/compressed-media policy and rejection matrix; D06.1's
 necessary size rejection does not complete it. Raw byte probe vectors do not
 claim those media types are supported product captures. D07 owns redaction and
