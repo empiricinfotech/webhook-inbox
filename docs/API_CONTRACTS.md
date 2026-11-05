@@ -150,3 +150,10 @@ References consulted: [Zod schemas](https://zod.dev/api),
 D06.2 [capture preparation](CAPTURE_PARSING.md) is an internal Node/Express type,
 not a shared browser response or sanitized event contract. Parse failures use
 static internal flags; no new HTTP error or capture success contract is added.
+
+
+D06.3 [capture media policy](CAPTURE_MEDIA.md) now uses the existing
+PAYLOAD_TOO_LARGE/413 and UNSUPPORTED_MEDIA_TYPE/415 catalog entries in the optional
+router. Both retain static messages, correlated IDs, no-store and connection close;
+415 advertises Accept-Encoding: identity. HEAD is bodyless. No capture success or
+new shared error code is introduced. Normal startup still does not enable capture.

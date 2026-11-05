@@ -221,3 +221,20 @@ and no persisted event. The API probe replies 204 only for observation; neither
 parsed nor unparsed data is a product acknowledgement. These checks use the same
 owned Mongo/HTTP lifecycle and normal test discovery. See [preparation decisions
 and limits](CAPTURE_PARSING.md). No UI/browser behavior changed.
+
+
+## D06.3 rejection policy
+
+```bash
+npm test -- tests/unit/capture-media.test.ts tests/unit/capture-body.test.ts tests/unit/capture-prepare.test.ts tests/api/capture-transport.test.ts
+```
+
+Seven new unit checks and five additions to the existing transport API file cover
+header preflight, duplicates hidden by Node, real compression, all six methods,
+strict streaming UTF-8/control checks, exact/chunked size limits, EOF cleanup,
+100-continue, empty framing, recovery and private errors/logs with zero stored
+events. Positive HTTP fixtures explicitly declare supported text, and arbitrary
+raw byte vectors remain covered by collector unit tests. Unsupported-byte HTTP
+probes now expect 415 instead of probe delivery. The fixture's default text/plain
+is test-only; missing-type tests actually omit it on the wire. See the full
+[status and ordering matrix](CAPTURE_MEDIA.md). No UI/browser flow changed.

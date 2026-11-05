@@ -94,11 +94,11 @@ and separate; no partial parsed value is delivered when parseFailed is true.
 
 ## Remaining boundaries
 
-An unparsed result is NOT an HTTP acceptance or storage decision. D06.3 must add
-and test the complete endpoint policy for oversized, binary and compressed media,
-including documented response statuses. This helper refuses to interpret those
-bytes but does not install a 415 response policy or mark D06.3 complete. Existing
-D06.1 transport overflow still returns 413 before a parser sees partial bytes.
+An unparsed result is NOT a storage decision. D06.3 now enforces [HTTP media
+rejection](CAPTURE_MEDIA.md) in the optional raw router before downstream delivery.
+Unsupported headers or nontext wire bytes yield 415; overflow yields 413. Direct
+internal preparation calls still report static flags, while malformed JSON/form
+syntax in otherwise valid wire text continues to produce parse-failure flags.
 
 D07 redaction/storage, D09 rendering, D20 signatures, browser journeys, provider
 capture-to-store examples and all release gates remain pending. Plain text can

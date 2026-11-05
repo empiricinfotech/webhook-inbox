@@ -1,8 +1,8 @@
-import { MIMEType, TextDecoder } from "node:util";
-import type { IncomingHttpHeaders } from "node:http";
+import { TextDecoder } from "node:util";
 import type { RawCaptureInput } from "../routes/capture.js";
 import { ApiError } from "../errors.js";
 import { MAX_CAPTURE_BYTES } from "./raw-body.js";
+import { readCaptureContentType, captureFormat, isIdentityEncoding, isUtf8Charset } from "./media.js";
 
 export const MAX_JSON_DEPTH = 64;
 export const MAX_FORM_FIELDS = 1000;
@@ -27,15 +27,6 @@ export interface PreparedCapture {
   body: CaptureBody;
 }
 
-function contentType(headers: Readonly<IncomingHttpHeaders>) {
-  const value = headers["content-type"];
-  if (value === undefined) return { media: null, charset: null, issue: "missing_content_type" as const };
-  if (typeof value !== "string" || value.length > 512) return { media: null, charset: null, issue: "invalid_content_type" as const };
-  try {
-    const mime = new MIMEType(value);
-    return { media: mime.essence, charset: mime.params.get("charset")?.toLowerCase() ?? null, issue: null };
-  } catch { return { media: null, charset: null, issue: "invalid_content_type" as const }; }
-}
 function failed(reason: ParseFailure): CaptureBody { return { format: "unparsed", parseFailed: true, value: null, reason }; }
 
 function parseJson(text: string): CaptureBody {
@@ -77,20 +68,19 @@ export function prepareCapture(input: RawCaptureInput): PreparedCapture {
     || !(input.receivedAt instanceof Date) || !Number.isFinite(input.receivedAt.getTime())) throw new ApiError("INVALID_REQUEST");
   const metadataOnly = input.method === "GET" || input.method === "HEAD";
   if (input.rawBody.length !== (metadataOnly ? 0 : input.receivedBytes)) throw new ApiError("INVALID_REQUEST");
-  const type = contentType(input.headers);
+  const type = readCaptureContentType(input.headers);
   const metadata = { method: input.method, receivedAt: input.receivedAt.toISOString(), receivedBytes: input.receivedBytes,
     contentType: type.media, safeHeaders: type.media === null ? {} : { "content-type": type.media } };
   const result = (body: CaptureBody): PreparedCapture => ({ inbox: input.inbox, metadata, body });
   if (metadataOnly) return result({ format: "metadata", parseFailed: false, value: null });
   if (type.issue) return result(failed(type.issue));
   const encoding = input.headers["content-encoding"];
-  if (encoding !== undefined && (typeof encoding !== "string" || encoding.trim().toLowerCase() !== "identity")) return result(failed("encoded_body"));
-  if (type.charset !== null && !["utf-8", "utf8"].includes(type.charset)) return result(failed("unsupported_charset"));
-  const json = type.media === "application/json" || type.media!.startsWith("application/") && type.media!.endsWith("+json");
-  const form = type.media === "application/x-www-form-urlencoded";
-  if (!json && !form && !type.media!.startsWith("text/")) return result(failed("unsupported_media"));
+  if (!isIdentityEncoding(encoding)) return result(failed("encoded_body"));
+  if (!isUtf8Charset(type.charset)) return result(failed("unsupported_charset"));
+  const format = captureFormat(type.media);
+  if (format === null) return result(failed("unsupported_media"));
   let text: string;
   try { text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(input.rawBody); }
   catch { return result(failed("invalid_utf8")); }
-  return result(json ? parseJson(text) : form ? parseForm(text) : { format: "text", parseFailed: false, value: text });
+  return result(format === "json" ? parseJson(text) : format === "form" ? parseForm(text) : { format: "text", parseFailed: false, value: text });
 }

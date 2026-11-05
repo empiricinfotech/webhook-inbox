@@ -6,8 +6,8 @@ The separate Express backend now provides an optional capture router and a bound
 original-byte collector. A caller must supply the existing token-eligibility
 service and an explicit downstream handler. Ordinary API and local-dashboard
 startup do not mount this router. D06.2 adds [private preparation](CAPTURE_PARSING.md)
-for explicit composition; media policy, redaction and durable storage are still
-later tasks. No default handler returns a fake capture success.
+for explicit composition; D06.3 adds [HTTP media rejection](CAPTURE_MEDIA.md).
+Redaction and durable storage are still later tasks. No default handler returns a fake capture success.
 
 ## Exercise the boundary
 
@@ -55,7 +55,7 @@ There is no raw vault, forwarding, signature verification or event model.
 | Request | Behavior |
 |---|---|
 | GET, HEAD | Validate token/limits, count and discard request body bytes; call the handler with an empty Buffer for metadata-only processing. HEAD responses remain bodyless. |
-| POST, PUT, PATCH, DELETE | Validate token/limits; deliver the complete original Buffer to the handler exactly once. No text decoding or decompression. |
+| POST, PUT, PATCH, DELETE | Validate token/limits; deliver the complete original Buffer to the handler exactly once. Transient UTF-8 validation; no transformation or decompression. |
 | OPTIONS | 204, no-store and Allow listing the six methods plus OPTIONS; no token lookup, body retention or handler call. No CORS origin/credentials grant is added. |
 | TRACE | METHOD_NOT_ALLOWED/405 with Allow, before token lookup or collection. |
 | CONNECT | Rejected by the Node server event with the same 405 catalog/error-ID/no-store contract; no tunnel, lookup or handler. |
@@ -70,6 +70,8 @@ excessive declared Content-Length before token lookup or 100 Continue. It also
 counts actual incoming Buffer lengths for all six methods, including unknown-
 length/chunked uploads. Exactly the limit is accepted at this boundary; the first
 byte over it rejects with PAYLOAD_TOO_LARGE/413 and never invokes the handler.
+D06.3 also validates supported headers and incremental UTF-8/control bytes before
+downstream delivery, returning UNSUPPORTED_MEDIA_TYPE/415 on policy failure.
 GET/HEAD count toward this bound even though their content is not retained.
 An ended stream must be complete and match any declared length. Already-decoded,
 consumed, broken or incomplete streams fail closed; no partial Buffer is delivered.
@@ -104,6 +106,7 @@ No undocumented ServerResponse/socket-attachment API is used.
 | Invalid/old/missing token or inactive workspace | NOT_FOUND/404 |
 | Current disabled inbox | ENDPOINT_DISABLED/410 |
 | Declared/streamed byte limit | PAYLOAD_TOO_LARGE/413 |
+| Unsupported media/coding, duplicates or nontext wire bytes | UNSUPPORTED_MEDIA_TYPE/415 |
 | Token storage unavailable | STORAGE_UNAVAILABLE/503 |
 | Unexpected consumer error or missing response | INTERNAL_ERROR/500 |
 
@@ -115,10 +118,10 @@ the [existing eligibility guard](INBOX_MANAGEMENT.md). Eligibility is checked
 before collection; rotation/disable does not cancel a read already authorized
 under the documented in-flight policy. No final-generation reservation is added.
 
-D06.2 now provides [safe metadata and private JSON/form/text preparation](CAPTURE_PARSING.md). D06.3 still owns the
-complete unsupported-binary/compressed-media policy and rejection matrix; D06.1's
-necessary size rejection does not complete it. Raw byte probe vectors do not
-claim those media types are supported product captures. D07 owns redaction and
+D06.2 provides [private JSON/form/text preparation](CAPTURE_PARSING.md), and D06.3
+now enforces the [media/coding/text-byte policy](CAPTURE_MEDIA.md). HTTP probes
+use supported text; arbitrary original bytes remain tested at the lower collector
+unit boundary and do not imply supported binary product captures. D07 owns redaction and
 sanitized persistence before acknowledgement. No first capture, public hosting,
 release, quotas, load result or complete Day 06 acceptance is claimed.
 

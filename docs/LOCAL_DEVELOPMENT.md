@@ -193,5 +193,6 @@ does not supply one and remains unchanged; no sample capture acknowledgement is
 available. createApiServer supplies Node CONNECT rejection and controlled
 100-continue handling, and startServer composes it. Next's API rewrite still
 excludes capture. D06.2 now provides [private metadata and parsing](CAPTURE_PARSING.md)
-for explicit composition. D06.3 and D07 must supply the endpoint media policy,
-redaction and durable storage before the product receiver is enabled.
+for explicit composition. D06.3 enforces [media/size rejection](CAPTURE_MEDIA.md)
+in that optional router. D07 must supply redaction and durable storage before
+the product receiver is enabled.

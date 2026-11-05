@@ -1,6 +1,8 @@
 import { randomBytes } from "node:crypto";
 import { request as httpRequest, type IncomingHttpHeaders } from "node:http";
 import { connect } from "node:net";
+import { gzipSync, deflateSync, brotliCompressSync } from "node:zlib";
+import { requestIdSchema } from "@empiric-webhook-inbox/contracts/identifiers";
 import { Writable } from "node:stream";
 import { Types } from "mongoose";
 import pino from "pino";
@@ -46,9 +48,10 @@ const captureTest = test.extend("capture", async ({ mongo }, { onCleanup }) => {
   await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
   const address = server.address();
   if (!address || typeof address === "string") throw new Error("Expected owned HTTP listener");
-  const exchange = (path: string, method = "POST", chunks: Buffer[] = [], headers: Record<string, string> = {}, mode: "normal" | "continue" | "stall" = "normal") => new Promise<Reply>((done, reject) => {
+  const exchange = (path: string, method = "POST", chunks: Buffer[] = [], headers: Record<string, string | undefined> = {}, mode: "normal" | "continue" | "stall" = "normal") => new Promise<Reply>((done, reject) => {
     let continues = 0;
-    const client = httpRequest({ host: "127.0.0.1", port: address.port, path, method, headers }, (response) => {
+    const outgoingHeaders = Object.fromEntries(Object.entries({ "Content-Type": "text/plain", ...headers }).filter(([, value]) => value !== undefined));
+    const client = httpRequest({ host: "127.0.0.1", port: address.port, path, method, headers: outgoingHeaders }, (response) => {
       const parts: Buffer[] = [];
       response.on("error", reject);
       response.on("data", (part: Buffer) => parts.push(part));
@@ -73,11 +76,11 @@ function error(response: Reply, status: number, code: ApiErrorCode) {
   expect(response.headers["x-request-id"]).toBe(body.error.requestId);
   expect(response.headers["cache-control"]).toBe("no-store");
 }
-async function tunnel(port: number, path: string) {
+async function rawHttp(port: number, message: string) {
   return new Promise<Reply>((done, reject) => {
     const parts: Buffer[] = [];
-    const client = connect(port, "127.0.0.1", () => client.write(`CONNECT ${path} HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n`));
-    client.setTimeout(3000, () => client.destroy(new Error("Owned CONNECT probe timed out")));
+    const client = connect(port, "127.0.0.1", () => client.write(message));
+    client.setTimeout(3000, () => client.destroy(new Error("Owned raw HTTP probe timed out")));
     client.on("error", reject);
     client.on("data", (part: Buffer) => parts.push(part));
     client.on("end", () => {
@@ -94,10 +97,14 @@ async function tunnel(port: number, path: string) {
   });
 }
 
+function tunnel(port: number, path: string) {
+  return rawHttp(port, `CONNECT ${path} HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n`);
+}
+
 captureTest("six explicit methods preserve original bytes; GET/HEAD deliver metadata with an empty body", async ({ capture, mongo }) => {
-  const bytes = Buffer.from([0, 255, 240, 159, 152, 128, 13, 10, 128]);
+  const bytes = Buffer.from("😀\r\né synthetic");
   for (const method of CAPTURE_METHODS) {
-    const response = await capture.exchange(capture.path, method, [bytes.subarray(0, 4), bytes.subarray(4)], { "Content-Length": String(bytes.length) });
+    const response = await capture.exchange(capture.path, method, [bytes.subarray(0, 2), bytes.subarray(2)], { "Content-Length": String(bytes.length) });
     expect(response.status).toBe(204);
     expect(response.text).toBe("");
     const input = capture.received.at(-1)!;
@@ -124,7 +131,7 @@ captureTest("OPTIONS is event-free; TRACE and Node CONNECT reject without lookup
 });
 
 captureTest("declared/chunked exact limits pass and every one-byte overflow rejects before downstream delivery", async ({ capture }) => {
-  const bytes = Buffer.alloc(MAX_CAPTURE_BYTES);
+  const bytes = Buffer.alloc(MAX_CAPTURE_BYTES, 97);
   expect((await capture.exchange(capture.path, "POST", [bytes], { "Content-Length": String(bytes.length) })).status).toBe(204);
   expect((await capture.exchange(capture.path, "PATCH", [bytes.subarray(0, 123), bytes.subarray(123)], { "Transfer-Encoding": "chunked" })).status).toBe(204);
   const before = capture.resolve.mock.calls.length;
@@ -160,7 +167,7 @@ captureTest("stalled and aborted uploads never invoke the consumer and a later r
   error(stalled, 408, "REQUEST_TIMEOUT");
   await new Promise<void>((done, reject) => {
     const client = connect(capture.port, "127.0.0.1", () => {
-      client.write(`POST ${capture.path} HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Length: 100\r\n\r\npartial`, () => client.destroy());
+      client.write(`POST ${capture.path} HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Type: text/plain\r\nContent-Length: 100\r\n\r\npartial`, () => client.destroy());
     });
     client.on("error", reject); client.on("close", () => done());
   });
@@ -227,9 +234,9 @@ captureTest("D06.2 respects metadata-only methods, OPTIONS and existing eligibil
   const observed: PreparedCapture[] = [];
   capture.handle.mockImplementation(async (input, response) => { observed.push(prepareCapture(input)); response.status(204).end(); });
   for (const method of ["GET", "HEAD"]) {
-    expect((await capture.exchange(capture.path, method, [Buffer.from([255])], { "Content-Type": "application/json", "Content-Length": "1" })).status).toBe(204);
+    expect((await capture.exchange(capture.path, method, [Buffer.from("✓")], { "Content-Type": "application/json", "Content-Length": "3" })).status).toBe(204);
     expect(observed.at(-1)!.body).toEqual({ format: "metadata", parseFailed: false, value: null });
-    expect(observed.at(-1)!.metadata.receivedBytes).toBe(1);
+    expect(observed.at(-1)!.metadata.receivedBytes).toBe(3);
   }
   expect((await capture.exchange(capture.path, "OPTIONS")).status).toBe(204);
   await capture.inboxes.disableForOwner(capture.owner, capture.request.inboxId);
@@ -243,9 +250,6 @@ captureTest("D06.2 parsing failures are static private results with no partial c
   for (const [type, bytes, extra, reason] of [
     ["application/json", Buffer.from('{"synthetic-private-body":'), {}, "invalid_json"],
     ["application/x-www-form-urlencoded", Buffer.from("synthetic-private-body=%FF"), {}, "invalid_form"],
-    ["text/plain", Buffer.from([255]), {}, "invalid_utf8"],
-    ["application/octet-stream", Buffer.from("synthetic-private-body"), {}, "unsupported_media"],
-    ["text/plain", Buffer.from("synthetic-private-body"), { "Content-Encoding": "gzip" }, "encoded_body"],
   ] as const) {
     const response = await capture.exchange(capture.path, "POST", [bytes], { "Content-Type": type, "Content-Length": String(bytes.length), ...extra });
     expect(response.status).toBe(204); // A test-only probe, never a capture acknowledgement.
@@ -270,4 +274,85 @@ captureTest("D06.2 enforces parser complexity bounds after transport and never p
   expect(observed.at(-1)!.body.parseFailed).toBe(false);
   error(await send("a".repeat(MAX_CAPTURE_BYTES + 1), "text/plain"), 413, "PAYLOAD_TOO_LARGE");
   expect(observed.length).toBe(3);
+});
+
+
+captureTest("D06.3 rejects unsupported headers before lookup/100-continue, while proven-empty bodies and method priority stay usable", async ({ capture }) => {
+  const invalid: Record<string, string | undefined>[] = [
+    { "Content-Type": undefined }, { "Content-Type": "not-a-type" }, { "Content-Type": "application/octet-stream; private=synthetic-private-header" },
+    { "Content-Type": "image/png" }, { "Content-Type": "application/pdf" }, { "Content-Type": "multipart/form-data; boundary=synthetic" },
+    { "Content-Type": "application/xml" }, { "Content-Type": "text/plain; charset=iso-8859-1" }, { "Content-Type": "text/plain; charset=utf-16" },
+    { "Content-Type": "text/" + "a".repeat(513) }, ...["gzip", "deflate", "br", "identity, gzip", "", "unknown"].map(value => ({ "Content-Encoding": value })),
+  ];
+  for (const headers of invalid) {
+    const reply = await capture.exchange(capture.path + "?private=synthetic-private-query", "POST", [], { "Content-Length": "1", Expect: "100-continue", ...headers }, "continue");
+    error(reply, 415, "UNSUPPORTED_MEDIA_TYPE"); expect(reply.continues).toBe(0);
+    expect(reply.headers.connection).toBe("close"); expect(reply.headers["accept-encoding"]).toBe("identity");
+  }
+  error(await capture.exchange(capture.path, "POST", [], { "Content-Length": String(MAX_CAPTURE_BYTES + 1), "Content-Encoding": "gzip" }), 413, "PAYLOAD_TOO_LARGE");
+  const options = await capture.exchange(capture.path, "OPTIONS", [], { "Content-Length": String(MAX_CAPTURE_BYTES + 1), "Content-Encoding": "gzip", Expect: "100-continue" }, "continue");
+  expect(options.status).toBe(204); expect(options.continues).toBe(0);
+  error(await capture.exchange(capture.path, "TRACE", [], { "Content-Encoding": "gzip" }), 405, "METHOD_NOT_ALLOWED");
+  expect(capture.resolve.mock.calls.length).toBe(0); expect(capture.received.length).toBe(0);
+  for (const method of ["POST", "GET", "HEAD"]) {
+    expect((await capture.exchange(capture.path, method, [], { "Content-Type": undefined, "Content-Length": "0" })).status).toBe(204);
+  }
+  error(await capture.exchange(capture.path, "POST", [], { "Content-Type": undefined, "Transfer-Encoding": "chunked", Expect: "100-continue" }, "continue"), 415, "UNSUPPORTED_MEDIA_TYPE");
+  expect([capture.token, "synthetic-private-header", "synthetic-private-query"].some(value => capture.logs().includes(value))).toBe(false);
+});
+
+captureTest("D06.3 rejects actual compression and binary/invalid UTF-8 on all six methods without downstream delivery, then recovers", async ({ capture, mongo }) => {
+  const text = Buffer.from("synthetic-private-body".repeat(100));
+  for (const [encoding, bytes] of [["gzip", gzipSync(text)], ["deflate", deflateSync(text)], ["br", brotliCompressSync(text)]] as const) {
+    error(await capture.exchange(capture.path, "POST", [bytes], { "Content-Length": String(bytes.length), "Content-Encoding": encoding }), 415, "UNSUPPORTED_MEDIA_TYPE");
+  }
+  const vectors = [Buffer.from([0]), Buffer.from([255]), Buffer.from([240]), Buffer.from([192, 175]), Buffer.from([237, 160, 128]),
+    Buffer.from([194, 133]), Buffer.from([80, 75, 3, 4]), gzipSync(text)];
+  for (const method of CAPTURE_METHODS) for (const bytes of vectors) {
+    const reply = await capture.exchange(capture.path, method, [bytes], { "Content-Length": String(bytes.length) });
+    if (method === "HEAD") {
+      expect(reply.status).toBe(415); expect(reply.text).toBe(""); expect(reply.headers["cache-control"]).toBe("no-store");
+      expect(requestIdSchema.safeParse(reply.headers["x-request-id"]).success).toBe(true);
+    } else error(reply, 415, "UNSUPPORTED_MEDIA_TYPE");
+  }
+  expect(capture.received.length).toBe(0); expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+  expect((await capture.exchange(capture.path, "POST", [Buffer.from("synthetic recovery")])).status).toBe(204);
+  expect(capture.received.length).toBe(1);
+  expect([capture.token, "synthetic-private-body"].some(value => capture.logs().includes(value))).toBe(false);
+});
+
+captureTest("D06.3 streamed UTF-8 validates split characters at the exact size bound, rejects overflow/truncated EOF, and retains no partial capture", async ({ capture }) => {
+  const bytes = Buffer.from("😀".repeat(MAX_CAPTURE_BYTES / 4));
+  const accepted = await capture.exchange(capture.path, "PATCH", [bytes.subarray(0, 1), bytes.subarray(1, 3), bytes.subarray(3)], { "Transfer-Encoding": "chunked" });
+  expect(accepted.status).toBe(204); expect(capture.received[0]!.rawBody.equals(bytes)).toBe(true);
+  error(await capture.exchange(capture.path, "PUT", [bytes, Buffer.from("a")], { "Transfer-Encoding": "chunked" }), 413, "PAYLOAD_TOO_LARGE");
+  error(await capture.exchange(capture.path, "POST", [Buffer.alloc(MAX_CAPTURE_BYTES - 1, 97), Buffer.from([240])], { "Transfer-Encoding": "chunked" }), 415, "UNSUPPORTED_MEDIA_TYPE");
+  const continuing = await capture.exchange(capture.path, "POST", [Buffer.from([0])], { "Content-Length": "1", Expect: "100-continue" }, "continue");
+  error(continuing, 415, "UNSUPPORTED_MEDIA_TYPE"); expect(continuing.continues).toBe(1);
+  expect(capture.received.length).toBe(1);
+});
+
+captureTest("D06.3 sees duplicate MIME/encoding fields through Node even when its ordinary header map hides one", async ({ capture }) => {
+  for (const fields of [["Content-Type: text/plain", "Content-Type: application/octet-stream"],
+    ["Content-Type: application/octet-stream", "Content-Type: text/plain"],
+    ["Content-Type: text/plain", "Content-Encoding: identity", "Content-Encoding: identity"]]) {
+    const reply = await rawHttp(capture.port, [`POST ${capture.path} HTTP/1.1`, "Host: 127.0.0.1", "Content-Length: 0", ...fields, "", ""].join("\r\n"));
+    error(reply, 415, "UNSUPPORTED_MEDIA_TYPE");
+  }
+  expect(capture.resolve.mock.calls.length).toBe(0); expect(capture.received.length).toBe(0);
+});
+
+captureTest("D06.3 accepted JSON suffixes, quoted UTF-8 and identity text/form still compose with preparation without mutating bytes or storing events", async ({ capture, mongo }) => {
+  const prepared: PreparedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => {
+    const before = Buffer.from(input.rawBody); prepared.push(prepareCapture(input));
+    expect(input.rawBody.equals(before)).toBe(true); response.status(204).end();
+  });
+  for (const [type, text, format] of [['Application/Problem+JSON; Charset="UTF-8"', '{"synthetic":true}', "json"],
+    ["application/x-www-form-urlencoded; charset=utf8", "a=1&a=2", "form"], ["text/html", "<script>syntheticDataOnly()</script>\r\n", "text"]] as const) {
+    const bytes = Buffer.from(text);
+    expect((await capture.exchange(capture.path, "POST", [bytes], { "Content-Type": type, "Content-Length": String(bytes.length), "Content-Encoding": " IDENTITY " })).status).toBe(204);
+    expect(prepared.at(-1)!.body.format).toBe(format); expect(prepared.at(-1)!.body.parseFailed).toBe(false);
+  }
+  expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
 });

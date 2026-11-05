@@ -13,9 +13,12 @@ export function declaredCaptureLength(request: IncomingMessage): number | undefi
 }
 
 export interface RawCaptureBody { bytes: Buffer; receivedBytes: number }
+// Trusted route-local validator; false rejects without exposing a decoder exception.
+export interface CaptureBodyValidation { write(chunk: Buffer): boolean; end(): boolean }
 
-// No decoding, decompression, parser, persistence or logging. The caller closes rejected transports.
-export function collectCaptureBody(request: IncomingMessage, retain: boolean, timeoutMs = CAPTURE_BODY_TIMEOUT_MS): Promise<RawCaptureBody> {
+// Keep original bytes; optional validation never replaces them. No decompression, parser or storage.
+// The caller closes rejected transports; private input is never logged here.
+export function collectCaptureBody(request: IncomingMessage, retain: boolean, timeoutMs = CAPTURE_BODY_TIMEOUT_MS, validation?: CaptureBodyValidation): Promise<RawCaptureBody> {
   const expected = declaredCaptureLength(request);
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30_000) throw new TypeError("Invalid capture body deadline");
   if (request.destroyed || request.readableEnded || request.readableEncoding !== null) throw new ApiError("INVALID_REQUEST");
@@ -31,7 +34,7 @@ export function collectCaptureBody(request: IncomingMessage, retain: boolean, ti
       request.removeListener("error", onError);
       request.removeListener("close", onClose);
     };
-    const fail = (code: "INVALID_REQUEST" | "PAYLOAD_TOO_LARGE" | "REQUEST_TIMEOUT") => {
+    const fail = (code: "INVALID_REQUEST" | "PAYLOAD_TOO_LARGE" | "REQUEST_TIMEOUT" | "UNSUPPORTED_MEDIA_TYPE") => {
       if (settled) return;
       settled = true;
       cleanup();
@@ -49,10 +52,12 @@ export function collectCaptureBody(request: IncomingMessage, retain: boolean, ti
       if (!Buffer.isBuffer(chunk)) { fail("INVALID_REQUEST"); return; }
       receivedBytes += chunk.length;
       if (receivedBytes > MAX_CAPTURE_BYTES) { fail("PAYLOAD_TOO_LARGE"); return; }
+      if (validation && !validation.write(chunk)) { fail("UNSUPPORTED_MEDIA_TYPE"); return; }
       if (retain) chunks.push(chunk);
     };
     const onEnd = () => {
       if (!request.complete || expected !== undefined && expected !== receivedBytes) { fail("INVALID_REQUEST"); return; }
+      if (validation && !validation.end()) { fail("UNSUPPORTED_MEDIA_TYPE"); return; }
       settled = true;
       cleanup();
       const bytes = retain ? Buffer.concat(chunks, receivedBytes) : Buffer.alloc(0);

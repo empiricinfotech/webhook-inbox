@@ -1,6 +1,7 @@
 import express, { type Response } from "express";
 import type { IncomingHttpHeaders } from "node:http";
 import { ApiError } from "../errors.js";
+import { createCaptureMediaValidation } from "../capture/media.js";
 import { CAPTURE_BODY_TIMEOUT_MS, collectCaptureBody, declaredCaptureLength } from "../capture/raw-body.js";
 import type { createCaptureTokenService } from "../services/capture-tokens.js";
 
@@ -46,11 +47,12 @@ export function createCaptureRouter(options: CaptureRouterOptions) {
       res.set("Allow", CAPTURE_ALLOW);
       throw new ApiError("METHOD_NOT_ALLOWED");
     }
-    declaredCaptureLength(req);
+    const length = declaredCaptureLength(req);
+    const validation = createCaptureMediaValidation(req, length);
     const inbox = await options.tokens.requireEnabledForCapture(req.params.token);
     const method = req.method as CaptureMethod;
     // Synchronous preflight rejects excessive Content-Length before permitting 100-continue.
-    const pending = collectCaptureBody(req, method !== "GET" && method !== "HEAD", deadline);
+    const pending = collectCaptureBody(req, method !== "GET" && method !== "HEAD", deadline, validation);
     if (req.headers.expect?.toLowerCase() === "100-continue") res.writeContinue();
     const body = await pending;
     await options.handle({ method, receivedAt, inbox, headers: { ...req.headers }, rawBody: body.bytes, receivedBytes: body.receivedBytes }, res);
@@ -58,7 +60,10 @@ export function createCaptureRouter(options: CaptureRouterOptions) {
   });
   router.use(((error, _req, res, next) => {
     // Do not drain an untrusted rejected upload or keep its connection reusable.
-    if (!res.headersSent) res.set("Connection", "close");
+    if (!res.headersSent) {
+      res.set("Connection", "close");
+      if (error instanceof ApiError && error.code === "UNSUPPORTED_MEDIA_TYPE") res.set("Accept-Encoding", "identity");
+    }
     next(error instanceof URIError ? new ApiError("INVALID_REQUEST") : error);
   }) as express.ErrorRequestHandler);
   return router;

@@ -676,7 +676,7 @@ Prerequisite: D05. Modules: M03. Planned effort: 5 to 6 hours.
 
 - [x] **D06.2** Normalize safe metadata and parse JSON, form and text payloads without executing content. [Preparation contract and verification](CAPTURE_PARSING.md).
 
-- [ ] **D06.3** Reject oversized, binary and compressed bodies with documented status codes.
+- [x] **D06.3** Reject oversized, binary and compressed bodies with documented status codes. [Media policy and rejection evidence](CAPTURE_MEDIA.md).
 
 **Acceptance:** Synthetic JSON and text samples capture; an oversized request returns 413 without partial storage.
 
