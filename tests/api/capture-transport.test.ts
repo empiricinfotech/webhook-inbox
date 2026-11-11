@@ -11,6 +11,7 @@ import { apiErrorResponseSchema, createErrorResponse, type ApiErrorCode } from "
 import { inboxSummarySchema } from "@empiric-webhook-inbox/contracts/inboxes";
 import { test } from "../helpers/api-fixture.js";
 import { prepareCapture, MAX_FORM_FIELDS, MAX_JSON_DEPTH, type PreparedCapture } from "../../apps/api/src/capture/prepare.js";
+import { createCaptureSanitizer, type SanitizedCapture } from "../../apps/api/src/capture/sanitize.js";
 import { MAX_CAPTURE_BYTES } from "../../apps/api/src/capture/raw-body.js";
 import { createApiServer } from "../../apps/api/src/server.js";
 import { createCaptureRouter, CAPTURE_ALLOW, CAPTURE_METHODS, type RawCaptureInput } from "../../apps/api/src/routes/capture.js";
@@ -355,4 +356,73 @@ captureTest("D06.3 accepted JSON suffixes, quoted UTF-8 and identity text/form s
     expect(prepared.at(-1)!.body.format).toBe(format); expect(prepared.at(-1)!.body.parseFailed).toBe(false);
   }
   expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+});
+
+
+captureTest("D07.1 composed sanitization omits credentials and nested secrets without changing original transport bytes", async ({ capture, mongo }) => {
+  const sanitize = createCaptureSanitizer({ sensitiveJsonKeys: ["private_value"] });
+  const observed: SanitizedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => {
+    const raw = Buffer.from(input.rawBody), headers = JSON.stringify(input.headers);
+    observed.push(sanitize(input));
+    expect(input.rawBody.equals(raw) && JSON.stringify(input.headers) === headers).toBe(true);
+    response.status(204).end(); // Observation only: no storage/success acknowledgement.
+  });
+  const bytes = Buffer.from('{"safe":"😀","nested":[{"PASSWORD":"synthetic-private-body","keep":1},{"private_value":{"deep":"synthetic-private-body"}}]}');
+  const reply = await capture.exchange(capture.path + "?private=synthetic-private-query", "POST", [bytes.subarray(0, 3), bytes.subarray(3)], {
+    "Content-Type": 'Application/JSON; private="synthetic-private-param"', "Content-Length": String(bytes.length),
+    Authorization: "synthetic-private-header", Cookie: "synthetic-private-cookie", "Proxy-Authorization": "synthetic-private-proxy",
+    "X-Api-Key": "synthetic-private-key", "X-Custom-Credential": "synthetic-private-custom", "X-Hub-Signature-256": "synthetic-private-signature",
+  });
+  expect(reply.status).toBe(204); expect(reply.text).toBe("");
+  expect(observed[0]!.body).toEqual({ format: "json", parseFailed: false, value: { safe: "😀", nested: [{ keep: 1 }, {}] } });
+  expect(observed[0]!.metadata.safeHeaders).toEqual({ "content-type": "application/json" });
+  expect(observed[0]!.redaction.jsonKeysRemoved).toBe(2);
+  expect(JSON.stringify(observed).includes("synthetic-private")).toBe(false);
+  expect(capture.logs().includes("synthetic-private") || capture.logs().includes(capture.token)).toBe(false);
+  expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+});
+
+captureTest("D07.1 per-inbox trusted policies isolate captures and can omit every non-metadata body", async ({ capture, mongo }) => {
+  const enabled = createCaptureSanitizer({ sensitiveJsonKeys: ["first"] });
+  const disabled = createCaptureSanitizer({ captureBody: false });
+  const observed: SanitizedCapture[] = [];
+  let sanitize = enabled;
+  capture.handle.mockImplementation(async (input, response) => { observed.push(sanitize(input)); response.status(204).end(); });
+  const send = (text: string, type: string, method = "POST") => capture.exchange(capture.path, method, [Buffer.from(text)], {
+    "Content-Type": type, "Content-Length": String(Buffer.byteLength(text)), "X-Capture-Body": "true",
+  });
+  expect((await send('{"first":1,"second":2}', "application/json")).status).toBe(204);
+  expect(observed.at(-1)!.body.value).toEqual({ second: 2 });
+  sanitize = disabled;
+  for (const [text, type] of [["secret=synthetic-private", "application/x-www-form-urlencoded"], ["synthetic-private", "text/html"], ['{"secret":"synthetic-private"}', "application/json"]]) {
+    expect((await send(text!, type!)).status).toBe(204);
+    expect(observed.at(-1)!.body).toEqual({ format: "omitted", parseFailed: false, value: null });
+    expect(observed.at(-1)!.redaction.bodyOmitted).toBe(true);
+  }
+  for (const method of ["GET", "HEAD"]) {
+    expect((await send("synthetic-private", "text/plain", method)).status).toBe(204);
+    expect(observed.at(-1)!.body.format).toBe("metadata");
+  }
+  const before = observed.length;
+  expect((await capture.exchange(capture.path, "OPTIONS")).status).toBe(204); expect(observed.length).toBe(before);
+  sanitize = createCaptureSanitizer({ sensitiveJsonKeys: ["second"] });
+  expect((await send('{"first":1,"second":2}', "application/json")).status).toBe(204);
+  expect(observed.at(-1)!.body.value).toEqual({ first: 1 });
+  expect(JSON.stringify(observed).includes("synthetic-private") || capture.logs().includes("synthetic-private")).toBe(false);
+  expect(await mongo.connection.collection("events").countDocuments()).toBe(0);
+});
+
+captureTest("D07.1 malformed JSON stays empty/flagged and bad trusted configuration fails safely before recovery", async ({ capture }) => {
+  const sanitize = createCaptureSanitizer();
+  const observed: SanitizedCapture[] = [];
+  capture.handle.mockImplementation(async (input, response) => { observed.push(sanitize(input)); response.status(204).end(); });
+  const send = (text: string) => capture.exchange(capture.path, "POST", [Buffer.from(text)], { "Content-Type": "application/json" });
+  expect((await send('{"synthetic-private":')).status).toBe(204);
+  expect(observed.at(-1)!.body).toEqual({ format: "unparsed", parseFailed: true, value: null, reason: "invalid_json" });
+  capture.handle.mockImplementationOnce(async () => { createCaptureSanitizer({ sensitiveJsonKeys: ["synthetic-private".repeat(20)] }); });
+  const failed = await send('{}'); error(failed, 500, "INTERNAL_ERROR");
+  expect(failed.text.includes("synthetic-private") || capture.logs().includes("synthetic-private")).toBe(false);
+  expect((await send('{"password":"synthetic-private","ok":true}')).status).toBe(204);
+  expect(observed.at(-1)!.body.value).toEqual({ ok: true });
 });

@@ -2869,3 +2869,188 @@ record preparation.** Next eligible task: **D07.1 — implement credential-heade
 configured JSON-key redaction.** D06.1–D06.3 components are its prerequisites;
 D07.1 and later storage work have not been started. Stop after this one task and
 its necessary verification/documentation/publication.
+
+
+## 2026-11-11 — D07.1: credential-header omission and configured JSON-key redaction
+
+**Implementation status: completed.**
+Exactly one task selected. Publication status is separate below. No TASK_BOARD.md
+exists. D07.2 and later tasks have not been started.
+
+### Selection, prerequisites and authorship
+
+Started clean on main tracking origin/main at
+6655c6a19226c6296da53620cda0224a579d3927. Inspected current source, tests, scripts,
+CI, branch/upstream, recent commits and working tree. Fresh fetch: 0 ahead/0 behind.
+Origin fetch/push destinations were parsed with userinfo/parameters withheld and
+match the expected https://github.com/empiricinfotech/webhook-inbox repository;
+upstream also targets that repository. Embedded credential location:
+.git/config remote.origin.url. Only its location was reported and credential-manager
+storage recommended; no credential/remote/identity/visibility/history was changed.
+
+GitHub main matched D06.3; author and committer both map to empiricinfotech.
+[Foundation CI 41971292815](https://github.com/empiricinfotech/webhook-inbox/actions/runs/41971292815)
+was completed/success on that exact SHA. The previous pre-commit publication note
+is resolved by fresh read-back; no unfinished publication remained to resume.
+Effective author/committer remain empiricinfotech <empiricinfotech@gmail.com>.
+Repository ownership, push authentication and commit attribution are separate.
+No invented human authorship, coauthor, independent review or score credit is
+inferred from agent work or repository ownership.
+
+Read ancestor instructions (none found), project architecture/backlog, the entire
+growth checklist, progress history/current evidence, README/contribution/local-dev,
+transport/parser/media/contracts/testing guides and scripts/CI. The only repository
+AGENTS.md is scoped to unchanged apps/web. Backend skill guidance retains the
+existing separate Express/Next.js architecture. Actual bounded transport, private
+preparation and rejection policy exist and their tests pass with this change;
+configured redaction did not exist. D07.1 is the earliest eligible unfinished task.
+Its individual acceptance does not require later event storage or rendering.
+
+Issue/PR searches found the existing v0.1 milestone and no D07.1 PR equivalent.
+Reuse [milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1)
+and the ordered backlog. No activity-only issue/PR/release/tag/post was created;
+all milestone issues remain untouched. Main is unprotected with empty rulesets;
+the established authorized direct-main workflow applies. Self-review only.
+
+### Work and individual acceptance
+
+- apps/api/src/capture/sanitize.ts: trusted bounded/snapshotted policy factory;
+  compose private preparation, retain only normalized Content-Type, omit every
+  other inbound header, recursively remove default/configured JSON properties,
+  and report header policy, removal count and explicit body omission.
+- tests/unit/capture-sanitize.test.ts: eight acceptance checks for nested arrays/
+  objects, roots, exact case-insensitive/escaped/literal/reserved names, duplicate
+  keys, immutable original bytes/headers, configuration limits/types/snapshot,
+  defaults, omission, parse failures and exact byte/depth boundaries.
+- tests/api/capture-transport.test.ts: three additional real HTTP/Mongo checks
+  compose the sanitizer, prove credential/log privacy, trusted-policy isolation,
+  omission on JSON/form/text, GET/HEAD/OPTIONS, safe errors and recovery.
+- docs/CAPTURE_REDACTION.md: exact rules/defaults, synthetic example, executable
+  acceptance, trusted per-inbox composition interface and limitations.
+- README.md; CONTRIBUTING.md; docs/PROJECT_BRIEF.md; docs/INBOX_MANAGEMENT.md;
+  docs/LOCAL_DEVELOPMENT.md; docs/CAPTURE_TRANSPORT.md; docs/CAPTURE_PARSING.md;
+  docs/CAPTURE_MEDIA.md; docs/API_CONTRACTS.md; docs/TESTING.md: current boundary
+  and next-task references updated consistently.
+- docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md: only D07.1
+  completion evidence after passing final checks; preserve prior history exactly.
+
+Custom names extend defaults and match literal lowercased strings, with no regex,
+path/glob, substring matching or Unicode normalization. Matching properties and
+subtrees are removed; array order/length and safe siblings remain. Removal counts
+count matched properties, not nested descendants already removed. Null-prototype
+objects preserve reserved names without prototype mutation or executing content.
+No input bytes/headers are changed. Policy is server-side; inbound fields cannot
+weaken it. Up to 64 custom names, 1–128 UTF-16 units without C0/DEL, are accepted.
+Invalid policies fail with a static error. Existing 256 KiB/64-container bounds
+apply; no dependency, lockfile, public endpoint, UI or deployment change.
+
+The internal captureBody:false policy omits every non-metadata body and reports
+that choice. It is not a newly persisted inbox setting or UI. JSON-key matching
+cannot find arbitrary aliases/encoded/string-embedded secrets. Enabled text/form
+bodies retain their content and are not guaranteed secret-free; synthetic data and
+body omission remain necessary. Omitted-body parseFailed:false describes the
+policy result, not proof that discarded JSON was valid. Existing parse failures
+with capture enabled retain static flags/null, with no raw fallback.
+
+HTTP probes return 204 solely for observation and insert zero events. Ordinary
+startup still does not mount a receiver, return event IDs or acknowledge capture.
+D07.2 must select the trusted policy, persist only sanitized output, attach expiry/
+parse/redaction flags and acknowledge only after success. D07.3 stored fixture/
+outage tests and D09 rendering remain pending. Day 07 stored-secret/database-
+failure acceptance, the first capture journey and release gates are not claimed.
+
+### Verification
+
+The focused initial command passed 27 tests (eight sanitizer unit and 19 transport
+API tests). A final clean snapshot uses tracked inputs plus the new task files,
+without private environment/operator files, .git or prior generated/dependency
+output. Pinned Node 24.22.0/npm 11.19.1 was restored into /tmp after verifying the
+official archive SHA-256. Native Mongo 8.0.32 runs only fixture-owned temporary
+instances/data. No normal database, local configuration or running service was
+reset or stopped. No test/assertion/timeout/CI policy was weakened.
+
+Commands, with pinned PATH, MONGOD_BINARY=/usr/bin/mongod,
+NEXT_TELEMETRY_DISABLED=1 and CIRCLE_NODE_TOTAL=2:
+
+```bash
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm test -- tests/unit/capture-sanitize.test.ts tests/api/capture-transport.test.ts
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+git diff --check
+git diff --cached --check
+```
+
+All 13 required commands passed on the final source: toolchain, frozen install,
+dependency tree/imports, lint, strict types, 120 normal tests in 20 files, six
+contract checks, the unchanged contract failure/correction gate (only the intended
+red assertion failed; corrected full suite 121 passed), foundation (5), Mongo
+lifecycle (6), production contracts/Express/Next build, compiled API (6) and Next
+development routing (3). No check needed a rerun or weaker assertion/timeout.
+The previous unreproduced gate failure did not recur; it is not claimed fixed.
+Source bytes equal the tested clean snapshot. Final local Markdown links/fences,
+credential-pattern scan, history-prefix preservation and git diff --check passed;
+staging review/check precedes commit. Only documentation status/evidence was
+finalized after executable checks.
+The lockfile SHA-256 remains
+1644e70e549d9d557305a6a26ff46810d6e5c5ce230d0e0348ae30b1f7eb18a6.
+The fresh frozen install reports 12 advisories (10 moderate, 2 high), versus the
+previous dated count of 11 (10 moderate, 1 high). This is a registry/install
+observation, not remediation or a security pass; dependency maintenance remains
+pending without unrelated upgrades. The earlier D06.3 corrected-contract-suite
+failure is an unresolved, unreproduced reliability finding; no cause/fix is claimed.
+
+Final review covers the complete/staged diff, task-only paths, prior-history
+preservation, local links/fences, secrets/generated clutter and snapshot/source
+hash equality. No measured performance/capacity, independent review, adoption or
+GHFind score improvement is claimed.
+
+**Not run:** UI/browser checks (no UI change), provider-to-store/inspect, stored
+redaction/database-outage acceptance (D07.2/D07.3), sessions/signatures/replay,
+deployment/release journeys, unfamiliar-user trial, independent review or GHFind
+scan. These are not passing outcomes or prerequisites of this component task.
+
+### Growth checklist — every checkpoint evaluated for this run
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+No lifetime/release/adoption phase is permanently completed by this increment.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1–0.2, 0.4–0.5 existing public scope/account, synthetic/private-data boundary and attribution inspection. P: 0.3 full useful capture product; 0.6–0.7 fresh six-category/deduction/freshness evidence (scan not requested). |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 current guides/commands/pins and retained placeholder config/MIT/contribution/roadmap. 1.5 C for executable synthetic component example; P for product demo. P: 1.1 metadata unchanged; 1.10 independent clean-setup trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 missing redaction need, duplicate inspection/reused tracking, expected results, observable acceptance and one scope. N/A: 2.5 no incoming bug report to reproduce. |
+| 3 build/check/review | **C for applicable local work.** C: 3.2, 3.4 meaningful success/failure/privacy checks and attribution/tracking inspection. N/A: 3.1, 3.3 no PR/independent feedback in authorized direct-main workflow. 3.5 P default-branch CI/read-back. Numbered steps 2–5 and 8 apply; 1, 6–7, 9 N/A; step 10 follows publication; milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 full workflow/release/examples/version/tag/notes/distribution/demo/link gates pending; component checks are not release acceptance. C: 4.8 retained safe reporting instructions. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 profile/tutorial/outreach/invitations, actual user support and outside contribution/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C scoped duplicate inspection, P ongoing wider triage. 6.3 C pinned compatibility/passing final regressions; advisories and the prior unreproduced gate finding P. N/A: 6.2, 6.4 no incoming user bug/recurring question. P: 6.5 fix releases when ready. 6.6 C locating internal policy gap and recording dependency findings, P remediation. N/A: 6.7–6.8 no verified upstream defect/discussion/fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5 and 7.7 full user trial, fresh scan/category/deduction/status/comparison evidence and multi-year outcomes absent. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are recorded;
+PR/independent-review/merge fields N/A. No activity-only public artifact, user,
+star, review, adoption, upstream contribution or score change is invented.
+
+### Publication and next task
+
+**Publication status at record preparation: pending D07.1 commit/push after completed local verification.** The final handoff must report actual SHA, remote/default-branch
+read-back, GitHub attribution and CI on that SHA; this record does not pre-claim
+those future outcomes. Preserve a local commit if pushing fails and report the
+safe exact reason. No force-push, history rewrite, identity/remote/visibility/
+protection change or unrelated dependency update is authorized by this record.
+
+**Implementation blockers: none. Publication verification remains pending at
+record preparation.**
+Next eligible task after completion: **D07.2 — persist sanitized events before
+acknowledging capture and attach expiry and parse flags.** Prerequisites:
+D06.1–D06.3 transport/preparation/media and completed D07.1 sanitizer. It has not
+been started. Stop after this one task and its verification/publication.

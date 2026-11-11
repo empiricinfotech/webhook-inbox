@@ -121,8 +121,9 @@ under the documented in-flight policy. No final-generation reservation is added.
 D06.2 provides [private JSON/form/text preparation](CAPTURE_PARSING.md), and D06.3
 now enforces the [media/coding/text-byte policy](CAPTURE_MEDIA.md). HTTP probes
 use supported text; arbitrary original bytes remain tested at the lower collector
-unit boundary and do not imply supported binary product captures. D07 owns redaction and
-sanitized persistence before acknowledgement. No first capture, public hosting,
+unit boundary and do not imply supported binary product captures. D07.1
+[redaction](CAPTURE_REDACTION.md) is implemented separately; D07.2 owns sanitized
+persistence before acknowledgement. No first capture, public hosting,
 release, quotas, load result or complete Day 06 acceptance is claimed.
 
 ## Verification

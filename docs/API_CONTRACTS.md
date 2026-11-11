@@ -157,3 +157,13 @@ PAYLOAD_TOO_LARGE/413 and UNSUPPORTED_MEDIA_TYPE/415 catalog entries in the opti
 router. Both retain static messages, correlated IDs, no-store and connection close;
 415 advertises Accept-Encoding: identity. HEAD is bodyless. No capture success or
 new shared error code is introduced. Normal startup still does not enable capture.
+
+
+## D07.1 internal sanitization boundary
+
+[createCaptureSanitizer](CAPTURE_REDACTION.md) composes private preparation with a
+closed Content-Type-only header projection, recursive configured JSON-key removal
+and optional complete body omission. The output includes redaction-policy/count/
+omission flags; it remains private data and is not a browser DTO or persistence
+acknowledgement. Normal startup still has no capture-to-store handler. No shared
+response/status contract or management endpoint changes in this task.

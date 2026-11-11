@@ -132,7 +132,8 @@ services, local metadata HTTP and shared error response contract. D05.3 is compl
 at those implemented boundaries. D06.1 now adds an [optional method/byte router](CAPTURE_TRANSPORT.md)
 using the eligibility guard; normal startup still has no capture-to-store handler.
 D06.2 adds [private metadata/parsing](CAPTURE_PARSING.md), and D06.3 adds
-[HTTP media rejection](CAPTURE_MEDIA.md). D07.1 redaction is next, before durable storage.
+[HTTP media rejection](CAPTURE_MEDIA.md). D07.1 [credential omission/JSON-key
+redaction](CAPTURE_REDACTION.md) is implemented; D07.2 durable storage is next.
 Day 06 individual component checks are complete; the first durable capture and
 release gates still require D07 and later work.
 

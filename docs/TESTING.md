@@ -238,3 +238,19 @@ raw byte vectors remain covered by collector unit tests. Unsupported-byte HTTP
 probes now expect 415 instead of probe delivery. The fixture's default text/plain
 is test-only; missing-type tests actually omit it on the wire. See the full
 [status and ordering matrix](CAPTURE_MEDIA.md). No UI/browser flow changed.
+
+
+## D07.1 credential omission and configured JSON redaction
+
+```bash
+npm test -- tests/unit/capture-sanitize.test.ts tests/api/capture-transport.test.ts
+```
+
+Eight unit checks and three real HTTP/Mongo checks verify recursive removal,
+case/escaped/literal/reserved names, primitive roots, input preservation, policy
+bounds/snapshotting/isolation, credential omission, optional body disabling,
+static failures/recovery and exact byte/depth boundaries. Text/form values are
+explicitly not claimed to be key-redacted. HTTP probes observe memory only, reply
+204 and persist no event. See [policy and limitations](CAPTURE_REDACTION.md).
+Browser checks are not applicable; no UI changed. Stored-event/outage acceptance
+remains D07.2/D07.3 work.

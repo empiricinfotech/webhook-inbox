@@ -684,7 +684,7 @@ Prerequisite: D05. Modules: M03. Planned effort: 5 to 6 hours.
 
 Prerequisite: D06. Modules: M03 M08. Planned effort: 5 to 6 hours.
 
-- [ ] **D07.1** Implement credential-header omission and recursive configured JSON-key redaction.
+- [x] **D07.1** Implement credential-header omission and recursive configured JSON-key redaction. [Policy and verification](CAPTURE_REDACTION.md).
 
 - [ ] **D07.2** Persist sanitized events before acknowledging capture and attach expiry and parse flags.
 

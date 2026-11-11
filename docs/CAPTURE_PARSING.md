@@ -21,14 +21,15 @@ These tests own disposable loopback HTTP/Mongo resources and use synthetic data.
 The composed test handler calls prepareCapture(raw), observes the result in
 memory and ends with 204. This probe creates no event or capture acknowledgement.
 The existing optional router still requires an explicit downstream handler.
-A future handler may call prepareCapture(raw) before the real sanitization/store
-step; configured signature verification must inspect raw.rawBody first. Keep raw
+The D07.1 [sanitizer](CAPTURE_REDACTION.md) now calls prepareCapture(raw) internally;
+configured signature verification must inspect raw.rawBody first. Keep raw
 input ephemeral, and never log, queue, export or persist it.
 
 PreparedCapture contains internal inbox identifiers, metadata and body. It omits
 rawBody and the original header map. It is still private: successfully parsed
 JSON/form/text may contain secrets and is NOT safe to persist or expose. D07.1
-must sanitize it and D07.2 must durably store before returning 201/captured:true.
+provides a separate sanitizer; D07.2 must durably store its output before returning
+201/captured:true.
 No default handler, raw vault, forwarding, event store or success response is added.
 
 ## Metadata contract
@@ -100,8 +101,8 @@ Unsupported headers or nontext wire bytes yield 415; overflow yields 413. Direct
 internal preparation calls still report static flags, while malformed JSON/form
 syntax in otherwise valid wire text continues to produce parse-failure flags.
 
-D07 redaction/storage, D09 rendering, D20 signatures, browser journeys, provider
-capture-to-store examples and all release gates remain pending. Plain text can
+D07.1 redaction is implemented separately. D07.2 storage, D09 rendering, D20
+signatures, browser journeys, provider capture-to-store examples and all release gates remain pending. Plain text can
 contain sensitive information; no universal body-safety guarantee is made.
 
 ## Verification and references
