@@ -4,9 +4,10 @@ import { z } from "zod";
 import { EnvironmentConfigurationError, parseEnvironment } from "@empiric-webhook-inbox/contracts/environment";
 import { readLocalInboxEnvironment } from "./config/local-inbox.js";
 import { connectDatabase, type Database } from "./database.js";
-import { readWebOrigin } from "./config/local-dashboard.js";
+import { readLocalCapturePolicy, readWebOrigin } from "./config/local-dashboard.js";
 import { createCaptureTokenCrypto } from "./security/capture-token.js";
 import { createLocalInboxRouter } from "./routes/local-inboxes.js";
+import { createLocalCaptureRouter } from "./routes/local-capture.js";
 import { startServer } from "./server.js";
 
 const logger = pino();
@@ -25,9 +26,10 @@ try {
     actorId: new Types.ObjectId(config.LOCAL_OWNER_ID), workspaceId: new Types.ObjectId(config.LOCAL_WORKSPACE_ID),
     webOrigin: extra.LOCAL_WEB_ORIGIN, apiHost: `127.0.0.1:${extra.API_PORT}`,
   });
+  const capture = createLocalCaptureRouter(connected.connection, crypto, new Types.ObjectId(config.LOCAL_WORKSPACE_ID), readLocalCapturePolicy());
   let stopping = false;
   const server = await startServer({ NODE_ENV: config.NODE_ENV, MONGODB_URI: config.MONGODB_URI,
-    API_PORT: extra.API_PORT, API_HOST: "127.0.0.1" }, () => connected.isReady(), logger, routes);
+    API_PORT: extra.API_PORT, API_HOST: "127.0.0.1" }, () => connected.isReady(), logger, routes, capture);
   logger.info({ host: "127.0.0.1", port: extra.API_PORT }, "Local dashboard API listening");
   const stop = () => {
     if (stopping) return;

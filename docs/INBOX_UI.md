@@ -7,7 +7,8 @@ metadata and reload the detail URL. The interface has loading, validation,
 connection-error, missing-inbox and empty states. Data flows from Next.js Client
 Components through same-origin /api/v1 to Express and Mongo. Next never connects
 to Mongo or receives the encryption key. This is an unauthenticated local-only
-preview, not a hosted dashboard or a working capture endpoint.
+preview, not a hosted dashboard. D07.2 adds a loopback-only durable capture
+receiver, but this UI does not expose capture URLs or event inspection.
 
 ## Start the interface
 
@@ -112,7 +113,7 @@ it has no rename/disable/rotation controls or token reveal/rotation endpoint.
 D05.3 now verifies saved disabled metadata through detail/list/HEAD/reloaded
 routers, invalid-input responses and old-token invalidation. A production service
 guard plus the real shared error handler produce 404/410/503 in a test-only HTTP
-adapter. This is not an installed capture route; that receiver belongs to D06.
+adapter. D07.2 subsequently installs the separate local durable receiver.
 No session/signup/membership, capture processing, event list, worker, release
 or deployment is added by the interface task.
 

@@ -90,7 +90,7 @@ It neither accepts bytes nor persists/acknowledges an event.
 
 The shared Express error handler already maps these codes to 404/410/503. D05.3
 verifies that real guard/handler composition with a test-only HTTP adapter;
-there is still no installed capture receiver. Ownership checks and writes remain separate;
+D07.2 later installs a scoped local capture receiver. Ownership checks and writes remain separate;
 later owner-transfer/deletion workflows need their own concurrency policy.
 No session authentication, membership revocation or audit trail is claimed.
 
@@ -125,7 +125,7 @@ D05.3 adds five focused tests in tests/api/inbox-management-responses.test.ts:
 The HTTP eligibility adapter exists only in tests and contains no duplicated
 policy decisions. Its 200 response exposes target metadata to the test, not a
 product capture acknowledgement; an events count check confirms no capture was
-stored. These tests do not claim a product /capture endpoint exists.
+stored. These earlier tests do not exercise the D07.2 local receiver.
 
 Day 05's create/disable/old-token acceptance is demonstrated through the existing
 services, local metadata HTTP and shared error response contract. D05.3 is complete
@@ -133,9 +133,8 @@ at those implemented boundaries. D06.1 now adds an [optional method/byte router]
 using the eligibility guard; normal startup still has no capture-to-store handler.
 D06.2 adds [private metadata/parsing](CAPTURE_PARSING.md), and D06.3 adds
 [HTTP media rejection](CAPTURE_MEDIA.md). D07.1 [credential omission/JSON-key
-redaction](CAPTURE_REDACTION.md) is implemented; D07.2 durable storage is next.
-Day 06 individual component checks are complete; the first durable capture and
-release gates still require D07 and later work.
+redaction](CAPTURE_REDACTION.md) is implemented; D07.2 adds [local durable
+capture](CAPTURE_STORAGE.md). D07.3 and later work remain for release gates.
 
 Primary references: [Mongoose atomic updates](https://mongoosejs.com/docs/tutorials/findoneandupdate.html#atomic-updates),
 [update validation](https://mongoosejs.com/docs/validation.html#update-validators)

@@ -167,3 +167,12 @@ and optional complete body omission. The output includes redaction-policy/count/
 omission flags; it remains private data and is not a browser DTO or persistence
 acknowledgement. Normal startup still has no capture-to-store handler. No shared
 response/status contract or management endpoint changes in this task.
+
+
+## D07.2 local durable capture
+
+The opt-in [local receiver](CAPTURE_STORAGE.md) returns 201 with
+`data.eventId` and `data.captured:true` only after a journaled majority Mongo
+acknowledgment. HEAD is bodyless. Storage failures use the existing safe 503
+contract; an uncertain failure can still have committed. Normal dev:api remains
+health-only. No shared response schema or management read endpoint is added.

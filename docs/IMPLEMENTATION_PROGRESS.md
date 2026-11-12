@@ -3054,3 +3054,173 @@ Next eligible task after completion: **D07.2 — persist sanitized events before
 acknowledging capture and attach expiry and parse flags.** Prerequisites:
 D06.1–D06.3 transport/preparation/media and completed D07.1 sanitizer. It has not
 been started. Stop after this one task and its verification/publication.
+
+
+## 2026-11-12 — D07.2: durable sanitized capture with expiry and parse flags
+
+**Implementation status: completed.** Exactly one task
+selected. Publication is recorded separately below. No TASK_BOARD.md exists.
+
+### Selection, prerequisites and authorship
+
+Started clean on main tracking origin/main at
+ce33682ed0b8a5ec295a7973af20dc6c2e04e625; fresh fetch showed 0 ahead/0 behind.
+Inspected current source, tests, package scripts, CI, branch, upstream, recent
+commits, working tree, applicable ancestor instructions (none), project plan,
+entire growth checklist, progress, README/contribution/local-development and
+capture, token and data-model guides. Only apps/web/AGENTS.md exists and applies
+to unchanged frontend files. Existing bounded transport, token eligibility,
+parsing and sanitizer were inspected; no event store or product capture handler
+existed. D07.2 is the earliest unfinished task after D07.1. D07.3's broader
+outage, hostile HTML and stored nested-fixture regressions remain separate.
+
+Origin fetch/push destinations were parsed with userinfo and sensitive parameters
+withheld and match https://github.com/empiricinfotech/webhook-inbox; upstream also
+matches. Embedded credential location: .git/config remote.origin.url. Only that
+location was reported; secure credential-manager storage is recommended. No value
+was printed, changed, removed or rotated. No remote, visibility, Git identity or
+history settings were changed.
+
+GitHub main matched D07.1; its author and committer both map to empiricinfotech.
+[Foundation CI 42992907972](https://github.com/empiricinfotech/webhook-inbox/actions/runs/42992907972)
+was completed/success for that SHA, resolving the prior pre-commit publication
+note. Effective author/committer remain empiricinfotech <empiricinfotech@gmail.com>.
+Repository ownership, authentication and attribution are distinct; no human
+coauthor, independent review or score credit is invented. Main is unprotected,
+rulesets are empty and the established explicitly authorized direct-main workflow
+applies. Existing [v0.1 milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1)
+tracks the broader work; duplicate issue/PR search found no D07.2 equivalent.
+No issue, PR, release, tag, public post or milestone closure was created for activity.
+
+### Work, files and individual acceptance
+
+- apps/api/src/services/capture-events.ts: strict allowlisted server-only event
+  validation and one Mongo insert with majority journal acknowledgement and a
+  10-second driver deadline. Writes contain only sanitized data and explicit UTC
+  receivedAt/expiresAt, format, parse failure and redaction flags; signature state
+  is explicitly unverified. No raw bytes, inbound headers, token or URL is stored.
+- apps/api/src/routes/local-capture.ts; apps/api/src/local-dashboard.ts: opt-in
+  local workspace-scoped token eligibility, sanitize/store/201 composition and
+  bodyless HEAD. Foreign scopes are hidden before enabled-state errors. Ordinary
+  dev:api remains health-only. Existing arrival-time eligibility snapshot semantics
+  remain; disabling or rotating after authorization does not cancel an in-flight upload.
+- apps/api/src/config/local-dashboard.ts: validated trusted local body-capture
+  option and additive bounded custom JSON-name list, snapshotted at server startup.
+  Defaults preserve existing configuration; settings apply to the local workspace,
+  not to separately editable inboxes. Invalid configuration reports field names only.
+- tests/api/capture-persistence.test.ts; tests/unit/local-capture-policy.test.ts:
+  ten new tests with owned disposable Mongo/HTTP resources. They cover actual saved
+  format/redaction/expiry/flags, original-secret omission, IDs, eligible/foreign/
+  disabled/rotated tokens, GET/HEAD/OPTIONS, write acknowledgment ordering,
+  errors/recovery/ambiguous writes, policy options and the real local-dashboard
+  process. Test data/credentials are synthetic and never printed as values.
+- docs/CAPTURE_STORAGE.md: storage schema, local configuration, security,
+  journaling, ambiguous-write, token-reveal and expiry limitations. README.md,
+  CONTRIBUTING.md, docs/API_CONTRACTS.md, CAPTURE_MEDIA.md, CAPTURE_PARSING.md,
+  CAPTURE_REDACTION.md, CAPTURE_TRANSPORT.md, DATA_MODELS.md, INBOX_MANAGEMENT.md,
+  INBOX_UI.md, LOCAL_DEVELOPMENT.md, LOCAL_INBOX.md, PROJECT_BRIEF.md, TESTING.md
+  and TOOLCHAIN.md: current status and related boundaries reconciled.
+- docs/PROJECT_DOCUMENTATION.md; docs/IMPLEMENTATION_PROGRESS.md: update only the
+  selected task checkbox after checks; preserve all previous progress history.
+
+The safeBody field is a BSON string containing serialized sanitized JSON or form
+pairs, a plain string for text, or null for metadata/omitted/unparsed formats.
+This preserves arbitrary JSON keys as inert data without BSON field-name semantics.
+A valid token may store a static parse-failure record with null body. Redaction
+removes configured JSON properties, not arbitrary string contents or text/form
+values. Local operators can disable body capture; the UI/CLI does not yet reveal
+capture URLs or inspect events. There is no hosted exposure, raw vault, signature
+verification, event list, automatic retry, deletion, quota or worker in this task.
+
+MongoDB journaled majority acknowledgement precedes 201; HEAD has no response
+body. A failed or timed-out acknowledgment returns 503 but may have committed;
+no claim of zero writes on an ambiguous failure or exactly-once delivery is made.
+A separate repeated delivery creates another event. Expiry is recorded but TTL,
+cleanup and read-time enforcement remain D18; records do not yet auto-expire.
+D07.3, the full Day 07 stored-fixture/outage acceptance, event inspection, and
+v0.1 release gates remain pending. The UI was unchanged.
+
+### Verification
+
+Node 24.22.0/npm 11.19.1 were restored to /tmp with the official archive SHA-256
+verified. `npm run bootstrap` installed the committed lockfile in an owned clean
+snapshot; native MongoDB 8.0.32 runs fixture-owned temporary instances and data.
+No normal database, private environment file or running service was read/reset.
+The first focused run found one test harness signature/cleanup error; it was fixed,
+then lint, strict types and all ten focused tests passed without weakened checks.
+
+Commands with pinned PATH, MONGOD_BINARY=/usr/bin/mongod,
+NEXT_TELEMETRY_DISABLED=1 and CIRCLE_NODE_TOTAL=2:
+
+```bash
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm test -- tests/unit/local-capture-policy.test.ts tests/api/capture-persistence.test.ts
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+git diff --check
+git diff --cached --check
+```
+
+All 13 required commands passed on the final source: pinned toolchain, frozen
+install, dependency tree/imports, lint, strict types, 130 normal tests in 22 files,
+six contract tests, the unchanged contract failure/correction gate (only the
+intentional red assertion failed; corrected full suite 131 passed), foundation (5),
+Mongo lifecycle (6), contracts/Express/Next production build, compiled API (6),
+and development routing (3). Source bytes equal the tested clean snapshot; only
+documentation status/evidence was finalized afterward. Local links/fences,
+credential-pattern scanning, preserved history and git diff --check passed;
+task-only staged diff and whitespace are verified immediately before commit.
+The previous gate failure did not recur and is not claimed fixed. Frozen install
+reported 12 advisories (10 moderate, 2 high), not an audit pass or remediation.
+Dependency maintenance remains pending without unrelated upgrades. The prior
+D06.3 unreproduced corrected-suite gate failure remains a reliability finding;
+no cause or fix is asserted. No performance, adoption, independent review,
+release or GHFind score gain is claimed.
+
+Not run: browser checks (no UI change); complete capture-to-inspect/delete journey;
+D07.3's broader real database outage, hostile rendering and stored-fixture suite;
+signatures, sessions, replay, deployment, release, unfamiliar-user trial,
+independent review and GHFind scan. These remain pending, not claimed as passes.
+
+### Growth checklist — all checkpoints considered for this run
+
+C = completed for this task/run; P = pending; N/A = not applicable. No lifetime
+phase is permanently complete; no checkpoint was blocked by essential access.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1–0.2, 0.4–0.5 existing public scope/account, private-data boundary and attribution. P: 0.3 complete independently usable journey; 0.6–0.7 fresh score/category/deduction and freshness evidence (scan not requested). |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 current documentation/commands/pins and retained placeholder config, MIT, contribution guide and roadmap. 1.5 C for synthetic component checks, P full product demo. P: 1.1 metadata unchanged; 1.10 independent clean-setup trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 missing durable capture need, duplicate search/reused milestone, intended behavior, acceptance and one scope. N/A: 2.5 no incoming bug report requiring reproduction. |
+| 3 build/check/review | **C for applicable local work.** 3.2 C meaningful behavior/checks; 3.4 C attribution/tracking inspected. N/A: 3.1, 3.3 no PR or independent feedback in authorized direct-main workflow. 3.5 P remote/default-branch CI/read-back. Numbered steps 2–5 and 8 apply; 1, 6–7, 9 N/A; 10 follows publication; milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 full user journey, matching release examples, version/tag, notes, distribution, demo and link gates pending; component checks are not release acceptance. C: 4.8 retained safe reporting instructions. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 profile/tutorial/outreach/invitations, real user support and outside contribution/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C scoped duplicate inspection, P ongoing wider triage. 6.3 C pinned compatibility and passing regressions; advisories and prior unreproduced gate failure P. N/A: 6.2, 6.4 no incoming user bug/recurring question. P: 6.5 fix releases when ready. 6.6 C locating internal persistence gap and preserving dependency findings; P remediation. N/A: 6.7–6.8 no verified upstream issue, discussion or fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5 and 7.7 full user trial, fresh scan/category/deduction/status/comparison evidence and multi-year outcomes absent. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are reflected
+above; PR/independent-review/merge fields N/A. No fabricated users, stars, reviews,
+adoption, upstream contribution, activity-only artifact or score change.
+
+### Publication and next task
+
+**Publication status at record preparation: pending D07.2 commit/push after completed local checks.** The final handoff must report actual SHA, branch, remote read-back,
+GitHub attribution and hosted CI for that SHA. Preserve a local commit if pushing
+fails and report the safe reason; do not force-push or change identity/remotes.
+
+**Implementation blockers: none. Publication verification remains pending at
+record preparation.**
+Next eligible task after completion: **D07.3 — test database failure, hostile HTML
+content and redaction on nested fixture data.** Its prerequisites are D06 and
+completed D07.1–D07.2. It has not been started. Stop after this one task and its
+necessary verification/documentation/publication.

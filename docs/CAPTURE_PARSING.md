@@ -6,7 +6,7 @@ The Express API now provides prepareCapture in apps/api/src/capture/prepare.ts.
 It consumes the validated [raw transport input](CAPTURE_TRANSPORT.md), creates a
 small metadata projection and parses JSON, URL-encoded form or text as inert data.
 It is an internal, synchronous preparation step, not an event model or public DTO.
-Normal API/local-dashboard startup still does not mount product capture.
+Normal API startup remains health-only; D07.2 enables [durable local capture](CAPTURE_STORAGE.md) in local:dashboard.
 
 ## Exercise and compose
 
@@ -28,9 +28,9 @@ input ephemeral, and never log, queue, export or persist it.
 PreparedCapture contains internal inbox identifiers, metadata and body. It omits
 rawBody and the original header map. It is still private: successfully parsed
 JSON/form/text may contain secrets and is NOT safe to persist or expose. D07.1
-provides a separate sanitizer; D07.2 must durably store its output before returning
-201/captured:true.
-No default handler, raw vault, forwarding, event store or success response is added.
+provides a separate sanitizer. D07.2 [stores its output](CAPTURE_STORAGE.md)
+before returning 201/captured:true in the opt-in local receiver. The D06.2
+preparation function itself neither stores nor acknowledges capture.
 
 ## Metadata contract
 
@@ -101,8 +101,8 @@ Unsupported headers or nontext wire bytes yield 415; overflow yields 413. Direct
 internal preparation calls still report static flags, while malformed JSON/form
 syntax in otherwise valid wire text continues to produce parse-failure flags.
 
-D07.1 redaction is implemented separately. D07.2 storage, D09 rendering, D20
-signatures, browser journeys, provider capture-to-store examples and all release gates remain pending. Plain text can
+D07.1 redaction and D07.2 local storage are implemented separately. D07.3
+regressions, D09 rendering, D20 signatures, browser journeys and release gates remain pending. Plain text can
 contain sensitive information; no universal body-safety guarantee is made.
 
 ## Verification and references

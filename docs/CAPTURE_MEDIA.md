@@ -5,8 +5,8 @@ D06.3 | 5 November 2026
 The optional Express capture router now rejects oversized, unsupported binary
 and compressed requests before any downstream handler receives a complete body.
 This completes the method/byte/preparation/media components in D06.1–D06.3.
-Normal API/local-dashboard startup still has no capture-to-store handler. D07.1
-[redaction](CAPTURE_REDACTION.md) is available internally; D07.2 durable persistence must precede a product capture acknowledgement.
+Normal API startup has no capture handler. D07.1 [redaction](CAPTURE_REDACTION.md)
+and D07.2 [durable local storage](CAPTURE_STORAGE.md) are now composed in local:dashboard.
 
 ## Run the acceptance checks
 
@@ -96,8 +96,8 @@ data, not transport byte decoding. No partial parse fallback is persisted.
 
 All Day 06 individual components are now available. JSON/text accepted by the
 transport and oversize rejection are demonstrated with the probe. The durable
-capture/inspect journey and M03 completion still need D07.2 durable storage and
-later UI work; no release/milestone issue is closed. D07.2 is the next task.
+capture/inspect journey and M03 completion still need D07.3 acceptance and
+later UI work; no release/milestone issue is closed. D07.3 is the next task.
 
 ## Evidence and references
 

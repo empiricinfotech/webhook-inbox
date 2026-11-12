@@ -4,10 +4,10 @@ D06.1 | 3 November 2026
 
 The separate Express backend now provides an optional capture router and a bounded
 original-byte collector. A caller must supply the existing token-eligibility
-service and an explicit downstream handler. Ordinary API and local-dashboard
-startup do not mount this router. D06.2 adds [private preparation](CAPTURE_PARSING.md)
-for explicit composition; D06.3 adds [HTTP media rejection](CAPTURE_MEDIA.md).
-Redaction and durable storage are still later tasks. No default handler returns a fake capture success.
+service and an explicit downstream handler. Ordinary API startup does not mount
+this router. D06.2 adds [private preparation](CAPTURE_PARSING.md); D06.3 adds
+[HTTP media rejection](CAPTURE_MEDIA.md). D07.1 adds redaction and D07.2 composes
+the [durable local receiver](CAPTURE_STORAGE.md) in local:dashboard.
 
 ## Exercise the boundary
 
@@ -23,7 +23,7 @@ npm test -- tests/unit/capture-body.test.ts tests/api/capture-transport.test.ts
 
 The integration probe observes byte delivery and replies 204 in tests only. It
 does not create events, return an event ID or claim successful capture. A product
-provider example/cURL journey must wait for the real sanitized persistence path.
+provider example/cURL journey also needs a user-facing capture-token reveal.
 
 ## Composition contract
 
@@ -41,14 +41,14 @@ shipped by D06.1. It receives RawCaptureInput plus the Express response and must
 complete its response. An omitted handler fails composition; a handler that
 returns without ending the response becomes INTERNAL_ERROR. Consumer exceptions
 use the existing safe error boundary. Only the later durable-storage path may
-return 201 with eventId/captured:true, after storage actually succeeds.
+return 201 with eventId/captured:true after storage actually succeeds; D07.2 now supplies that local handler.
 
 RawCaptureInput contains method, safe internal inbox target, unnormalized raw
 headers, server-generated receivedAt Date, rawBody Buffer and receivedBytes. Headers and raw bytes are untrusted,
 private, ephemeral input: never log, persist, export or queue them before the
 later sanitization policy. No original URL/capture token is added to the input.
 The raw router has no parser; D06.2 preparation can be explicitly composed.
-There is no raw vault, forwarding, signature verification or event model.
+There is no raw vault, forwarding or signature verification; D07.2 supplies a separate event storage contract.
 
 ## Methods and raw-byte behavior
 
@@ -122,8 +122,8 @@ D06.2 provides [private JSON/form/text preparation](CAPTURE_PARSING.md), and D06
 now enforces the [media/coding/text-byte policy](CAPTURE_MEDIA.md). HTTP probes
 use supported text; arbitrary original bytes remain tested at the lower collector
 unit boundary and do not imply supported binary product captures. D07.1
-[redaction](CAPTURE_REDACTION.md) is implemented separately; D07.2 owns sanitized
-persistence before acknowledgement. No first capture, public hosting,
+[redaction](CAPTURE_REDACTION.md) is implemented separately; D07.2 adds sanitized
+local persistence before acknowledgement. No complete capture journey, public hosting,
 release, quotas, load result or complete Day 06 acceptance is claimed.
 
 ## Verification

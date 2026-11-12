@@ -2,7 +2,7 @@
 
 A self-hostable developer tool planned for capturing, inspecting, comparing and replaying sanitized webhook test events.
 
-**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Local bootstrap and inbox creation/list/detail UI are implemented; capture and releases remain future work.
+**Status:** local application foundation. The Next.js overview/setup shell and separate Express API now run locally with MongoDB connectivity, validated environment configuration and liveness/readiness checks. Local bootstrap, inbox creation/list/detail UI and a loopback-only durable capture receiver are implemented; event inspection and releases remain future work.
 
 ## Why this project exists
 
@@ -63,7 +63,7 @@ npm run dev:web
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000) and follow **Local setup**, or open `/setup` directly. Run `npm run check:foundation` for configuration, provider isolation and API startup checks. Stop either service with Ctrl+C.
 
-Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives, owner retrieval and rotation](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. The [local inbox UI](docs/INBOX_UI.md) now connects to an explicitly enabled local-only management API; capture remains pending. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
+Express exposes `/health/live` (process liveness) and `/health/ready` (Mongo ping); readiness returns 503 during a database outage. In development, same-origin `/api/v1` requests through Next.js reach Express; the currently unimplemented management routes return the shared JSON `NOT_FOUND` error with a server-generated `X-Request-Id` matching `error.requestId`. Capture and health URLs are accessed directly on Express. [Workspace/inbox metadata schemas](docs/DATA_MODELS.md) now validate persistence; [capture-token primitives, owner retrieval and rotation](docs/CAPTURE_TOKENS.md) are implemented internally. [Local operator bootstrap and creation/list services](docs/LOCAL_INBOX.md) are available. The [local inbox UI](docs/INBOX_UI.md) connects to an explicitly enabled local-only management API; [durable capture](docs/CAPTURE_STORAGE.md) is available through the same local API when a capture token is supplied. [Local development](docs/LOCAL_DEVELOPMENT.md) documents configuration, routing and build/check commands. See [local MongoDB and health](docs/MONGODB_LOCAL.md) for persistent volumes and real-database checks.
 
 ```bash
 npm run lint
@@ -109,7 +109,7 @@ This unauthenticated entry point is loopback-only and must not be publicly proxi
 - **Data and worker:** MongoDB/Mongoose stores sanitized events and durable jobs; a separate Node worker will handle retention cleanup and controlled replay.
 - **Hosting:** a shared origin will route frontend pages to Next.js and API/capture/health paths to Express. UI route guards do not replace API permission checks.
 
-The frontend shell, Express startup, MongoDB connection and health checks are implemented; capture-token primitives and internal owner retrieval are implemented. Local operator inbox creation/listing is implemented; event storage and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
+The frontend shell, Express startup, MongoDB connection and health checks are implemented; capture-token primitives and internal owner retrieval are implemented. Local operator inbox creation/listing and loopback-only event storage are implemented; event inspection and the remaining runtime components are planned. [PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) is the authoritative architecture and ordered backlog.
 
 ## Repository layout
 
@@ -147,7 +147,7 @@ All four releases are future work. Development-day ranges are effort estimates r
 | v0.3 Team and replay beta | 21 to 30 | Roles, collaboration, audit history and controlled replay | [Issue #3](https://github.com/empiricinfotech/webhook-inbox/issues/3) |
 | v1.0 Public release | 31 to 40 | Compare/export, scoped read tokens, self-hosting and recovery evidence | [Issue #4](https://github.com/empiricinfotech/webhook-inbox/issues/4) |
 
-Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 adds [owner-scoped rename, disable and token-rotation services](docs/INBOX_MANAGEMENT.md). D05.3 verifies validation, old-token invalidation and disabled responses at the service/shared-error and local metadata HTTP boundaries. D06.1 adds an [optional method/byte transport boundary](docs/CAPTURE_TRANSPORT.md) requiring an explicit downstream handler; ordinary startup still has no capture-to-store flow. D06.2 adds [private metadata and JSON/form/text preparation](docs/CAPTURE_PARSING.md). D06.3 adds [HTTP size/media rejection](docs/CAPTURE_MEDIA.md). D07.1 adds [credential omission and configured JSON-key redaction](docs/CAPTURE_REDACTION.md). D07.2 durable storage is next; no product capture acknowledgement is available.
+Each issue contains observable release criteria. [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md) records completed tasks separately from pending release work. D01.1–D04.3 are complete. D05.1 inbox management UI is complete. D05.2 adds [owner-scoped rename, disable and token-rotation services](docs/INBOX_MANAGEMENT.md). D05.3 verifies validation, old-token invalidation and disabled responses at the service/shared-error and local metadata HTTP boundaries. D06.1 adds an [optional method/byte transport boundary](docs/CAPTURE_TRANSPORT.md) requiring an explicit downstream handler; ordinary startup still has no capture-to-store flow. D06.2 adds [private metadata and JSON/form/text preparation](docs/CAPTURE_PARSING.md). D06.3 adds [HTTP size/media rejection](docs/CAPTURE_MEDIA.md). D07.1 adds [credential omission and configured JSON-key redaction](docs/CAPTURE_REDACTION.md). D07.2 adds [local durable capture](docs/CAPTURE_STORAGE.md); D07.3 is next. The UI and CLI do not yet reveal capture URLs or inspect stored events.
 
 ## Data and scope boundaries
 

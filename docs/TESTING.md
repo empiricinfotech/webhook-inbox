@@ -183,7 +183,7 @@ continued validity. The production requireEnabledForCapture service guard is
 composed with the real shared Express error handler in a test-only adapter to
 verify 404/410/503, request correlation, no-store responses and private logs.
 The adapter does not implement a product endpoint or persist an event. The
-application's capture-to-store receiver and persistence remain later work.
+D07.2 later adds the [local capture-to-store receiver](CAPTURE_STORAGE.md).
 D06.1 now adds the optional bounded method/byte transport described below. See [management acceptance and limits](INBOX_MANAGEMENT.md).
 
 Normal npm test and the unchanged CI workflow discover all five automatically;
@@ -253,4 +253,18 @@ static failures/recovery and exact byte/depth boundaries. Text/form values are
 explicitly not claimed to be key-redacted. HTTP probes observe memory only, reply
 204 and persist no event. See [policy and limitations](CAPTURE_REDACTION.md).
 Browser checks are not applicable; no UI changed. Stored-event/outage acceptance
-remains D07.2/D07.3 work.
+is covered in part by D07.2; broader stored-fixture/outage checks remain D07.3 work.
+
+
+## D07.2 local durable capture
+
+```bash
+npm test -- tests/unit/local-capture-policy.test.ts tests/api/capture-persistence.test.ts
+```
+
+Ten focused tests check trusted policy validation, real Mongo storage/expiry and
+parse flags, scoped eligibility, acknowledgment ordering, safe error/recovery,
+ambiguous outcomes and the actual opt-in local dashboard process. Tests use
+synthetic data and exclusively owned local Mongo/HTTP resources. See
+[storage policy](CAPTURE_STORAGE.md); browser UI is unchanged. Broader hostile HTML,
+database outage and stored nested-fixture coverage belongs to D07.3.

@@ -165,7 +165,7 @@ D03.2 runs these six contract regressions through Vitest and adds Supertest
 checks with owned disposable Mongo processes/data; see [testing](TESTING.md).
 Legacy Node lifecycle/routing checks remain available without being collected
 by Vitest.
-No inbox capture, independent user trial, hosted deployment or release is claimed.
+D07.2 now provides [local durable capture](CAPTURE_STORAGE.md); no independent user trial, hosted deployment or release is claimed.
 On this constrained verification host, CIRCLE_NODE_TOTAL=2 limits build workers;
 no resource override is committed. Detailed results are in
 [implementation progress](IMPLEMENTATION_PROGRESS.md).
@@ -195,4 +195,5 @@ available. createApiServer supplies Node CONNECT rejection and controlled
 excludes capture. D06.2 now provides [private metadata and parsing](CAPTURE_PARSING.md)
 for explicit composition. D06.3 enforces [media/size rejection](CAPTURE_MEDIA.md)
 in that optional router. D07.1 now supplies [internal redaction](CAPTURE_REDACTION.md).
-D07.2 durable storage must precede enabling the product receiver.
+D07.2 now composes [durable local capture](CAPTURE_STORAGE.md) in local:dashboard.
+The normal dev:api path stays health-only; event inspection and token reveal are pending.

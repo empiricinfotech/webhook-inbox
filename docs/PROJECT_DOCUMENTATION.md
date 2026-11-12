@@ -686,7 +686,7 @@ Prerequisite: D06. Modules: M03 M08. Planned effort: 5 to 6 hours.
 
 - [x] **D07.1** Implement credential-header omission and recursive configured JSON-key redaction. [Policy and verification](CAPTURE_REDACTION.md).
 
-- [ ] **D07.2** Persist sanitized events before acknowledging capture and attach expiry and parse flags.
+- [x] **D07.2** Persist sanitized events before acknowledging capture and attach expiry and parse flags. [Local storage and verification](CAPTURE_STORAGE.md).
 
 - [ ] **D07.3** Test database failure, hostile HTML content and redaction on nested fixture data.
 

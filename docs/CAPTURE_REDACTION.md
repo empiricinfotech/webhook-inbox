@@ -29,15 +29,15 @@ const sanitize = createCaptureSanitizer({
   captureBody: true,
 });
 const sanitized = sanitize(raw); // private input from the optional capture router
-// D07.2 must durably persist only sanitized data before acknowledging capture.
+// The D07.2 local receiver persists sanitized data before acknowledging capture.
 ```
 
 For synthetic JSON
 `{"password":"synthetic-secret","nested":[{"private_value":1,"keep":true}]}`,
 this policy produces `{"nested":[{"keep":true}]}` and reports two removed keys.
-Examples/tests use synthetic data. Ordinary API/local-dashboard startup remains
-unchanged: it does not mount a product capture receiver. HTTP tests observe results
-in memory and return 204 only; they store no event and return no event ID.
+Examples/tests use synthetic data. The D07.1 HTTP probe observes results in memory
+and returns 204 only. D07.2 now mounts [durable capture](CAPTURE_STORAGE.md) in the
+opt-in local dashboard; ordinary API startup remains health-only.
 
 ## Header omission
 
@@ -107,7 +107,7 @@ checks compose the existing token eligibility/transport with the sanitizer and
 verify private logs/errors, per-policy isolation, GET/HEAD/OPTIONS and recovery.
 No event is inserted. Normal test discovery and Foundation CI include the checks.
 
-D07.2 is next: event persistence, expiry/parse/redaction flags and acknowledgement
-only after successful storage. D07.3 database-failure/stored-fixture checks,
+D07.2 now stores events and expiry/parse/redaction flags before acknowledgment.
+D07.3 database-failure/stored-fixture checks,
 D09 safe rendering, D20 signatures and all release gates remain pending. The
 Day 07 stored-secret/outage acceptance is not claimed by this individual task.

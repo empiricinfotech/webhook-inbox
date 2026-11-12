@@ -2,7 +2,7 @@
 
 D01.3 | Verified 21 October 2026 | Linux x64
 
-This records the D01.3 dependency/bootstrap baseline. D02.1 subsequently adds the application shell and startup checks documented in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md); D02.2 adds the Mongo connection/health checks documented in [MONGODB_LOCAL.md](MONGODB_LOCAL.md); capture remains pending.
+This records the D01.3 dependency/bootstrap baseline. D02.1 subsequently adds the application shell and startup checks documented in [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md); D02.2 adds the Mongo connection/health checks documented in [MONGODB_LOCAL.md](MONGODB_LOCAL.md); D07.2 later adds [local durable capture](CAPTURE_STORAGE.md), while the complete inspection journey remains pending.
 
 ## Runtime and package manager
 

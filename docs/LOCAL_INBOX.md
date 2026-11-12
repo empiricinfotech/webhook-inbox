@@ -69,7 +69,7 @@ Successful commands emit a data object. Creation/list entries contain only:
 id, workspaceId, name, description, enabled, retentionDays, createdAt and updatedAt.
 IDs are canonical strings and timestamps are UTC ISO 8601 strings. New inboxes
 are enabled with seven-day retention metadata. No token, hash, encrypted envelope,
-key or capture URL is printed. Capture/HTTP token retrieval are not implemented;
+key or capture URL is printed. CLI/HTTP token retrieval are not implemented;
 this command cannot yet receive a webhook.
 Errors return a static error.code on stderr and exit nonzero, without private
 input, environment values, argv, URI, driver messages or causes. Bad configuration
@@ -123,11 +123,12 @@ Day 04's created-inbox/secret-free list criterion is exercised through backend
 services and the operator command. It does not require Day 05's UI or infer a
 shipped HTTP list endpoint. The CLI retains an internal array; D05.1 supplies
 HTTP pagination. Inbox quotas remain future policy work. No signup, password/session/membership,
-capture route, event storage, hosted deployment or release is added by this
+capture route or event storage was added by this CLI task; D07.2 later adds
+[local durable capture](CAPTURE_STORAGE.md). No hosted deployment or release was added by this
 operator flow. D05.1 supplies the separate [frontend and local transport](INBOX_UI.md).
 D05.2 adds [internal rename/disable/rotation services](INBOX_MANAGEMENT.md); the
 operator command still exposes only init/bootstrap/create/list. D05.3 verifies
-validation, old-token invalidation and disabled responses; D06.1 is next.
+validation, old-token invalidation and disabled responses; D07.2 later adds local durable capture and D07.3 is next.
 
 Primary references: [Mongoose Model.create/createIndexes](https://mongoosejs.com/docs/api/model.html),
 [Node file creation flags](https://nodejs.org/docs/latest-v24.x/api/fs.html#file-system-flags)
