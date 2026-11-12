@@ -108,6 +108,6 @@ verify private logs/errors, per-policy isolation, GET/HEAD/OPTIONS and recovery.
 No event is inserted. Normal test discovery and Foundation CI include the checks.
 
 D07.2 now stores events and expiry/parse/redaction flags before acknowledgment.
-D07.3 database-failure/stored-fixture checks,
-D09 safe rendering, D20 signatures and all release gates remain pending. The
-Day 07 stored-secret/outage acceptance is not claimed by this individual task.
+D07.3 adds [database-failure and stored nested-fixture checks](CAPTURE_REGRESSION.md)
+and demonstrates the Day 07 stored-secret/outage acceptance. D09 safe rendering,
+D20 signatures and all release gates remain pending.

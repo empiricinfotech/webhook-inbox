@@ -128,7 +128,7 @@ capture route or event storage was added by this CLI task; D07.2 later adds
 operator flow. D05.1 supplies the separate [frontend and local transport](INBOX_UI.md).
 D05.2 adds [internal rename/disable/rotation services](INBOX_MANAGEMENT.md); the
 operator command still exposes only init/bootstrap/create/list. D05.3 verifies
-validation, old-token invalidation and disabled responses; D07.2 later adds local durable capture and D07.3 is next.
+validation, old-token invalidation and disabled responses; D07.2 later adds local durable capture; D07.3 verifies its security/outage paths and D08.1 is next.
 
 Primary references: [Mongoose Model.create/createIndexes](https://mongoosejs.com/docs/api/model.html),
 [Node file creation flags](https://nodejs.org/docs/latest-v24.x/api/fs.html#file-system-flags)

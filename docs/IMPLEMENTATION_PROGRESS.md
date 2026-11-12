@@ -3224,3 +3224,164 @@ Next eligible task after completion: **D07.3 — test database failure, hostile 
 content and redaction on nested fixture data.** Its prerequisites are D06 and
 completed D07.1–D07.2. It has not been started. Stop after this one task and its
 necessary verification/documentation/publication.
+
+
+## 2026-11-12 — D07.3: database failure, hostile HTML and nested redaction tests
+
+**Implementation status: completed.** Exactly one task
+selected. Publication status is separate below. No TASK_BOARD.md exists.
+
+### Selection, prerequisites and attribution
+
+Started clean on main tracking origin/main at
+a5c16266ea568a3d2fff17477e5c97b68c9841df. Inspected the working tree, recent
+commits, branch/upstream, application code, current capture tests, package scripts
+and CI. Read applicable ancestor instructions (none), project architecture/backlog,
+the entire growth checklist, progress, README, contribution, local-development,
+capture transport/parsing/redaction/storage and testing guides. The sole repository
+AGENTS.md is scoped to unchanged apps/web. The real bounded transport, sanitizer,
+workspace-scoped receiver and journaled store exist; D07.3 is the earliest
+unfinished eligible task. No event inspection page exists; D09 owns safe rendering.
+
+Origin fetch/push destinations were parsed with userinfo/parameters withheld and
+match https://github.com/empiricinfotech/webhook-inbox; upstream also matches.
+Embedded credential location: .git/config remote.origin.url. Only the location was
+reported; credential-manager storage was recommended. No credential, remote,
+visibility, Git identity or history was changed.
+
+GitHub main matched D07.2; its author and committer both map to empiricinfotech.
+[Foundation CI 43163482044](https://github.com/empiricinfotech/webhook-inbox/actions/runs/43163482044)
+completed successfully on that exact SHA, resolving the earlier pre-commit
+publication note. Effective author/committer remain empiricinfotech
+<empiricinfotech@gmail.com>. Ownership, push authentication and Git attribution
+are separate; no human coauthor, independent review or score gain is inferred.
+Main is unprotected and rulesets are empty; the established explicitly authorized
+direct-main workflow applies. Duplicate issue/PR search found no D07.3 equivalent;
+the existing [v0.1 milestone issue #1](https://github.com/empiricinfotech/webhook-inbox/issues/1)
+tracks the broader release. No activity-only issue, PR, tag, release or post was
+created; milestone issues remain open and unchanged.
+
+### Work and individual acceptance
+
+- tests/fixtures/capture-security.ts: synthetic nested secret/expected output and
+  hostile HTML inputs only; no real credentials or user payloads.
+- tests/helpers/restartable-mongo.ts: dedicated fixture owns a loopback process,
+  port, random database and temporary directory; performs controlled shutdown,
+  restart and real ping, cleans its own startup log and removes its own resources.
+- tests/api/capture-security.test.ts: five real HTTP/Mongo regression tests.
+  Nested default/custom sensitive keys are removed through objects, arrays and a
+  literal prototype key in the actual stored event, with safe siblings preserved.
+  Hostile HTML remains inert text, is not reflected in the JSON acknowledgment or
+  logs, and is omitted under disabled-body policy. Oversized/unsupported messages
+  return 413/415 without stored events; a valid capture recovers.
+- The outage test stops its own actual MongoDB process after token lookup and
+  before the driver insert, using a one-call timing wrapper around the real insert.
+  The error is a real database failure, not an injected fake exception. Insert
+  and lookup during the outage return correlated safe 503 rather than 201; after
+  restart the same HTTP listener works, the earlier acknowledged event remains,
+  and these specifically pre-insert attempts created no event. A write dispatched
+  before a lost acknowledgment can still have committed; no universal no-write or
+  exactly-once claim is made. Existing D07.2 tests cover a simulated ambiguous
+  post-insert error. Synthetic values, raw input and credentials are not logged.
+- docs/CAPTURE_REGRESSION.md and docs/TESTING.md: concrete checks, command,
+  resource ownership, limits and current Day 06/07 acceptance evidence. README,
+  CONTRIBUTING, CAPTURE_MEDIA, CAPTURE_PARSING, CAPTURE_REDACTION, CAPTURE_STORAGE,
+  CAPTURE_TRANSPORT, INBOX_MANAGEMENT, LOCAL_INBOX and PROJECT_BRIEF status
+  references are reconciled. docs/PROJECT_DOCUMENTATION.md marks only D07.3 after
+  checks; this progress entry appends without changing history.
+
+The Day 07 acceptance is demonstrated by redacted stored nested samples and an
+actual database outage returning 503 rather than success. D06's JSON/text capture
+and oversize/no-partial-storage acceptance is also covered across D07.2/D07.3.
+Hostile HTML was tested as stored text and non-reflected response data, not in a
+browser event viewer; safe UI rendering remains D09. UI/CLI token reveal, event
+listing/inspection/deletion, expiry cleanup/enforcement, quotas, signatures and
+v0.1 release gates remain pending. No application/runtime feature is added.
+
+### Verification
+
+Node 24.22.0/npm 11.19.1 and native MongoDB 8.0.32 were used; the official pinned
+Node archive SHA-256 was reverified. The committed lockfile was installed in an
+owned clean snapshot. The focused five-test suite initially passed; its hostile
+HTML assertion was then strengthened to reject partial reflection as well as a
+full echo. Final checks run on that strengthened version. No assertions/timeouts
+or repository CI policy were weakened; the new real-outage test has its own
+40-second upper bound for a deliberate process stop/restart and driver deadlines.
+The frozen install reported 12 advisories (10 moderate, 2 high), not an audit
+pass or remediation. Existing dependency maintenance and the prior unreproduced
+D06.3 gate reliability finding remain pending, with no claimed cause or fix.
+
+Commands with pinned PATH, MONGOD_BINARY=/usr/bin/mongod,
+NEXT_TELEMETRY_DISABLED=1 and CIRCLE_NODE_TOTAL=2:
+
+```bash
+npm run check:toolchain
+npm run bootstrap
+npm run check:dependencies
+npm run lint
+npm run typecheck
+npm test
+npm test -- tests/api/capture-security.test.ts
+npm run check:contracts
+npm run check:ci-contract-gate
+npm run check:foundation
+npm run check:mongo
+npm run build
+npm run check:compiled-api
+npm run check:routing
+git diff --check
+git diff --cached --check
+```
+
+All 13 required commands passed in the frozen clean snapshot: pinned toolchain,
+bootstrap, dependency imports, lint, strict types, 135 normal tests in 23 files,
+six contract checks, the unchanged intentional-failure/correction gate (corrected
+suite 136 passed), foundation (5), Mongo lifecycle (6), contracts/Express/Next
+production build, compiled API (6) and Next routing (3). After strengthening the
+HTML reflection and prototype assertions, lint, strict types, the five focused
+tests, all 135 normal tests and the unchanged contract gate (136 corrected tests)
+were rerun and passed on the final test source. The other checks concern unchanged
+application/build inputs and had already passed. No unrelated failures were
+suppressed; the prior unreproduced gate finding did not recur and is not claimed
+fixed. Source matches the verified snapshot. Local links/fences, credential-pattern
+scan, preserved history and git diff --check passed; the staged task-only diff and
+whitespace are verified before commit. No lockfile or dependency was changed.
+
+Not run: browser
+rendering/UI flow (no event viewer or UI change), complete capture-inspect-delete
+journey, sessions/signatures/replay/deployment/release, unfamiliar-user trial,
+independent review and GHFind scan. No measured performance, adoption, user/star,
+review, upstream contribution or score improvement is claimed.
+
+### Growth checklist — every checkpoint evaluated for this run
+
+C = completed for applicable work this run; P = pending; N/A = not applicable.
+No lifetime/release/adoption phase is permanently complete and no checkpoint was
+blocked by essential access.
+
+| Phase | Status and checkpoint results |
+|---|---|
+| 0 public scope/baseline | **P overall.** C: 0.1–0.2, 0.4–0.5 existing public scope/account, synthetic/private-data boundary and attribution inspection. P: 0.3 complete independently usable capture journey; 0.6–0.7 fresh six-category/deduction/freshness evidence (scan not requested). |
+| 1 usable repository | **P overall.** C: 1.2–1.4, 1.6–1.9 guides/commands/pins and retained placeholder config, MIT license, contribution guide and roadmap. 1.5 C for executable synthetic component tests, P for full product demo. P: 1.1 metadata unchanged; 1.10 independent clean-setup trial absent. |
+| 2 real improvement | **C for applicable planning.** C: 2.1–2.4, 2.6–2.7 real outage/redaction test gap, duplicate search and reused milestone, expected behavior, acceptance and one scope. N/A: 2.5 no incoming user bug report requiring reproduction. |
+| 3 build/check/review | **C for applicable local work.** 3.2 C meaningful behavior/checks; 3.4 C attribution and tracking inspected. N/A: 3.1, 3.3 no PR or independent feedback in authorized direct-main workflow. 3.5 P remote/default-branch CI read-back. Numbered steps 2–5 and 8 apply; 1, 6–7, 9 N/A; 10 follows publication; milestone closure N/A. Self-review is not independent review. |
+| 4 usable release | **P.** 4.1–4.7 full user journey, matching release examples, version/tag, notes, distribution, demo and link gates pending. C: 4.8 retained safe reporting instructions. Component checks are not release acceptance. |
+| 5 discovery/adoption | **P.** C: 5.3 retained code/install links. P: 5.1–5.2, 5.4–5.8 profile/tutorial/outreach/invitations, real user support and outside contribution/review evidence absent. |
+| 6 maintenance | **P overall.** 6.1 C scoped duplicate inspection, P wider ongoing triage. 6.3 C pinned compatibility and passing regressions; advisories and prior unreproduced gate finding P. N/A: 6.2, 6.4 no incoming user bug/recurring question. P: 6.5 fix releases when ready. 6.6 C identifying the internal test gap and preserving dependency findings; P remediation. N/A: 6.7–6.8 no verified upstream defect/discussion/fix required or claimed. |
+| 7 longitudinal review | **P.** C: 7.6 next useful task identified, not started. P: 7.1–7.5 and 7.7 full user trial, fresh scan/category/deduction/status/comparison evidence and multi-year outcomes absent. |
+
+Reusable PR problem/change/verification/tracking/self-review fields are reflected
+above; PR/independent-review/merge fields N/A. No activity-only public artifact,
+invented users, stars, adoption, reviews, upstream contribution or score change.
+
+### Publication and next task
+
+**Publication status at record preparation: pending D07.3 commit/push after completed local checks.** The final handoff must report actual SHA, branch, remote read-back,
+GitHub attribution and hosted CI on that SHA. Preserve the local commit if pushing
+fails and report the safe reason; do not force-push or change identity/remotes.
+
+**Implementation blockers: none. Publication verification remains pending at
+record preparation.**
+Next eligible task after completion: **D08.1 — build inbox event list with loading,
+error and empty states**. Its prerequisite is completed Day 07; it has not been
+started. Stop after this one task and its necessary verification/publication.

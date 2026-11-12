@@ -101,8 +101,9 @@ Unsupported headers or nontext wire bytes yield 415; overflow yields 413. Direct
 internal preparation calls still report static flags, while malformed JSON/form
 syntax in otherwise valid wire text continues to produce parse-failure flags.
 
-D07.1 redaction and D07.2 local storage are implemented separately. D07.3
-regressions, D09 rendering, D20 signatures, browser journeys and release gates remain pending. Plain text can
+D07.1 redaction and D07.2 local storage are implemented separately. D07.3 adds
+[storage and outage regressions](CAPTURE_REGRESSION.md); D09 rendering, D20
+signatures, browser journeys and release gates remain pending. Plain text can
 contain sensitive information; no universal body-safety guarantee is made.
 
 ## Verification and references

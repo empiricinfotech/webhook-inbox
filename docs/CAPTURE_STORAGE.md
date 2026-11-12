@@ -89,6 +89,6 @@ acknowledgment ordering, error/recovery and ambiguous-write behavior, policy
 validation, body omission, and an actual local-dashboard process using configured
 redaction. No normal development data or configuration file is modified.
 
-D07.3 is next for broader database-failure, hostile HTML and nested stored-fixture
-regressions. The complete Day 07 acceptance and v0.1 capture-inspect-delete release
-gate are not claimed by this individual task.
+D07.3 adds [real database-outage, hostile text and nested stored-fixture
+regressions](CAPTURE_REGRESSION.md), demonstrating Day 07 acceptance. D08.1 is
+next; the v0.1 capture-inspect-delete release gate remains pending.

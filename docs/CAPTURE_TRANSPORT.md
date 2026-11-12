@@ -123,8 +123,9 @@ now enforces the [media/coding/text-byte policy](CAPTURE_MEDIA.md). HTTP probes
 use supported text; arbitrary original bytes remain tested at the lower collector
 unit boundary and do not imply supported binary product captures. D07.1
 [redaction](CAPTURE_REDACTION.md) is implemented separately; D07.2 adds sanitized
-local persistence before acknowledgement. No complete capture journey, public hosting,
-release, quotas, load result or complete Day 06 acceptance is claimed.
+local persistence before acknowledgement. D07.3 [checks real stored capture and
+oversize rejection](CAPTURE_REGRESSION.md), demonstrating Day 06 acceptance.
+No complete capture journey, public hosting, release, quota or load result is claimed.
 
 ## Verification
 

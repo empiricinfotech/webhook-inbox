@@ -134,7 +134,7 @@ using the eligibility guard; normal startup still has no capture-to-store handle
 D06.2 adds [private metadata/parsing](CAPTURE_PARSING.md), and D06.3 adds
 [HTTP media rejection](CAPTURE_MEDIA.md). D07.1 [credential omission/JSON-key
 redaction](CAPTURE_REDACTION.md) is implemented; D07.2 adds [local durable
-capture](CAPTURE_STORAGE.md). D07.3 and later work remain for release gates.
+capture](CAPTURE_STORAGE.md). D07.3 verifies [outage and redaction](CAPTURE_REGRESSION.md); later work remains for release gates.
 
 Primary references: [Mongoose atomic updates](https://mongoosejs.com/docs/tutorials/findoneandupdate.html#atomic-updates),
 [update validation](https://mongoosejs.com/docs/validation.html#update-validators)

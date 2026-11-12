@@ -94,10 +94,10 @@ valid wire text still yields the existing private parse-failure flag; HTTP media
 validation does not execute or silently repair it. Percent escapes are parser
 data, not transport byte decoding. No partial parse fallback is persisted.
 
-All Day 06 individual components are now available. JSON/text accepted by the
-transport and oversize rejection are demonstrated with the probe. The durable
-capture/inspect journey and M03 completion still need D07.3 acceptance and
-later UI work; no release/milestone issue is closed. D07.3 is the next task.
+All Day 06 individual components are available. D07.2 durable captures and
+D07.3 [oversize/no-partial-storage checks](CAPTURE_REGRESSION.md) demonstrate
+Day 06 acceptance. The capture/inspect journey and release remain pending; no
+release/milestone issue is closed. D08.1 is the next task.
 
 ## Evidence and references
 

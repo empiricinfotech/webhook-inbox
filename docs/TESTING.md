@@ -253,7 +253,7 @@ static failures/recovery and exact byte/depth boundaries. Text/form values are
 explicitly not claimed to be key-redacted. HTTP probes observe memory only, reply
 204 and persist no event. See [policy and limitations](CAPTURE_REDACTION.md).
 Browser checks are not applicable; no UI changed. Stored-event/outage acceptance
-is covered in part by D07.2; broader stored-fixture/outage checks remain D07.3 work.
+is covered by D07.2 and the broader D07.3 stored-fixture/outage checks.
 
 
 ## D07.2 local durable capture
@@ -266,5 +266,19 @@ Ten focused tests check trusted policy validation, real Mongo storage/expiry and
 parse flags, scoped eligibility, acknowledgment ordering, safe error/recovery,
 ambiguous outcomes and the actual opt-in local dashboard process. Tests use
 synthetic data and exclusively owned local Mongo/HTTP resources. See
-[storage policy](CAPTURE_STORAGE.md); browser UI is unchanged. Broader hostile HTML,
-database outage and stored nested-fixture coverage belongs to D07.3.
+[storage policy](CAPTURE_STORAGE.md); browser UI is unchanged. D07.3 adds hostile
+HTML, real database-outage and stored nested-fixture coverage.
+
+
+## D07.3 outage, hostile HTML and nested redaction
+
+```bash
+npm test -- tests/api/capture-security.test.ts
+```
+
+Five focused tests use synthetic fixtures and owned Mongo/HTTP resources to verify
+nested stored redaction, HTML data/non-reflection and omission, 413/415 no-partial-
+storage recovery, and a real Mongo shutdown between token lookup and insertion
+followed by restart. They demonstrate the individual Day 07 outage/redaction
+acceptance. This does not exercise browser rendering; D09 remains responsible for
+safe event display. See [test scope and limitations](CAPTURE_REGRESSION.md).
