@@ -3511,3 +3511,13 @@ read-back. Preserve this local commit if push is blocked; never force-push.
 security advisory gate. **Next eligible task: D08.1 resume after an authorized,
 separately scoped dependency maintenance decision and successful build.** Do not
 start D08.2 yet.
+
+### Publication attempt outcome
+
+The implementation commit `5a9ede005bda3417ea4024358e6910936967b10f` was pushed
+to `codex/d08.1-event-list`; `git ls-remote` read back the same SHA. Draft PR
+creation against `main` was attempted through the connected GitHub integration
+and rejected with HTTP 422: the authenticated account “must be a collaborator.”
+No PR was created. The push destination and Git identity were not changed. A
+repository collaborator must create/authorize the PR, or grant the connected
+account collaborator access, before this contribution workflow can continue.
