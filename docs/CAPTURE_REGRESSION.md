@@ -55,4 +55,8 @@ The Day 07 acceptance is demonstrated: nested synthetic secrets are absent from
 stored samples and a real database outage returns 503 rather than success. The
 v0.1 capture-inspect-delete journey, UI/CLI token reveal, HTML rendering, expiry
 cleanup/read enforcement, quotas, signatures and release gates remain pending.
-D08.1 (event list) is the next eligible task and is not started here.
+At D07.3 completion, D08.1 was next. Its [bounded metadata-only event list](INBOX_EVENTS.md)
+is implemented, but D08.1 verification remains in progress because the production
+build is blocked by the installed Next.js security gate. D08.2 cursor paging remains
+pending. HTML rendering, expiry cleanup/read enforcement, quotas, signatures and
+release gates remain pending.

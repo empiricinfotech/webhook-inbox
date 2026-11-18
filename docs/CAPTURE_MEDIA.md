@@ -97,7 +97,9 @@ data, not transport byte decoding. No partial parse fallback is persisted.
 All Day 06 individual components are available. D07.2 durable captures and
 D07.3 [oversize/no-partial-storage checks](CAPTURE_REGRESSION.md) demonstrate
 Day 06 acceptance. The capture/inspect journey and release remain pending; no
-release/milestone issue is closed. D08.1 is the next task.
+release/milestone issue is closed. D08.1 implementation provides the metadata-only
+event list, but task verification remains in progress because the production build
+is blocked by the installed Next.js security gate. D08.2 remains pending.
 
 ## Evidence and references
 

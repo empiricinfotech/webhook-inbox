@@ -101,8 +101,9 @@ filters; they must not forward raw query objects to Mongo.
 Cursor transport is an opaque, case-sensitive, nonempty token of at most 512
 ASCII URL-safe characters (`A-Z`, `a-z`, `0-9`, `_`, `-`). Clients pass it back
 unchanged. This validates the transport shape only: it does not decode or trust
-a database position. Versioned cursor encoding, receivedAt/ID ordering, query
-scope and stable traversal are D08.2 work. No pagination endpoint exists yet.
+a database position. Versioned event-cursor encoding, receivedAt/ID traversal and
+event query scope are D08.2 work. D08.1 provides a fixed latest-25 event list; it
+does not yet provide an event pagination endpoint.
 
 A page has a `data` array of validated items (maximum 100) and a required
 `nextCursor` token or null when finished, including empty pages. No total count,

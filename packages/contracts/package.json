@@ -27,6 +27,10 @@
     "./inboxes": {
       "types": "./dist/inboxes.d.ts",
       "default": "./dist/inboxes.js"
+    },
+    "./events": {
+      "types": "./dist/events.d.ts",
+      "default": "./dist/events.js"
     }
   },
   "scripts": {

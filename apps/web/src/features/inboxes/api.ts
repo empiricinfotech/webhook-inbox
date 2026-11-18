@@ -3,6 +3,7 @@ import { inboxSummarySchema, type InboxSummary } from "@empiric-webhook-inbox/co
 import { identifierSchema } from "@empiric-webhook-inbox/contracts/identifiers";
 import { pageResponseSchema } from "@empiric-webhook-inbox/contracts/pagination";
 import { apiErrorResponseSchema } from "@empiric-webhook-inbox/contracts/errors";
+import { inboxEventListResponseSchema } from "@empiric-webhook-inbox/contracts/events";
 
 export class InboxRequestError extends Error {
   constructor(public readonly code: string = "UNAVAILABLE", public readonly requestId?: string) {
@@ -36,6 +37,8 @@ export const fetchInboxes = (workspaceId: string, cursor?: string, signal?: Abor
   `/workspaces/${encodeURIComponent(workspaceId)}/inboxes${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`,
   pageResponseSchema(inboxSummarySchema), { signal: signal ?? null });
 export const fetchInbox = (id: string, signal?: AbortSignal) => requestJson(`/inboxes/${encodeURIComponent(id)}`, inboxResponse, { signal: signal ?? null });
+export const fetchInboxEvents = (id: string, signal?: AbortSignal) => requestJson(
+  `/inboxes/${encodeURIComponent(id)}/events`, inboxEventListResponseSchema, { signal: signal ?? null });
 export const createInbox = (workspaceId: string, input: { name: string; description: string }): Promise<{ data: InboxSummary }> => requestJson(
   `/workspaces/${encodeURIComponent(workspaceId)}/inboxes`, inboxResponse,
   { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });

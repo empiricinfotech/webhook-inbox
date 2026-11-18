@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInbox } from "./api";
+import { InboxEventList } from "./inbox-event-list";
 import { InboxFailure, LoadingInbox, useLocalWorkspace } from "./shared";
 
 export function InboxDetail({ id }: { id: string }) {
@@ -24,9 +25,7 @@ export function InboxDetail({ id }: { id: string }) {
         <div><dt>Created (UTC)</dt><dd><time dateTime={data.createdAt}>{data.createdAt.replace("T", " ").replace(".000Z", " UTC").replace("Z", " UTC")}</time></dd></div>
         <div><dt>Inbox ID</dt><dd><code>{data.id}</code></dd></div></dl>
     </section>
-    <section className="panel inbox-state" aria-labelledby="capture-heading"><h2 id="capture-heading">Ready for the next step.</h2>
-      <p>Your inbox configuration is saved. Request capture and inspection are still being built.</p>
-      <p className="muted">No requests have been loaded. This preview does not receive webhooks yet.</p></section>
+    <InboxEventList inboxId={id} workspaceId={workspace.data.data.id} />
     <Link href="/inboxes">← Back to inboxes</Link>
   </>;
 }

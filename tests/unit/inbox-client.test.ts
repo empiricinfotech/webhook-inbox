@@ -3,7 +3,7 @@ import { z } from "zod";
 import { EnvironmentConfigurationError } from "@empiric-webhook-inbox/contracts/environment";
 import { createErrorResponse } from "@empiric-webhook-inbox/contracts/errors";
 import { readWebOrigin } from "../../apps/api/src/config/local-dashboard.js";
-import { createInbox, fetchInbox, fetchInboxes, InboxRequestError, requestJson } from "../../apps/web/src/features/inboxes/api.js";
+import { createInbox, fetchInbox, fetchInboxEvents, fetchInboxes, InboxRequestError, requestJson } from "../../apps/web/src/features/inboxes/api.js";
 
 const id = "0123456789abcdef01234567";
 const summary = { id, workspaceId: id, name: "Synthetic", description: "", enabled: true, retentionDays: 7,
@@ -26,6 +26,18 @@ test("response allowlist refuses hidden credentials, HTML responses and noncontr
     try { await fetchInbox(id); throw new Error("Expected client rejection"); }
     catch (error) { expect(error instanceof InboxRequestError).toBe(true); expect(String(error).includes("synthetic-private-value")).toBe(false); }
   }
+});
+test("event-list client requests same-origin metadata and rejects payload fields", async () => {
+  const event = { id, receivedAt: "2026-11-18T00:00:00.000Z", method: "POST", receivedBytes: 12,
+    contentType: "application/json", format: "json", parseFailed: false, signatureState: "unverified" };
+  const fetch = vi.fn().mockResolvedValueOnce(Response.json({ data: [event] }));
+  vi.stubGlobal("fetch", fetch);
+  await expect(fetchInboxEvents(id)).resolves.toEqual({ data: [event] });
+  expect(fetch.mock.calls[0]![0]).toBe(`/api/v1/inboxes/${id}/events`);
+  expect(fetch.mock.calls[0]![1]).toMatchObject({ cache: "no-store", credentials: "same-origin" });
+
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ data: [{ ...event, safeBody: "synthetic" }] })));
+  await expect(fetchInboxEvents(id)).rejects.toBeInstanceOf(InboxRequestError);
 });
 test("client errors preserve safe request correlation and avoid automatic mutation retries", async () => {
   const requestId = "d9291b26-40f2-4b1b-8fa9-6d11e790b6f5";

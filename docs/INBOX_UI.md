@@ -4,11 +4,12 @@ D05.1 | 30 October 2026
 
 A maintainer can list inboxes, create one with a name/description, open its saved
 metadata and reload the detail URL. The interface has loading, validation,
-connection-error, missing-inbox and empty states. Data flows from Next.js Client
-Components through same-origin /api/v1 to Express and Mongo. Next never connects
-to Mongo or receives the encryption key. This is an unauthenticated local-only
-preview, not a hosted dashboard. D07.2 adds a loopback-only durable capture
-receiver, but this UI does not expose capture URLs or event inspection.
+connection-error, missing-inbox and empty states. D08.1 adds a metadata-only
+captured-request list with its own loading, error and empty states. Data flows
+from Next.js Client Components through same-origin /api/v1 to Express and Mongo.
+Next never connects to Mongo or receives the encryption key. This is an
+unauthenticated local-only preview, not a hosted dashboard. The UI does not
+expose capture URLs or event payloads.
 
 ## Start the interface
 
@@ -59,6 +60,7 @@ Only the opted-in local dashboard API mounts these routes:
 | GET /api/v1/workspaces/:workspaceId/inboxes | Bounded data/nextCursor page; default 25, max 100; newest createdAt/_id first |
 | POST /api/v1/workspaces/:workspaceId/inboxes | Strict JSON creation, 201/data and Location; uses the atomic credentialed creation service |
 | GET /api/v1/inboxes/:id | Owner/workspace-scoped safe metadata, or inaccessible/missing 404 |
+| GET /api/v1/inboxes/:id/events | Owner/workspace-scoped newest 25 event metadata records; payload excluded |
 
 The trusted actor/workspace come only from private server config. Headers, query
 and body cannot choose a different actor; foreign workspace/inbox IDs fail safely.
@@ -108,14 +110,15 @@ The progress record contains exact checks and observed browser results.
 The detail view shows saved settings and an honest placeholder for future capture.
 It does not display a fake event count or an active capture URL.
 [D05.2](INBOX_MANAGEMENT.md) now implements internal rename, disable and token
-rotation services. This UI/HTTP transport still offers only list/create/detail;
-it has no rename/disable/rotation controls or token reveal/rotation endpoint.
+rotation services. This UI/HTTP transport still offers only list/create/detail
+and event metadata; it has no rename/disable/rotation controls or token
+reveal/rotation endpoint.
 D05.3 now verifies saved disabled metadata through detail/list/HEAD/reloaded
 routers, invalid-input responses and old-token invalidation. A production service
 guard plus the real shared error handler produce 404/410/503 in a test-only HTTP
 adapter. D07.2 subsequently installs the separate local durable receiver.
-No session/signup/membership, capture processing, event list, worker, release
-or deployment is added by the interface task.
+No session/signup/membership, event payload inspection, worker, release or
+deployment is added by the interface task. Cursor paging is D08.2.
 
 See [local operator setup](LOCAL_INBOX.md), [testing](TESTING.md) and
 [implementation progress](IMPLEMENTATION_PROGRESS.md). Relevant installed Next

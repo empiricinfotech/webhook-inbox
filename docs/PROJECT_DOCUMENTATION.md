@@ -696,7 +696,7 @@ Prerequisite: D06. Modules: M03 M08. Planned effort: 5 to 6 hours.
 
 Prerequisite: D07. Modules: M04. Planned effort: 5 to 6 hours.
 
-- [ ] **D08.1** Build inbox event list with loading, error and empty states.
+- [ ] **D08.1** Build inbox event list with loading, error and empty states. [Implementation and verification status](INBOX_EVENTS.md).
 
 - [ ] **D08.2** Implement stable cursor pagination and the inbox receivedAt index.
 

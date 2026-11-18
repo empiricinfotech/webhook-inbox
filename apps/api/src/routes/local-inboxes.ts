@@ -4,6 +4,7 @@ import { identifierSchema } from "@empiric-webhook-inbox/contracts/identifiers";
 import { ApiError } from "../errors.js";
 import { getWorkspaceModel } from "../models/workspace.js";
 import { createInboxService } from "../services/inboxes.js";
+import { createInboxEventService } from "../services/inbox-events.js";
 import { safeStorageOperation } from "../services/storage-operation.js";
 import type { CaptureTokenCrypto } from "../security/capture-token.js";
 
@@ -15,6 +16,7 @@ export interface LocalInboxAccess {
 }
 export async function createLocalInboxRouter(connection: Connection, crypto: CaptureTokenCrypto, access: LocalInboxAccess) {
   const service = await createInboxService(connection, crypto);
+  const eventService = createInboxEventService(connection);
   const Workspace = getWorkspaceModel(connection);
   const request = { actorId: access.actorId, workspaceId: access.workspaceId };
   const router = express.Router();
@@ -57,6 +59,12 @@ export async function createLocalInboxRouter(connection: Connection, crypto: Cap
     const id = identifierSchema.safeParse(req.params.id);
     if (!id.success) throw new ApiError("INVALID_REQUEST");
     res.json({ data: await service.getForOwner(request, new Types.ObjectId(id.data)) });
+  });
+  router.get("/inboxes/:id/events", async (req, res) => {
+    const id = identifierSchema.safeParse(req.params.id);
+    if (!id.success) throw new ApiError("INVALID_REQUEST");
+    if (Object.keys(req.query).length > 0) throw new ApiError("INVALID_REQUEST");
+    res.json(await eventService.listForOwner(request, new Types.ObjectId(id.data)));
   });
   // Body-parser errors contain private body data: replace before the shared error handler.
   router.use(((error, _req, _res, next) => {

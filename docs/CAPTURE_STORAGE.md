@@ -13,8 +13,9 @@ delivery creates a separate event. No message is forwarded.
 `dev:api`/`start:api` remain health-only. The local receiver binds loopback,
 accepts only the configured workspace's capture tokens, and must not be exposed
 through a public proxy or tunnel. The current UI/CLI does not reveal capture URLs;
-owner-only token retrieval exists internally. Event listing, inspection, deletion
-and a complete self-service capture journey are later tasks.
+owner-only token retrieval exists internally. D08.1 adds a metadata-only event
+list. Payload inspection, deletion and a complete self-service capture journey
+remain later tasks.
 
 ## Configure the local receiver
 
@@ -71,7 +72,8 @@ and [ambiguous write-concern timeouts](https://www.mongodb.com/docs/manual/refer
 
 `expiresAt` is attached now; TTL indexes, cleanup and enforcement on reads belong
 to D18. Until then, stored records do not automatically disappear at expiry.
-This task adds no event read route or list index. Capture has no quota/rate limiter,
+The D07.2 capture task added no event read route or list index; [D08.1](INBOX_EVENTS.md)
+now provides a bounded metadata-only read. Capture has no quota/rate limiter,
 authenticated sessions, signature verification, worker, replay or release.
 Only configured JSON keys are removed; arbitrary text/form content and unconfigured
 or string-embedded secrets may remain. Use synthetic data, or disable body capture.
@@ -90,5 +92,6 @@ validation, body omission, and an actual local-dashboard process using configure
 redaction. No normal development data or configuration file is modified.
 
 D07.3 adds [real database-outage, hostile text and nested stored-fixture
-regressions](CAPTURE_REGRESSION.md), demonstrating Day 07 acceptance. D08.1 is
-next; the v0.1 capture-inspect-delete release gate remains pending.
+regressions](CAPTURE_REGRESSION.md), demonstrating Day 07 acceptance. D08.2 adds
+event pagination and its index; the v0.1 capture-inspect-delete release gate
+remains pending.

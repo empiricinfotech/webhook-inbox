@@ -3385,3 +3385,129 @@ record preparation.**
 Next eligible task after completion: **D08.1 — build inbox event list with loading,
 error and empty states**. Its prerequisite is completed Day 07; it has not been
 started. Stop after this one task and its necessary verification/publication.
+
+## 2026-11-18 — D08.1 Build inbox event list with loading, error and empty states
+
+**Status: in progress; production-build acceptance is blocked.** Repository and
+prior progress evidence showed D08.1 was the earliest unfinished task. Its
+implementation is now present, but the task is not marked complete because the
+required production build exits at the security gate for the repository's locked
+Next.js 16.4.2. No dependency upgrade or D08.2 work is included. Resume D08.1
+after the Next.js security-maintenance decision and rerun the build.
+
+### Work performed and files
+
+- Added a strict metadata-only event DTO and package export in
+  `packages/contracts/src/events.ts` and `packages/contracts/package.json`.
+- Added an owner/workspace/inbox-scoped, fixed-25, newest-first events service and
+  `GET /inboxes/:id/events` route in `apps/api/src/services/inbox-events.ts` and
+  `apps/api/src/routes/local-inboxes.ts`. Projection excludes event bodies.
+- Added the browser API client and inbox event list with loading, retryable error,
+  empty, populated and stale-refresh-error states in
+  `apps/web/src/features/inboxes/api.ts`,
+  `apps/web/src/features/inboxes/inbox-event-list.tsx`,
+  `apps/web/src/features/inboxes/inbox-detail.tsx` and
+  `apps/web/src/app/globals.css`.
+- Added synthetic API and client contract tests in
+  `tests/api/inbox-events.test.ts` and `tests/unit/inbox-client.test.ts`.
+- Added task scope and verification status in `docs/INBOX_EVENTS.md`; reconciled
+  task status/handoff text in `README.md`, `CONTRIBUTING.md`,
+  `docs/PROJECT_DOCUMENTATION.md`, `docs/PROJECT_BRIEF.md`,
+  `docs/API_CONTRACTS.md`, `docs/CAPTURE_MEDIA.md`,
+  `docs/CAPTURE_REGRESSION.md`, `docs/CAPTURE_STORAGE.md`, `docs/INBOX_UI.md` and
+  `docs/LOCAL_INBOX.md`.
+- `docs/TASK_BOARD.md` is absent; no task board was created.
+
+### Acceptance and verification
+
+- **Metadata-only response and privacy boundary:** passed by strict contract,
+  database projection and API tests; `safeBody` is neither returned nor accepted
+  by the client schema.
+- **Inbox isolation and safe failure:** passed for foreign scope, unknown inbox
+  and storage outage in the API tests.
+- **Newest-first fixed 25 result and empty result:** passed with synthetic Mongo
+  fixtures. Cursor pagination, the receivedAt index and 60-event stable browsing
+  are D08.2/D08.3 and remain pending.
+- **Loading, error, empty and populated UI:** passed in the browser on the local
+  dashboard; retry, correlation ID, metadata-only rows and a narrow 390px view
+  were checked. Keyboard focus reached the refresh control. No payload appeared.
+- **Lint, types, tests and repository gates:** passed. Full suite: 139 tests in
+  24 files. Contract gate corrected suite: 140 tests. Toolchain, dependencies,
+  foundation, Mongo, compiled API and routing checks passed.
+- **Production build:** blocked. `npm run build` compiled, passed TypeScript,
+  static generation and trace collection, then exited because the installed
+  Next.js 16.4.2 is rejected by its security advisory gate. The lockfile and
+  dependencies were not changed. This is the unresolved D08.1 acceptance check.
+- **Diff hygiene:** `git diff --check` passed before this progress update. Review
+  the final scoped diff, links and credential patterns before commit.
+
+Commands used (Node 24.22.0, npm 11.19.1; Mongo checks used the local owned
+MongoDB service):
+
+```text
+npm run lint                                      PASS
+npm run typecheck                                 PASS
+npm test -- tests/api/inbox-events.test.ts tests/unit/inbox-client.test.ts PASS
+npm test                                          PASS (139 tests / 24 files)
+npm run check:toolchain                           PASS
+npm run check:dependencies                        PASS
+npm run check:contracts                           PASS (6)
+npm run check:ci-contract-gate                    PASS (140 corrected tests)
+npm run check:foundation                          PASS
+npm run check:mongo                               PASS
+npm run build                                     BLOCKED (Next.js 16.4.2 security gate)
+npm run check:compiled-api                        PASS
+npm run check:routing                             PASS
+git diff --check                                  PASS before this record
+```
+
+### Growth checklist — all checkpoints evaluated for this run
+
+Statuses describe this task/run only. **C** completed/applicable, **P** pending,
+**N/A** not applicable, **B** blocked. No score, adoption or release outcome is
+claimed.
+
+| Phase/checkpoints | Result for this run |
+|---|---|
+| 0.1 public project/scope; 0.2 private-data boundary; 0.4 scored account; 0.5 accurate authorship | **C** inspected existing scope/privacy boundary and effective Git identity without changing settings; no authorship credit inferred from repository ownership. |
+| 0.3 independently useful journey | **P** this metadata-list task does not complete capture/inspect/delete. |
+| 0.6–0.7 fresh six-category GHFind scan, date, deductions and cache status | **P** no scan requested or evidence available. |
+| 1.1 repository description/topics | **P** repository metadata unchanged. |
+| 1.2 README | **C** current capability and D08.1 verification status updated. |
+| 1.3 install/run commands; 1.4 runtime/dependencies | **C** existing instructions/pins checked and retained; task adds no dependency. |
+| 1.5 working example/demo | **P** local browser states verified; no product demo added. |
+| 1.6 placeholder configuration | **N/A** configuration does not change. |
+| 1.7 license | **N/A** license does not change. |
+| 1.8 contribution process; 1.9 roadmap | **C** contribution task status and roadmap references reconciled. |
+| 1.10 unfamiliar clean setup | **P** no independent setup trial this run. |
+| 2.1 real need; 2.2 duplicate issue/PR search | **C** selected planned event-list need and searched GitHub; no D08.1 duplicate issue or PR found. |
+| 2.3 issue open/reuse | **N/A** no additional issue was needed; task has source-plan acceptance. |
+| 2.4 expected result; 2.6 acceptance; 2.7 single scope | **C** metadata list states, limits and privacy acceptance are documented and scoped to D08.1. |
+| 2.5 bug reproduction | **N/A** no user-reported bug selected. |
+| Phase 3 steps 1–5 (branch, implementation, tests, flow, docs) | **C** implementation/verification/docs completed; branch/PR publication follows this record. |
+| Phase 3 steps 6–7 and PR checklist | **P** draft PR creation is authorized and planned after commit/push; no PR review yet. |
+| Phase 3 step 8 independent review | **P** no independent reviewer evidence. |
+| Phase 3 steps 9–10 merge/default-branch confirmation | **P** task is incomplete and must not merge; default-branch CI not applicable until then. |
+| Phase 4.1–4.7 clean release trial, version/tag/notes/distribution/demo/link | **P** no release; build gate blocks task completion. |
+| Phase 4.8 user issue-report path | **C** existing report guidance retained. |
+| Phase 5.1–5.8 profile, tutorial, sharing, invitations, user support, outside work/review | **P** no release/adoption/user activity claimed or attempted. |
+| Phase 6.1 triage | **C** duplicate task tracking checked; no incoming report. |
+| 6.2 user bug; 6.4 recurring support | **N/A** none received for this task. |
+| 6.3 dependency compatibility/regression checks | **B** task checks passed except the installed Next.js security gate blocks the production build; dependency maintenance is outside D08.1. |
+| 6.5 fix releases | **P** release is not ready. |
+| 6.6 identify internal/external cause; 6.7–6.8 upstream discussion/fix | **C** identified local build gate; **N/A** no verified upstream defect claim or upstream patch task. |
+| 7.1 user installation/use/help; 7.2 scan; 7.3 category/deduction record; 7.4 comparable scan; 7.5 attribution review; 7.7 multi-year outcomes | **P** no user trial or scan evidence this run; no longitudinal outcomes claimed. |
+| 7.6 next useful task | **C** D08.1 is explicitly the resume task; D08.2 is not eligible yet. |
+
+### Publication and next task
+
+At record preparation, commit, push and a transparent draft PR are pending. The
+expected destination is `empiricinfotech/webhook-inbox`; do not alter remotes or
+Git identity. The draft must state the production-build blocker and must not claim
+task completion. After publishing, report the actual commit, branch, PR and remote
+read-back. Preserve this local commit if push is blocked; never force-push.
+
+**Blocker:** required `npm run build` rejects the locked Next.js 16.4.2 at its
+security advisory gate. **Next eligible task: D08.1 resume after an authorized,
+separately scoped dependency maintenance decision and successful build.** Do not
+start D08.2 yet.
